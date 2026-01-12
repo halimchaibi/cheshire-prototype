@@ -652,7 +652,7 @@ mvn clean test jacoco:report
 
 ## 🌟 Reference Application
 
-The **[Blog Application](../cheshire-blog-app)** serves as the primary reference implementation, featuring:
+The **[Blog Application](https://github.com/halimchaibi/cheshire-blog-app)** serves as the primary reference implementation, featuring:
 
 - Complete CRUD operations for Authors, Articles, and Comments
 - Multi-protocol support (REST, MCP stdio, MCP HTTP)
