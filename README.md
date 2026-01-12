@@ -166,7 +166,7 @@ java -jar blog-app.jar --config blog-mcp-stdio.yaml \
 java -jar blog-app.jar --config blog-mcp-streamable-http.yaml
 ```
 
-See the complete [blog-app example](../cheshire-blog-app) for full source code, comprehensive documentation, and testing guides.
+See the complete [blog-app example](https://github.com/halimchaibi/cheshire-blog-app/blob/64126cd58f100470fea3055c75624b65aecc2dca/README.md) for full source code, comprehensive documentation, and testing guides.
 
 ## 📚 Documentation
 
@@ -264,7 +264,7 @@ JSON-based query templates that generate SQL dynamically:
 }
 ```
 
-See [SQL_TEMPLATE_DSL_REFERENCE.md](docs/guides/SQL_TEMPLATE_DSL_REFERENCE.md) for complete documentation.
+See [SQL_TEMPLATE_DSL_REFERENCE.md](docs/guides/user/SQL_TEMPLATE_DSL_REFERENCE.md) for complete documentation.
 
 ## 📦 Modules
 
@@ -553,14 +553,13 @@ curl "http://localhost:9000/api/v1/blog/create_author?username=demo_user&email=d
 curl "http://localhost:9000/api/v1/blog/stats_overview"
 ```
 
-See [cheshire-blog-app/TESTING.md](../cheshire-blog-app/TESTING.md) for comprehensive testing guide.
+See [cheshire-blog-app/TESTING.md](https://github.com/halimchaibi/cheshire-blog-app/blob/64126cd58f100470fea3055c75624b65aecc2dca/TESTING.md) for comprehensive testing guide.
 
 ## 🧑‍💻 Development
 
 ### Project Structure
 
 ```
-cheshire-framework/
 ├── cheshire-prototype/              # Core framework
 │   ├── cheshire-bom/                # Dependency management
 │   ├── cheshire-core/               # Core framework (Session, Managers, Capabilities)
@@ -579,20 +578,6 @@ cheshire-framework/
 │       ├── guides/developer/        # Developer guides
 │       ├── reference/               # Reference documentation
 │       └── List-O-Mania/            # Exploration topics and research
-│
-└── cheshire-blog-app/               # Reference implementation
-    ├── src/main/                    # Application source code
-    │   ├── java/io/blog/            # Blog application classes
-    │   └── resources/config/        # Configuration files
-    ├── infra/                       # Infrastructure setup
-    │   ├── docker-compose.yml       # PostgreSQL Docker setup
-    │   └── postgres/                # Test data generation scripts
-    ├── dev-utils/                   # Development utilities
-    ├── README.md                    # Application documentation
-    ├── TESTING.md                   # Comprehensive testing guide (1,800+ lines)
-    ├── API_DOCUMENTATION.md         # API usage guide
-    ├── openapi-blog-api.yaml        # OpenAPI 3.0 specification
-    └── postman-api-complete.json    # Postman collection
 ```
 
 ### Code Style
@@ -652,7 +637,7 @@ mvn clean test jacoco:report
 
 ## 🌟 Reference Application
 
-The **[Blog Application](https://github.com/halimchaibi/cheshire-blog-app)** serves as the primary reference implementation, featuring:
+The **[Blog Application](https://github.com/halimchaibi/cheshire-blog-app/blob/64126cd58f100470fea3055c75624b65aecc2dca/README.md)** serves as the primary reference implementation, featuring:
 
 - Complete CRUD operations for Authors, Articles, and Comments
 - Multi-protocol support (REST, MCP stdio, MCP HTTP)
@@ -663,7 +648,7 @@ The **[Blog Application](https://github.com/halimchaibi/cheshire-blog-app)** ser
 - OpenAPI 3.0 and Postman collections
 - Production-ready pipeline configurations
 
-See [cheshire-blog-app/README.md](../cheshire-blog-app/README.md) for complete documentation.
+See [cheshire-blog-app/README.md](https://github.com/halimchaibi/cheshire-blog-app/blob/64126cd58f100470fea3055c75624b65aecc2dca/README.md) for complete documentation.
 
 ## 📞 Support
 
