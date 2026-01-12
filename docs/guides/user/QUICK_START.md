@@ -17,8 +17,8 @@ java --version
 ### 2. Clone Repository
 
 ```bash
-git clone https://github.com/cheshire-framework/cheshire-framework.git
-cd cheshire-framework/cheshire
+git clone https://github.com/halimchaibi/cheshire-prototype.git
+cd cheshire-prototype
 ```
 
 ### 3. Build Project
@@ -197,10 +197,10 @@ Same application, multiple protocols:
 
 ### Learn More
 
-- [Full Documentation](README.md)
+- [Full Documentation](../../../README.md)
 - [Architecture Guide](docs/architecture/)
 - [DSL Query Reference](docs/guides/SQL_TEMPLATE_DSL_REFERENCE.md)
-- [Building Guide](BUILDING.md)
+- [Building Guide](../devloper/BUILDING.md)
 
 ### Examples
 
