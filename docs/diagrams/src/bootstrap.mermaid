@@ -1,0 +1,170 @@
+%%{
+  init: {
+    'theme': 'base',
+    'themeVariables': {
+      'primaryColor': '#e8f4f8',
+      'primaryTextColor': '#2c3e50',
+      'primaryBorderColor': '#3498db',
+      'lineColor': '#34495e',
+      'secondaryColor': '#ecf0f1',
+      'tertiaryColor': '#fff'
+    }
+  }
+}%%
+sequenceDiagram
+    autonumber
+    participant User as Application
+    participant CB as CheshireBootstrap
+    participant CM as ConfigurationManager
+    participant CL as ConfigLoader
+    participant LM as LifecycleManager
+    participant SPM as SourceProviderManager
+    participant QEM as QueryEngineManager
+    participant CAP as CapabilityManager
+    participant CS as CheshireSession
+    participant RT as CheshireRuntime
+    participant SF as ServerFactory
+    participant SRV as Servers (Jetty/stdio)
+%% ============================================
+%% PHASE 1: Configuration Loading
+%% ============================================
+    rect rgb(240, 248, 255)
+        Note over User, CL: Phase 1: Configuration Loading
+        User ->> CB: fromClasspath("config") / fromFilesystem(path)
+        CB ->> CM: new ConfigurationManager(configSource)
+        CM ->> CL: load main config (cheshire.yaml)
+        CL -->> CM: CheshireConfig (raw)
+        Note over CM: Recursive loading of actions & pipelines
+        loop For each capability
+            CM ->> CL: load actions-specification-file
+            CL -->> CM: ActionsConfig
+            CM ->> CL: load pipelines-definition-file
+            CL -->> CM: PipelineConfig
+        end
+
+        CM -->> CM: Validate configuration
+        CM -->> CB: Resolved CheshireConfig
+    end
+
+%% ============================================
+%% PHASE 2: Lifecycle Initialization
+%% ============================================
+    rect rgb(245, 255, 245)
+        Note over CB, CAP: Phase 2: Three-Phase Lifecycle Initialization
+        CB ->> LM: new LifecycleManager(config)
+        CB ->> LM: initialize()
+        Note over LM: Phase 1: Initialize Source Providers (SPI)
+        LM ->> SPM: new SourceProviderManager()
+        loop For each configured source
+            SPM ->> SPM: Load via ServiceLoader
+            SPM ->> SPM: create(sourceConfig)
+            SPM ->> SPM: open() source
+        end
+        SPM -->> LM: Initialized sources
+        Note over LM: Phase 2: Initialize Query Engines (SPI)
+        LM ->> QEM: new QueryEngineManager()
+        loop For each configured engine
+            QEM ->> QEM: Load via ServiceLoader
+            QEM ->> QEM: create(engineConfig)
+            QEM ->> QEM: open() engine
+        end
+        QEM -->> LM: Initialized engines
+        Note over LM: Phase 3: Initialize Capabilities
+        LM ->> CAP: new CapabilityManager()
+        loop For each capability
+            CAP ->> CAP: Build PipelineFactory
+            CAP ->> CAP: Register in registry
+        end
+        CAP -->> LM: Initialized capabilities
+        LM -->> CB: Lifecycle initialized
+    end
+
+%% ============================================
+%% PHASE 3: Session Building
+%% ============================================
+    rect rgb(255, 250, 240)
+        Note over CB, CS: Phase 3: Session Building
+        CB ->> CS: CheshireSession.builder()
+        CB ->> CS: .config(config)
+        CB ->> CS: .sourceProviders(sources)
+        CB ->> CS: .queryEngines(engines)
+        CB ->> CS: .capabilities(capabilities)
+        CB ->> CS: .shutdownHooks(hooks)
+        CB ->> CS: .build()
+
+        alt autoStartSession = true
+            CS ->> CS: start()
+            Note over CS: Session becomes active
+        end
+
+        CS -->> CB: CheshireSession ready
+        CB -->> User: CheshireSession
+    end
+
+%% ============================================
+%% PHASE 4: Runtime Startup (Structured Concurrency)
+%% ============================================
+    rect rgb(255, 245, 255)
+        Note over User, SRV: Phase 4: Runtime Startup (Java 21 Structured Concurrency)
+        User ->> RT: CheshireRuntime.expose(session)
+        User ->> RT: start()
+        RT ->> RT: state: NEW → STARTING
+        RT ->> RT: printBanner()
+        RT ->> RT: metrics.recordStart()
+        Note over RT, SRV: Parallel server startup using StructuredTaskScope
+        par Parallel Server Creation
+            RT ->> SF: create(capability, binding, dispatcher)
+            SF ->> SRV: new JettyServerHandle() or StdioServerHandle()
+            SRV ->> SRV: init()
+            SRV ->> SRV: start()
+            SRV -->> RT: Server started
+        and
+            RT ->> SF: create(capability, binding, dispatcher)
+            SF ->> SRV: new JettyServerHandle() or StdioServerHandle()
+            SRV ->> SRV: init()
+            SRV ->> SRV: start()
+            SRV -->> RT: Server started
+        and
+            RT ->> SF: create(capability, binding, dispatcher)
+            SF ->> SRV: new StdioServerHandle()
+            SRV ->> SRV: init()
+            SRV ->> SRV: start()
+            SRV -->> RT: Server started
+        end
+
+        RT ->> RT: state: STARTING → RUNNING
+        RT ->> RT: health.setStatus(RUNNING)
+        RT -->> User: CheshireRuntime running
+        Note over RT: Runtime ready to accept requests
+        Note over RT: Press Ctrl+C to shutdown
+    end
+
+%% ============================================
+%% PHASE 5: Shutdown Sequence (LIFO)
+%% ============================================
+    rect rgb(255, 240, 240)
+        Note over User, LM: Phase 5: Graceful Shutdown (LIFO Order)
+        User ->> RT: shutdown() or awaitTermination()
+        RT ->> RT: state: RUNNING → STOPPING
+        Note over RT, SRV: Stop servers (reverse order)
+        loop For each server (LIFO)
+            RT ->> SRV: stop()
+            SRV -->> RT: stopped
+        end
+
+        RT ->> LM: shutdown()
+        Note over LM, SPM: LIFO: Capabilities → Engines → Sources
+        LM ->> CAP: shutdown()
+        LM ->> QEM: shutdown()
+        loop For each engine
+            QEM ->> QEM: close()
+        end
+        LM ->> SPM: shutdown()
+        loop For each source
+            SPM ->> SPM: close()
+        end
+
+        RT ->> RT: state: STOPPING → STOPPED
+        RT ->> RT: metrics.recordStop()
+        RT -->> User: Runtime stopped
+    end

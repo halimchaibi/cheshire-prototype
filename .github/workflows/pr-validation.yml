@@ -1,0 +1,329 @@
+name: Pull Request Validation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - main
+      - develop
+
+env:
+  JAVA_VERSION: '21'
+  MAVEN_OPTS: >-
+    -Xmx2g
+    -XX:+UseG1GC
+    -Dmaven.repo.local=${{ github.workspace }}/.m2/repository
+
+jobs:
+  pr-checks:
+    name: PR Initial Checks
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Check PR title
+        uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            perf
+            test
+            build
+            ci
+            chore
+            revert
+          requireScope: false
+          subjectPattern: ^[A-Z].+$
+          subjectPatternError: |
+            The subject must start with an uppercase letter.
+          validateSingleCommit: false
+
+      - name: Check for merge conflicts
+        run: |
+          git fetch origin ${{ github.base_ref }}
+          if git merge-tree $(git merge-base HEAD origin/${{ github.base_ref }}) origin/${{ github.base_ref }} HEAD | grep -q '<<<<<<<'; then
+            echo "::error::This PR has merge conflicts with ${{ github.base_ref }}"
+            exit 1
+          fi
+
+      - name: Check file sizes
+        run: |
+          # Check for files larger than 10MB
+          find . -type f -size +10M -not -path './.git/*' -not -path '*/target/*' -not -path '*/node_modules/*' | while read file; do
+            echo "::warning::Large file detected: $file ($(du -h "$file" | cut -f1))"
+          done
+
+  code-validation:
+    name: Code Validation
+    runs-on: ubuntu-latest
+    needs: pr-checks
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Validate POM files
+        run: |
+          ./mvnw validate --batch-mode
+
+      - name: Check code formatting
+        run: |
+          ./mvnw spotless:check --batch-mode
+        continue-on-error: true
+
+      - name: Run Checkstyle
+        run: |
+          ./mvnw checkstyle:check --batch-mode
+
+      - name: Check for TODO/FIXME comments
+        run: |
+          if grep -r "TODO\|FIXME" --include=\*.java src/; then
+            echo "::warning::Found TODO/FIXME comments in the code"
+          fi
+
+  build-and-test:
+    name: Build and Test PR
+    runs-on: ubuntu-latest
+    needs: code-validation
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build project
+        run: |
+          ./mvnw clean install -DskipTests --batch-mode --errors
+
+      - name: Run unit tests
+        run: |
+          ./mvnw test --batch-mode --errors
+
+      - name: Run integration tests
+        run: |
+          ./mvnw verify -DskipUnitTests --batch-mode --errors
+        continue-on-error: true
+
+      - name: Generate coverage report
+        run: |
+          ./mvnw jacoco:prepare-agent test jacoco:report --batch-mode
+
+      - name: Comment coverage on PR
+        uses: madrapps/jacoco-report@v1.6.1
+        with:
+          paths: |
+            ${{ github.workspace }}/**/target/site/jacoco/jacoco.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 60
+          min-coverage-changed-files: 70
+          title: Code Coverage Report
+          update-comment: true
+
+  diff-analysis:
+    name: Diff Analysis
+    runs-on: ubuntu-latest
+    needs: pr-checks
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v42
+        with:
+          files: |
+            **/*.java
+            **/*.xml
+            **/*.yml
+            **/*.yaml
+
+      - name: Analyze changes
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          echo "Changed files:"
+          echo "${{ steps.changed-files.outputs.all_changed_files }}"
+          
+          # Count lines changed
+          git diff --numstat origin/${{ github.base_ref }}...HEAD | \
+            awk '{added+=$1; deleted+=$2} END {print "Lines added:", added, "Lines deleted:", deleted}'
+
+      - name: Check for API changes
+        run: |
+          # Check if public API files changed
+          if git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E '(spi|api)/'; then
+            echo "::warning::This PR modifies public API interfaces"
+          fi
+
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    needs: pr-checks
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: moderate
+          deny-licenses: GPL-2.0, GPL-3.0
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: build-and-test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Run OWASP Dependency Check
+        run: |
+          ./mvnw org.owasp:dependency-check-maven:check --batch-mode
+        continue-on-error: true
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  performance-check:
+    name: Performance Check
+    runs-on: ubuntu-latest
+    needs: build-and-test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Run performance tests
+        run: |
+          ./mvnw test -Dtest=**/*Performance* --batch-mode
+        continue-on-error: true
+
+      - name: Check build time
+        run: |
+          START_TIME=$(date +%s)
+          ./mvnw clean install -DskipTests --batch-mode
+          END_TIME=$(date +%s)
+          BUILD_TIME=$((END_TIME - START_TIME))
+          echo "Build time: ${BUILD_TIME}s"
+          if [ $BUILD_TIME -gt 600 ]; then
+            echo "::warning::Build time exceeded 10 minutes"
+          fi
+
+  pr-summary:
+    name: PR Summary
+    runs-on: ubuntu-latest
+    needs: [build-and-test, code-validation, security-scan]
+    if: always()
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Generate PR summary
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const jobs = {
+              'Code Validation': '${{ needs.code-validation.result }}',
+              'Build and Test': '${{ needs.build-and-test.result }}',
+              'Security Scan': '${{ needs.security-scan.result }}'
+            };
+            
+            let summary = '## 🔍 Pull Request Validation Summary\n\n';
+            
+            for (const [job, result] of Object.entries(jobs)) {
+              const icon = result === 'success' ? '✅' : result === 'failure' ? '❌' : '⚠️';
+              summary += `${icon} **${job}**: ${result}\n`;
+            }
+            
+            summary += '\n';
+            summary += `**Commit**: ${context.sha.substring(0, 7)}\n`;
+            summary += `**Author**: @${context.payload.pull_request.user.login}\n`;
+            
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: summary
+            });
+
+  auto-label:
+    name: Auto Label PR
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Label PR
+        uses: actions/labeler@v5
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          configuration-path: .github/labeler.yml
+          sync-labels: true
+

@@ -1,0 +1,613 @@
+2026-01-08 18:09:15.279 [main] INFO io.blog.BlogApp - Logging redirected to: blog-mcp-stdio-claude.yaml
+2026-01-08 18:09:15.279 [main] INFO io.blog.BlogApp - Starting Blog Application...
+2026-01-08 18:09:15.280 [main] INFO io.blog.BlogApp - Using configuration: blog-mcp-stdio-claude.yaml
+2026-01-08 18:09:15.521 [main] INFO io.cheshire.core.manager.ConfigurationManager - Cheshire configuration validation passed
+2026-01-08 18:09:15.578 [main] INFO io.cheshire.core.manager.LifecycleManager - Initializing Lifecycle Manager
+2026-01-08 18:09:15.587 [pool-1-thread-2] INFO io.cheshire.core.manager.QueryEngineManager - Found QueryEngineFactory: io.cheshire.query.engine.jdbc.JdbcQueryEngineFactory
+2026-01-08 18:09:15.587 [pool-1-thread-1] INFO io.cheshire.core.manager.SourceProviderManager - Found SourceProvider: io.cheshire.source.jdbc.JdbcDataSourceProviderFactory
+2026-01-08 18:09:15.589 [pool-1-thread-2] INFO io.cheshire.core.registry.Registry.QueryEngine - Registered QueryEngine 'jdbc' (type: JdbcQueryEngine)
+2026-01-08 18:09:15.589 [pool-1-thread-1] INFO io.cheshire.core.registry.Registry.SourceProvider - Registered SourceProvider 'blog-db' (type: JdbcDataSourceProvider)
+2026-01-08 18:09:15.591 [pool-1-thread-3] INFO io.cheshire.core.registry.Registry.Capability - Registered Capability 'blog' (type: Capability)
+2026-01-08 18:09:15.591 [pool-1-thread-3] INFO io.cheshire.core.manager.CapabilityManager - Registered capability: blog
+2026-01-08 18:09:15.598 [main] INFO io.cheshire.core.CheshireSession - Starting Cheshire Session...
+2026-01-08 18:09:15.615 [main] INFO io.cheshire.runtime.CheshireRuntime - -------------------------------------------
+  BLOG DATA HUB (v1.0.0)
+  Domain: Blog | Org: Blog Corp
+-------------------------------------------
+
+2026-01-08 18:09:15.616 [main] INFO io.cheshire.runtime.CheshireRuntime - Starting Cheshire Servers...
+2026-01-08 18:09:15.625 [] INFO io.cheshire.jetty.ServerRegistry - Creating dedicated STDIO transport for capability blog
+2026-01-08 18:09:15.629 [] INFO io.cheshire.stdio.StdioServerHandle - Starting STDIO server handle for capability blog
+2026-01-08 18:09:15.729 [] DEBUG reactor.util.Loggers - Using Slf4j logging framework
+2026-01-08 18:09:15.800 [pool-2-thread-1] DEBUG io.modelcontextprotocol.server.transport.StdioServerTransportProvider - Received JSON message: {"jsonrpc":"2.0","id":0,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{"sampling":{},"elicitation":{},"roots":{"listChanged":true}},"clientInfo":{"name":"inspector-client","version":"0.18.0"}}}
+2026-01-08 18:09:15.801 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpSchema - Received JSON message: {"jsonrpc":"2.0","id":0,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{"sampling":{},"elicitation":{},"roots":{"listChanged":true}},"clientInfo":{"name":"inspector-client","version":"0.18.0"}}}
+2026-01-08 18:09:15.813 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: create_author
+2026-01-08 18:09:15.816 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: create_author
+2026-01-08 18:09:15.816 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: update_author
+2026-01-08 18:09:15.816 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: update_author
+2026-01-08 18:09:15.817 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: delete_author
+2026-01-08 18:09:15.817 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: delete_author
+2026-01-08 18:09:15.817 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: create_article
+2026-01-08 18:09:15.817 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: create_article
+2026-01-08 18:09:15.817 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: update_article
+2026-01-08 18:09:15.817 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: update_article
+2026-01-08 18:09:15.817 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: delete_article
+2026-01-08 18:09:15.817 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: delete_article
+2026-01-08 18:09:15.817 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: publish_article
+2026-01-08 18:09:15.817 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: publish_article
+2026-01-08 18:09:15.817 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: create_comment
+2026-01-08 18:09:15.817 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: create_comment
+2026-01-08 18:09:15.818 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: update_comment
+2026-01-08 18:09:15.818 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: update_comment
+2026-01-08 18:09:15.818 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: delete_comment
+2026-01-08 18:09:15.818 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: delete_comment
+2026-01-08 18:09:15.818 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_author_schema
+2026-01-08 18:09:15.818 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_author_schema
+2026-01-08 18:09:15.818 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_article_schema
+2026-01-08 18:09:15.818 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_article_schema
+2026-01-08 18:09:15.818 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_comment_schema
+2026-01-08 18:09:15.818 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_comment_schema
+2026-01-08 18:09:15.818 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: list_authors
+2026-01-08 18:09:15.819 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: list_authors
+2026-01-08 18:09:15.819 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: list_author_by_id
+2026-01-08 18:09:15.819 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: list_author_by_id
+2026-01-08 18:09:15.819 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_articles_by_author
+2026-01-08 18:09:15.819 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_articles_by_author
+2026-01-08 18:09:15.819 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: list_articles
+2026-01-08 18:09:15.819 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: list_articles
+2026-01-08 18:09:15.819 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_article_by_id
+2026-01-08 18:09:15.819 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_article_by_id
+2026-01-08 18:09:15.819 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_comments_by_article
+2026-01-08 18:09:15.819 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_comments_by_article
+2026-01-08 18:09:15.820 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: list_comments
+2026-01-08 18:09:15.820 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: list_comments
+2026-01-08 18:09:15.820 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_comment_by_id
+2026-01-08 18:09:15.820 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_comment_by_id
+2026-01-08 18:09:15.820 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_article_stats
+2026-01-08 18:09:15.820 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_article_stats
+2026-01-08 18:09:15.820 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_top_authors
+2026-01-08 18:09:15.820 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_top_authors
+2026-01-08 18:09:15.820 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_comments_activity
+2026-01-08 18:09:15.821 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_comments_activity
+2026-01-08 18:09:15.824 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource handler: author_schema
+2026-01-08 18:09:15.824 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource: Author JSON Schema
+2026-01-08 18:09:15.817 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpServerSession - Received request: JSONRPCRequest[jsonrpc=2.0, method=initialize, id=0, params={protocolVersion=2025-11-25, capabilities={sampling={}, elicitation={}, roots={listChanged=true}}, clientInfo={name=inspector-client, version=0.18.0}}]
+2026-01-08 18:09:15.825 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource handler: article_schema
+2026-01-08 18:09:15.825 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource: Article JSON Schema
+2026-01-08 18:09:15.826 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource handler: comment_schema
+2026-01-08 18:09:15.826 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource: Comment JSON Schema
+2026-01-08 18:09:15.826 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource handler: api_documentation
+2026-01-08 18:09:15.827 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource: API Overview Documentation
+2026-01-08 18:09:15.830 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added prompt handler: create_blog_post
+2026-01-08 18:09:15.830 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound prompt: create_blog_post
+2026-01-08 18:09:15.831 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added prompt handler: search_articles
+2026-01-08 18:09:15.831 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound prompt: search_articles
+2026-01-08 18:09:15.831 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added prompt handler: get_article_with_comments
+2026-01-08 18:09:15.831 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound prompt: get_article_with_comments
+2026-01-08 18:09:15.831 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added prompt handler: author_analytics
+2026-01-08 18:09:15.831 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound prompt: author_analytics
+2026-01-08 18:09:15.832 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: list_authors{?page,limit,search,created_after}
+2026-01-08 18:09:15.833 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Authors Collection
+2026-01-08 18:09:15.833 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: list_author_by_id{?id}
+2026-01-08 18:09:15.833 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Author Resource
+2026-01-08 18:09:15.833 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: articles_by_author{?id,published_only,page,limit,sort}
+2026-01-08 18:09:15.833 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Author Articles Collection
+2026-01-08 18:09:15.833 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: list_articles{?author,published,search,category,page,limit,sort}
+2026-01-08 18:09:15.833 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Articles Collection
+2026-01-08 18:09:15.833 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: list_article_by_id{?id}
+2026-01-08 18:09:15.833 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Article Resource
+2026-01-08 18:09:15.834 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: comments_by_article{?id,page,limit,sort}
+2026-01-08 18:09:15.834 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Article Comments Collection
+2026-01-08 18:09:15.834 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: list_comments{?article,author_email,date_from,date_to,page,limit}
+2026-01-08 18:09:15.834 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Comments Collection
+2026-01-08 18:09:15.834 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: list_comment_by_id{?id}
+2026-01-08 18:09:15.834 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Comment Resource
+2026-01-08 18:09:15.834 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: article_stats{?author,start_date,end_date}
+2026-01-08 18:09:15.834 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Article Statistics Report
+2026-01-08 18:09:15.834 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: top_authors{?limit,timeframe}
+2026-01-08 18:09:15.835 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Top Authors Report
+2026-01-08 18:09:15.835 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: comments_activity{?article,timeframe,min_comments}
+2026-01-08 18:09:15.835 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Comments Activity Report
+2026-01-08 18:09:15.835 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Capability 'blog' registered with 24 tools, 4 resources, 11 resource templates, and 4 prompts
+2026-01-08 18:09:15.835 [] INFO io.cheshire.stdio.StdioMcpModule - Stdio MCP Module initialized for capability: blog
+2026-01-08 18:09:15.836 [] INFO io.cheshire.stdio.StdioServerContainer - Starting STDIO for Implementation[name=cheshire-mcp-jetty, title=null, version=1.0.0]
+2026-01-08 18:09:15.843 [main] INFO io.cheshire.runtime.CheshireRuntime - Runtime is now RUNNING
+2026-01-08 18:09:15.843 [main] INFO io.blog.BlogApp - Blog application started successfully
+Runtime started, awaiting termination...
+2026-01-08 18:09:15.843 [pool-2-thread-1] INFO io.modelcontextprotocol.server.McpAsyncServer - Client initialize request - Protocol: 2025-11-25, Capabilities: ClientCapabilities[experimental=null, roots=RootCapabilities[listChanged=true], sampling=Sampling[], elicitation=Elicitation[]], Info: Implementation[name=inspector-client, title=null, version=0.18.0]
+2026-01-08 18:09:15.845 [pool-2-thread-1] WARN io.modelcontextprotocol.server.McpAsyncServer - Client requested unsupported protocol version: 2025-11-25, so the server will suggest the 2024-11-05 version instead
+2026-01-08 18:09:15.865 [pool-2-thread-1] DEBUG io.modelcontextprotocol.server.transport.StdioServerTransportProvider - Received JSON message: {"jsonrpc":"2.0","method":"notifications/initialized"}
+2026-01-08 18:09:15.865 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpSchema - Received JSON message: {"jsonrpc":"2.0","method":"notifications/initialized"}
+2026-01-08 18:09:15.866 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpServerSession - Received notification: JSONRPCNotification[jsonrpc=2.0, method=notifications/initialized, params=null]
+2026-01-08 18:09:18.766 [pool-2-thread-1] DEBUG io.modelcontextprotocol.server.transport.StdioServerTransportProvider - Received JSON message: {"jsonrpc":"2.0","id":1,"method":"logging/setLevel","params":{"level":"debug"}}
+2026-01-08 18:09:18.766 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpSchema - Received JSON message: {"jsonrpc":"2.0","id":1,"method":"logging/setLevel","params":{"level":"debug"}}
+2026-01-08 18:09:18.766 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpServerSession - Received request: JSONRPCRequest[jsonrpc=2.0, method=logging/setLevel, id=1, params={level=debug}]
+2026-01-08 18:09:33.364 [pool-2-thread-1] DEBUG io.modelcontextprotocol.server.transport.StdioServerTransportProvider - Received JSON message: {"jsonrpc":"2.0","id":2,"method":"resources/list","params":{"_meta":{"progressToken":2}}}
+2026-01-08 18:09:33.364 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpSchema - Received JSON message: {"jsonrpc":"2.0","id":2,"method":"resources/list","params":{"_meta":{"progressToken":2}}}
+2026-01-08 18:09:33.364 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpServerSession - Received request: JSONRPCRequest[jsonrpc=2.0, method=resources/list, id=2, params={_meta={progressToken=2}}]
+2026-01-08 18:09:34.909 [pool-2-thread-1] DEBUG io.modelcontextprotocol.server.transport.StdioServerTransportProvider - Received JSON message: {"jsonrpc":"2.0","id":3,"method":"resources/read","params":{"_meta":{"progressToken":3},"uri":"comment_schema"}}
+2026-01-08 18:09:34.910 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpSchema - Received JSON message: {"jsonrpc":"2.0","id":3,"method":"resources/read","params":{"_meta":{"progressToken":3},"uri":"comment_schema"}}
+2026-01-08 18:09:34.910 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpServerSession - Received request: JSONRPCRequest[jsonrpc=2.0, method=resources/read, id=3, params={_meta={progressToken=3}, uri=comment_schema}]
+2026-01-08 18:09:34.921 [boundedElastic-1] INFO io.cheshire.core.server.StdioDispatcher - Stdio Dispatching: blog/comment_schema
+2026-01-08 18:09:34.923 [boundedElastic-1] ERROR io.cheshire.core.CheshireSession - Pipeline execution failed unexpectedly: 
+java.lang.NullPointerException: Cannot invoke "io.cheshire.spi.pipeline.PipelineProcessor.name()" because "pipeline" is null
+	at io.cheshire.core.CheshireSession.execute(CheshireSession.java:162)
+	at io.cheshire.core.server.StdioDispatcher.dispatch(StdioDispatcher.java:30)
+	at io.cheshire.jetty.mcp.McpManifestRegistrar.lambda$createResourceSpecification$7(McpManifestRegistrar.java:143)
+	at reactor.core.publisher.MonoCallable.call(MonoCallable.java:72)
+	at reactor.core.publisher.FluxSubscribeOnCallable$CallableSubscribeOnSubscription.run(FluxSubscribeOnCallable.java:228)
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:68)
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:28)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-01-08 18:10:18.027 [pool-2-thread-1] DEBUG io.modelcontextprotocol.server.transport.StdioServerTransportProvider - Session transport closed
+2026-01-08 18:11:06.541 [main] INFO io.blog.BlogApp - Logging redirected to: blog-mcp-stdio-claude.yaml
+2026-01-08 18:11:06.541 [main] INFO io.blog.BlogApp - Starting Blog Application...
+2026-01-08 18:11:06.542 [main] WARN io.blog.BlogApp - Unknown argument: --log-file, using default configuration
+2026-01-08 18:11:06.542 [main] INFO io.blog.BlogApp - Using configuration: blog-mcp-stdio-claude.yaml
+2026-01-08 18:11:06.777 [main] INFO io.cheshire.core.manager.ConfigurationManager - Cheshire configuration validation passed
+2026-01-08 18:11:06.834 [main] INFO io.cheshire.core.manager.LifecycleManager - Initializing Lifecycle Manager
+2026-01-08 18:11:06.841 [pool-1-thread-1] INFO io.cheshire.core.manager.SourceProviderManager - Found SourceProvider: io.cheshire.source.jdbc.JdbcDataSourceProviderFactory
+2026-01-08 18:11:06.841 [pool-1-thread-2] INFO io.cheshire.core.manager.QueryEngineManager - Found QueryEngineFactory: io.cheshire.query.engine.jdbc.JdbcQueryEngineFactory
+2026-01-08 18:11:06.843 [pool-1-thread-1] INFO io.cheshire.core.registry.Registry.SourceProvider - Registered SourceProvider 'blog-db' (type: JdbcDataSourceProvider)
+2026-01-08 18:11:06.843 [pool-1-thread-2] INFO io.cheshire.core.registry.Registry.QueryEngine - Registered QueryEngine 'jdbc' (type: JdbcQueryEngine)
+2026-01-08 18:11:06.846 [pool-1-thread-3] INFO io.cheshire.core.registry.Registry.Capability - Registered Capability 'blog' (type: Capability)
+2026-01-08 18:11:06.846 [pool-1-thread-3] INFO io.cheshire.core.manager.CapabilityManager - Registered capability: blog
+2026-01-08 18:11:06.854 [main] INFO io.cheshire.core.CheshireSession - Starting Cheshire Session...
+2026-01-08 18:11:06.869 [main] INFO io.cheshire.runtime.CheshireRuntime - -------------------------------------------
+  BLOG DATA HUB (v1.0.0)
+  Domain: Blog | Org: Blog Corp
+-------------------------------------------
+
+2026-01-08 18:11:06.870 [main] INFO io.cheshire.runtime.CheshireRuntime - Starting Cheshire Servers...
+2026-01-08 18:11:06.876 [] INFO io.cheshire.jetty.ServerRegistry - Creating dedicated STDIO transport for capability blog
+2026-01-08 18:11:06.881 [] INFO io.cheshire.stdio.StdioServerHandle - Starting STDIO server handle for capability blog
+2026-01-08 18:11:06.979 [] DEBUG reactor.util.Loggers - Using Slf4j logging framework
+2026-01-08 18:11:07.048 [pool-2-thread-1] DEBUG io.modelcontextprotocol.server.transport.StdioServerTransportProvider - Received JSON message: {"jsonrpc":"2.0","id":0,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{"sampling":{},"elicitation":{},"roots":{"listChanged":true}},"clientInfo":{"name":"inspector-client","version":"0.18.0"}}}
+2026-01-08 18:11:07.048 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpSchema - Received JSON message: {"jsonrpc":"2.0","id":0,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{"sampling":{},"elicitation":{},"roots":{"listChanged":true}},"clientInfo":{"name":"inspector-client","version":"0.18.0"}}}
+2026-01-08 18:11:07.059 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: create_author
+2026-01-08 18:11:07.062 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: create_author
+2026-01-08 18:11:07.063 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: update_author
+2026-01-08 18:11:07.063 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: update_author
+2026-01-08 18:11:07.063 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: delete_author
+2026-01-08 18:11:07.063 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: delete_author
+2026-01-08 18:11:07.063 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: create_article
+2026-01-08 18:11:07.063 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: create_article
+2026-01-08 18:11:07.063 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: update_article
+2026-01-08 18:11:07.063 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: update_article
+2026-01-08 18:11:07.063 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: delete_article
+2026-01-08 18:11:07.063 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: delete_article
+2026-01-08 18:11:07.064 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: publish_article
+2026-01-08 18:11:07.064 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: publish_article
+2026-01-08 18:11:07.064 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: create_comment
+2026-01-08 18:11:07.064 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: create_comment
+2026-01-08 18:11:07.064 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: update_comment
+2026-01-08 18:11:07.064 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: update_comment
+2026-01-08 18:11:07.064 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: delete_comment
+2026-01-08 18:11:07.064 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: delete_comment
+2026-01-08 18:11:07.064 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_author_schema
+2026-01-08 18:11:07.064 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_author_schema
+2026-01-08 18:11:07.064 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_article_schema
+2026-01-08 18:11:07.065 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_article_schema
+2026-01-08 18:11:07.065 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_comment_schema
+2026-01-08 18:11:07.065 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_comment_schema
+2026-01-08 18:11:07.065 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: list_authors
+2026-01-08 18:11:07.065 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: list_authors
+2026-01-08 18:11:07.065 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: list_author_by_id
+2026-01-08 18:11:07.065 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: list_author_by_id
+2026-01-08 18:11:07.065 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_articles_by_author
+2026-01-08 18:11:07.065 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_articles_by_author
+2026-01-08 18:11:07.065 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: list_articles
+2026-01-08 18:11:07.066 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: list_articles
+2026-01-08 18:11:07.066 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_article_by_id
+2026-01-08 18:11:07.066 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_article_by_id
+2026-01-08 18:11:07.066 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_comments_by_article
+2026-01-08 18:11:07.066 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_comments_by_article
+2026-01-08 18:11:07.066 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: list_comments
+2026-01-08 18:11:07.066 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: list_comments
+2026-01-08 18:11:07.066 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_comment_by_id
+2026-01-08 18:11:07.066 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_comment_by_id
+2026-01-08 18:11:07.067 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_article_stats
+2026-01-08 18:11:07.067 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_article_stats
+2026-01-08 18:11:07.067 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_top_authors
+2026-01-08 18:11:07.067 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_top_authors
+2026-01-08 18:11:07.067 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_comments_activity
+2026-01-08 18:11:07.067 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_comments_activity
+2026-01-08 18:11:07.069 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource handler: author_schema
+2026-01-08 18:11:07.069 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource: Author JSON Schema
+2026-01-08 18:11:07.069 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource handler: article_schema
+2026-01-08 18:11:07.069 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource: Article JSON Schema
+2026-01-08 18:11:07.069 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource handler: comment_schema
+2026-01-08 18:11:07.069 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource: Comment JSON Schema
+2026-01-08 18:11:07.069 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource handler: api_documentation
+2026-01-08 18:11:07.069 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource: API Overview Documentation
+2026-01-08 18:11:07.062 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpServerSession - Received request: JSONRPCRequest[jsonrpc=2.0, method=initialize, id=0, params={protocolVersion=2025-11-25, capabilities={sampling={}, elicitation={}, roots={listChanged=true}}, clientInfo={name=inspector-client, version=0.18.0}}]
+2026-01-08 18:11:07.072 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added prompt handler: create_blog_post
+2026-01-08 18:11:07.073 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound prompt: create_blog_post
+2026-01-08 18:11:07.073 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added prompt handler: search_articles
+2026-01-08 18:11:07.073 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound prompt: search_articles
+2026-01-08 18:11:07.073 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added prompt handler: get_article_with_comments
+2026-01-08 18:11:07.073 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound prompt: get_article_with_comments
+2026-01-08 18:11:07.073 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added prompt handler: author_analytics
+2026-01-08 18:11:07.073 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound prompt: author_analytics
+2026-01-08 18:11:07.075 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: list_authors{?page,limit,search,created_after}
+2026-01-08 18:11:07.075 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Authors Collection
+2026-01-08 18:11:07.075 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: list_author_by_id{?id}
+2026-01-08 18:11:07.076 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Author Resource
+2026-01-08 18:11:07.076 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: articles_by_author{?id,published_only,page,limit,sort}
+2026-01-08 18:11:07.076 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Author Articles Collection
+2026-01-08 18:11:07.076 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: list_articles{?author,published,search,category,page,limit,sort}
+2026-01-08 18:11:07.076 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Articles Collection
+2026-01-08 18:11:07.076 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: list_article_by_id{?id}
+2026-01-08 18:11:07.076 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Article Resource
+2026-01-08 18:11:07.076 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: comments_by_article{?id,page,limit,sort}
+2026-01-08 18:11:07.076 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Article Comments Collection
+2026-01-08 18:11:07.076 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: list_comments{?article,author_email,date_from,date_to,page,limit}
+2026-01-08 18:11:07.076 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Comments Collection
+2026-01-08 18:11:07.076 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: list_comment_by_id{?id}
+2026-01-08 18:11:07.076 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Comment Resource
+2026-01-08 18:11:07.077 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: article_stats{?author,start_date,end_date}
+2026-01-08 18:11:07.077 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Article Statistics Report
+2026-01-08 18:11:07.077 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: top_authors{?limit,timeframe}
+2026-01-08 18:11:07.077 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Top Authors Report
+2026-01-08 18:11:07.077 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: comments_activity{?article,timeframe,min_comments}
+2026-01-08 18:11:07.077 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Comments Activity Report
+2026-01-08 18:11:07.077 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Capability 'blog' registered with 24 tools, 4 resources, 11 resource templates, and 4 prompts
+2026-01-08 18:11:07.077 [] INFO io.cheshire.stdio.StdioMcpModule - Stdio MCP Module initialized for capability: blog
+2026-01-08 18:11:07.077 [] INFO io.cheshire.stdio.StdioServerContainer - Starting STDIO for Implementation[name=cheshire-mcp-jetty, title=null, version=1.0.0]
+2026-01-08 18:11:07.084 [main] INFO io.cheshire.runtime.CheshireRuntime - Runtime is now RUNNING
+2026-01-08 18:11:07.084 [main] INFO io.blog.BlogApp - Blog application started successfully
+Runtime started, awaiting termination...
+2026-01-08 18:11:07.085 [pool-2-thread-1] INFO io.modelcontextprotocol.server.McpAsyncServer - Client initialize request - Protocol: 2025-11-25, Capabilities: ClientCapabilities[experimental=null, roots=RootCapabilities[listChanged=true], sampling=Sampling[], elicitation=Elicitation[]], Info: Implementation[name=inspector-client, title=null, version=0.18.0]
+2026-01-08 18:11:07.089 [pool-2-thread-1] WARN io.modelcontextprotocol.server.McpAsyncServer - Client requested unsupported protocol version: 2025-11-25, so the server will suggest the 2024-11-05 version instead
+2026-01-08 18:11:07.109 [pool-2-thread-1] DEBUG io.modelcontextprotocol.server.transport.StdioServerTransportProvider - Received JSON message: {"jsonrpc":"2.0","method":"notifications/initialized"}
+2026-01-08 18:11:07.109 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpSchema - Received JSON message: {"jsonrpc":"2.0","method":"notifications/initialized"}
+2026-01-08 18:11:07.111 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpServerSession - Received notification: JSONRPCNotification[jsonrpc=2.0, method=notifications/initialized, params=null]
+2026-01-08 18:11:07.149 [pool-2-thread-1] DEBUG io.modelcontextprotocol.server.transport.StdioServerTransportProvider - Received JSON message: {"jsonrpc":"2.0","id":1,"method":"logging/setLevel","params":{"level":"debug"}}
+2026-01-08 18:11:07.149 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpSchema - Received JSON message: {"jsonrpc":"2.0","id":1,"method":"logging/setLevel","params":{"level":"debug"}}
+2026-01-08 18:11:07.150 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpServerSession - Received request: JSONRPCRequest[jsonrpc=2.0, method=logging/setLevel, id=1, params={level=debug}]
+2026-01-08 18:11:07.180 [main] INFO io.blog.BlogApp - Logging redirected to: blog-mcp-stdio-claude.yaml
+2026-01-08 18:11:07.180 [main] INFO io.blog.BlogApp - Starting Blog Application...
+2026-01-08 18:11:07.181 [main] WARN io.blog.BlogApp - Unknown argument: --log-file, using default configuration
+2026-01-08 18:11:07.181 [main] INFO io.blog.BlogApp - Using configuration: blog-mcp-stdio-claude.yaml
+2026-01-08 18:11:07.415 [main] INFO io.cheshire.core.manager.ConfigurationManager - Cheshire configuration validation passed
+2026-01-08 18:11:07.469 [main] INFO io.cheshire.core.manager.LifecycleManager - Initializing Lifecycle Manager
+2026-01-08 18:11:07.477 [pool-1-thread-1] INFO io.cheshire.core.manager.SourceProviderManager - Found SourceProvider: io.cheshire.source.jdbc.JdbcDataSourceProviderFactory
+2026-01-08 18:11:07.477 [pool-1-thread-2] INFO io.cheshire.core.manager.QueryEngineManager - Found QueryEngineFactory: io.cheshire.query.engine.jdbc.JdbcQueryEngineFactory
+2026-01-08 18:11:07.478 [pool-1-thread-2] INFO io.cheshire.core.registry.Registry.QueryEngine - Registered QueryEngine 'jdbc' (type: JdbcQueryEngine)
+2026-01-08 18:11:07.478 [pool-1-thread-1] INFO io.cheshire.core.registry.Registry.SourceProvider - Registered SourceProvider 'blog-db' (type: JdbcDataSourceProvider)
+2026-01-08 18:11:07.482 [pool-1-thread-3] INFO io.cheshire.core.registry.Registry.Capability - Registered Capability 'blog' (type: Capability)
+2026-01-08 18:11:07.482 [pool-1-thread-3] INFO io.cheshire.core.manager.CapabilityManager - Registered capability: blog
+2026-01-08 18:11:07.489 [main] INFO io.cheshire.core.CheshireSession - Starting Cheshire Session...
+2026-01-08 18:11:07.505 [main] INFO io.cheshire.runtime.CheshireRuntime - -------------------------------------------
+  BLOG DATA HUB (v1.0.0)
+  Domain: Blog | Org: Blog Corp
+-------------------------------------------
+
+2026-01-08 18:11:07.505 [main] INFO io.cheshire.runtime.CheshireRuntime - Starting Cheshire Servers...
+2026-01-08 18:11:07.513 [] INFO io.cheshire.jetty.ServerRegistry - Creating dedicated STDIO transport for capability blog
+2026-01-08 18:11:07.517 [] INFO io.cheshire.stdio.StdioServerHandle - Starting STDIO server handle for capability blog
+2026-01-08 18:11:07.618 [] DEBUG reactor.util.Loggers - Using Slf4j logging framework
+2026-01-08 18:11:07.684 [pool-2-thread-1] DEBUG io.modelcontextprotocol.server.transport.StdioServerTransportProvider - Received JSON message: {"jsonrpc":"2.0","id":0,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{"sampling":{},"elicitation":{},"roots":{"listChanged":true}},"clientInfo":{"name":"inspector-client","version":"0.18.0"}}}
+2026-01-08 18:11:07.685 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpSchema - Received JSON message: {"jsonrpc":"2.0","id":0,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{"sampling":{},"elicitation":{},"roots":{"listChanged":true}},"clientInfo":{"name":"inspector-client","version":"0.18.0"}}}
+2026-01-08 18:11:07.696 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: create_author
+2026-01-08 18:11:07.699 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: create_author
+2026-01-08 18:11:07.699 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: update_author
+2026-01-08 18:11:07.699 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: update_author
+2026-01-08 18:11:07.699 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: delete_author
+2026-01-08 18:11:07.700 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: delete_author
+2026-01-08 18:11:07.700 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: create_article
+2026-01-08 18:11:07.700 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: create_article
+2026-01-08 18:11:07.700 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: update_article
+2026-01-08 18:11:07.700 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: update_article
+2026-01-08 18:11:07.700 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: delete_article
+2026-01-08 18:11:07.701 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: delete_article
+2026-01-08 18:11:07.701 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: publish_article
+2026-01-08 18:11:07.701 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: publish_article
+2026-01-08 18:11:07.701 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: create_comment
+2026-01-08 18:11:07.701 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: create_comment
+2026-01-08 18:11:07.701 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: update_comment
+2026-01-08 18:11:07.701 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: update_comment
+2026-01-08 18:11:07.701 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: delete_comment
+2026-01-08 18:11:07.702 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: delete_comment
+2026-01-08 18:11:07.702 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_author_schema
+2026-01-08 18:11:07.702 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_author_schema
+2026-01-08 18:11:07.702 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_article_schema
+2026-01-08 18:11:07.702 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_article_schema
+2026-01-08 18:11:07.702 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_comment_schema
+2026-01-08 18:11:07.702 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_comment_schema
+2026-01-08 18:11:07.702 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: list_authors
+2026-01-08 18:11:07.702 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: list_authors
+2026-01-08 18:11:07.703 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: list_author_by_id
+2026-01-08 18:11:07.703 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: list_author_by_id
+2026-01-08 18:11:07.703 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_articles_by_author
+2026-01-08 18:11:07.703 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_articles_by_author
+2026-01-08 18:11:07.703 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: list_articles
+2026-01-08 18:11:07.703 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: list_articles
+2026-01-08 18:11:07.703 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_article_by_id
+2026-01-08 18:11:07.703 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_article_by_id
+2026-01-08 18:11:07.703 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_comments_by_article
+2026-01-08 18:11:07.703 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_comments_by_article
+2026-01-08 18:11:07.703 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: list_comments
+2026-01-08 18:11:07.704 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: list_comments
+2026-01-08 18:11:07.704 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_comment_by_id
+2026-01-08 18:11:07.704 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_comment_by_id
+2026-01-08 18:11:07.704 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_article_stats
+2026-01-08 18:11:07.704 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_article_stats
+2026-01-08 18:11:07.704 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_top_authors
+2026-01-08 18:11:07.704 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_top_authors
+2026-01-08 18:11:07.704 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_comments_activity
+2026-01-08 18:11:07.704 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_comments_activity
+2026-01-08 18:11:07.706 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource handler: author_schema
+2026-01-08 18:11:07.706 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource: Author JSON Schema
+2026-01-08 18:11:07.706 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource handler: article_schema
+2026-01-08 18:11:07.706 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource: Article JSON Schema
+2026-01-08 18:11:07.707 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource handler: comment_schema
+2026-01-08 18:11:07.707 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource: Comment JSON Schema
+2026-01-08 18:11:07.707 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource handler: api_documentation
+2026-01-08 18:11:07.707 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource: API Overview Documentation
+2026-01-08 18:11:07.709 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added prompt handler: create_blog_post
+2026-01-08 18:11:07.709 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound prompt: create_blog_post
+2026-01-08 18:11:07.709 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added prompt handler: search_articles
+2026-01-08 18:11:07.709 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound prompt: search_articles
+2026-01-08 18:11:07.709 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added prompt handler: get_article_with_comments
+2026-01-08 18:11:07.709 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound prompt: get_article_with_comments
+2026-01-08 18:11:07.709 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added prompt handler: author_analytics
+2026-01-08 18:11:07.709 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound prompt: author_analytics
+2026-01-08 18:11:07.700 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpServerSession - Received request: JSONRPCRequest[jsonrpc=2.0, method=initialize, id=0, params={protocolVersion=2025-11-25, capabilities={sampling={}, elicitation={}, roots={listChanged=true}}, clientInfo={name=inspector-client, version=0.18.0}}]
+2026-01-08 18:11:07.711 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: list_authors{?page,limit,search,created_after}
+2026-01-08 18:11:07.711 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Authors Collection
+2026-01-08 18:11:07.711 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: list_author_by_id{?id}
+2026-01-08 18:11:07.711 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Author Resource
+2026-01-08 18:11:07.711 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: articles_by_author{?id,published_only,page,limit,sort}
+2026-01-08 18:11:07.711 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Author Articles Collection
+2026-01-08 18:11:07.712 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: list_articles{?author,published,search,category,page,limit,sort}
+2026-01-08 18:11:07.712 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Articles Collection
+2026-01-08 18:11:07.712 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: list_article_by_id{?id}
+2026-01-08 18:11:07.712 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Article Resource
+2026-01-08 18:11:07.712 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: comments_by_article{?id,page,limit,sort}
+2026-01-08 18:11:07.712 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Article Comments Collection
+2026-01-08 18:11:07.712 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: list_comments{?article,author_email,date_from,date_to,page,limit}
+2026-01-08 18:11:07.712 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Comments Collection
+2026-01-08 18:11:07.712 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: list_comment_by_id{?id}
+2026-01-08 18:11:07.712 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Comment Resource
+2026-01-08 18:11:07.712 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: article_stats{?author,start_date,end_date}
+2026-01-08 18:11:07.712 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Article Statistics Report
+2026-01-08 18:11:07.713 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: top_authors{?limit,timeframe}
+2026-01-08 18:11:07.713 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Top Authors Report
+2026-01-08 18:11:07.713 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: comments_activity{?article,timeframe,min_comments}
+2026-01-08 18:11:07.713 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Comments Activity Report
+2026-01-08 18:11:07.713 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Capability 'blog' registered with 24 tools, 4 resources, 11 resource templates, and 4 prompts
+2026-01-08 18:11:07.713 [] INFO io.cheshire.stdio.StdioMcpModule - Stdio MCP Module initialized for capability: blog
+2026-01-08 18:11:07.713 [] INFO io.cheshire.stdio.StdioServerContainer - Starting STDIO for Implementation[name=cheshire-mcp-jetty, title=null, version=1.0.0]
+2026-01-08 18:11:07.722 [main] INFO io.cheshire.runtime.CheshireRuntime - Runtime is now RUNNING
+2026-01-08 18:11:07.722 [main] INFO io.blog.BlogApp - Blog application started successfully
+Runtime started, awaiting termination...
+2026-01-08 18:11:07.724 [pool-2-thread-1] INFO io.modelcontextprotocol.server.McpAsyncServer - Client initialize request - Protocol: 2025-11-25, Capabilities: ClientCapabilities[experimental=null, roots=RootCapabilities[listChanged=true], sampling=Sampling[], elicitation=Elicitation[]], Info: Implementation[name=inspector-client, title=null, version=0.18.0]
+2026-01-08 18:11:07.728 [pool-2-thread-1] WARN io.modelcontextprotocol.server.McpAsyncServer - Client requested unsupported protocol version: 2025-11-25, so the server will suggest the 2024-11-05 version instead
+2026-01-08 18:11:07.747 [pool-2-thread-1] DEBUG io.modelcontextprotocol.server.transport.StdioServerTransportProvider - Received JSON message: {"jsonrpc":"2.0","method":"notifications/initialized"}
+2026-01-08 18:11:07.747 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpSchema - Received JSON message: {"jsonrpc":"2.0","method":"notifications/initialized"}
+2026-01-08 18:11:07.748 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpServerSession - Received notification: JSONRPCNotification[jsonrpc=2.0, method=notifications/initialized, params=null]
+2026-01-08 18:11:07.759 [pool-2-thread-1] DEBUG io.modelcontextprotocol.server.transport.StdioServerTransportProvider - Received JSON message: {"jsonrpc":"2.0","id":1,"method":"logging/setLevel","params":{"level":"debug"}}
+2026-01-08 18:11:07.759 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpSchema - Received JSON message: {"jsonrpc":"2.0","id":1,"method":"logging/setLevel","params":{"level":"debug"}}
+2026-01-08 18:11:07.760 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpServerSession - Received request: JSONRPCRequest[jsonrpc=2.0, method=logging/setLevel, id=1, params={level=debug}]
+2026-01-08 18:12:01.916 [pool-2-thread-1] DEBUG io.modelcontextprotocol.server.transport.StdioServerTransportProvider - Received JSON message: {"jsonrpc":"2.0","id":2,"method":"resources/read","params":{"_meta":{"progressToken":2},"uri":"comment_schema"}}
+2026-01-08 18:12:01.917 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpSchema - Received JSON message: {"jsonrpc":"2.0","id":2,"method":"resources/read","params":{"_meta":{"progressToken":2},"uri":"comment_schema"}}
+2026-01-08 18:12:01.917 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpServerSession - Received request: JSONRPCRequest[jsonrpc=2.0, method=resources/read, id=2, params={_meta={progressToken=2}, uri=comment_schema}]
+2026-01-08 18:12:01.928 [boundedElastic-1] INFO io.cheshire.core.server.StdioDispatcher - Stdio Dispatching: blog/comment_schema
+2026-01-08 18:12:01.929 [boundedElastic-1] ERROR io.cheshire.core.CheshireSession - Pipeline execution failed unexpectedly: 
+java.lang.NullPointerException: Cannot invoke "io.cheshire.spi.pipeline.PipelineProcessor.name()" because "pipeline" is null
+	at io.cheshire.core.CheshireSession.execute(CheshireSession.java:162)
+	at io.cheshire.core.server.StdioDispatcher.dispatch(StdioDispatcher.java:30)
+	at io.cheshire.jetty.mcp.McpManifestRegistrar.lambda$createResourceSpecification$7(McpManifestRegistrar.java:143)
+	at reactor.core.publisher.MonoCallable.call(MonoCallable.java:72)
+	at reactor.core.publisher.FluxSubscribeOnCallable$CallableSubscribeOnSubscription.run(FluxSubscribeOnCallable.java:228)
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:68)
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:28)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-01-08 18:12:05.101 [pool-2-thread-1] DEBUG io.modelcontextprotocol.server.transport.StdioServerTransportProvider - Received JSON message: {"jsonrpc":"2.0","id":3,"method":"resources/read","params":{"_meta":{"progressToken":3},"uri":"author_schema"}}
+2026-01-08 18:12:05.101 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpSchema - Received JSON message: {"jsonrpc":"2.0","id":3,"method":"resources/read","params":{"_meta":{"progressToken":3},"uri":"author_schema"}}
+2026-01-08 18:12:05.101 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpServerSession - Received request: JSONRPCRequest[jsonrpc=2.0, method=resources/read, id=3, params={_meta={progressToken=3}, uri=author_schema}]
+2026-01-08 18:12:05.102 [boundedElastic-1] INFO io.cheshire.core.server.StdioDispatcher - Stdio Dispatching: blog/author_schema
+2026-01-08 18:12:05.102 [boundedElastic-1] ERROR io.cheshire.core.CheshireSession - Pipeline execution failed unexpectedly: 
+java.lang.NullPointerException: Cannot invoke "io.cheshire.spi.pipeline.PipelineProcessor.name()" because "pipeline" is null
+	at io.cheshire.core.CheshireSession.execute(CheshireSession.java:162)
+	at io.cheshire.core.server.StdioDispatcher.dispatch(StdioDispatcher.java:30)
+	at io.cheshire.jetty.mcp.McpManifestRegistrar.lambda$createResourceSpecification$7(McpManifestRegistrar.java:143)
+	at reactor.core.publisher.MonoCallable.call(MonoCallable.java:72)
+	at reactor.core.publisher.FluxSubscribeOnCallable$CallableSubscribeOnSubscription.run(FluxSubscribeOnCallable.java:228)
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:68)
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:28)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-01-08 18:12:05.907 [pool-2-thread-1] DEBUG io.modelcontextprotocol.server.transport.StdioServerTransportProvider - Received JSON message: {"jsonrpc":"2.0","id":4,"method":"resources/read","params":{"_meta":{"progressToken":4},"uri":"api_documentation"}}
+2026-01-08 18:12:05.907 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpSchema - Received JSON message: {"jsonrpc":"2.0","id":4,"method":"resources/read","params":{"_meta":{"progressToken":4},"uri":"api_documentation"}}
+2026-01-08 18:12:05.908 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpServerSession - Received request: JSONRPCRequest[jsonrpc=2.0, method=resources/read, id=4, params={_meta={progressToken=4}, uri=api_documentation}]
+2026-01-08 18:12:05.909 [boundedElastic-1] INFO io.cheshire.core.server.StdioDispatcher - Stdio Dispatching: blog/api_documentation
+2026-01-08 18:12:05.909 [boundedElastic-1] ERROR io.cheshire.core.CheshireSession - Pipeline execution failed unexpectedly: 
+java.lang.NullPointerException: Cannot invoke "io.cheshire.spi.pipeline.PipelineProcessor.name()" because "pipeline" is null
+	at io.cheshire.core.CheshireSession.execute(CheshireSession.java:162)
+	at io.cheshire.core.server.StdioDispatcher.dispatch(StdioDispatcher.java:30)
+	at io.cheshire.jetty.mcp.McpManifestRegistrar.lambda$createResourceSpecification$7(McpManifestRegistrar.java:143)
+	at reactor.core.publisher.MonoCallable.call(MonoCallable.java:72)
+	at reactor.core.publisher.FluxSubscribeOnCallable$CallableSubscribeOnSubscription.run(FluxSubscribeOnCallable.java:228)
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:68)
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:28)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-01-08 18:12:06.634 [pool-2-thread-1] DEBUG io.modelcontextprotocol.server.transport.StdioServerTransportProvider - Received JSON message: {"jsonrpc":"2.0","id":5,"method":"resources/read","params":{"_meta":{"progressToken":5},"uri":"article_schema"}}
+2026-01-08 18:12:06.634 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpSchema - Received JSON message: {"jsonrpc":"2.0","id":5,"method":"resources/read","params":{"_meta":{"progressToken":5},"uri":"article_schema"}}
+2026-01-08 18:12:06.635 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpServerSession - Received request: JSONRPCRequest[jsonrpc=2.0, method=resources/read, id=5, params={_meta={progressToken=5}, uri=article_schema}]
+2026-01-08 18:12:06.635 [boundedElastic-1] INFO io.cheshire.core.server.StdioDispatcher - Stdio Dispatching: blog/article_schema
+2026-01-08 18:12:06.635 [boundedElastic-1] ERROR io.cheshire.core.CheshireSession - Pipeline execution failed unexpectedly: 
+java.lang.NullPointerException: Cannot invoke "io.cheshire.spi.pipeline.PipelineProcessor.name()" because "pipeline" is null
+	at io.cheshire.core.CheshireSession.execute(CheshireSession.java:162)
+	at io.cheshire.core.server.StdioDispatcher.dispatch(StdioDispatcher.java:30)
+	at io.cheshire.jetty.mcp.McpManifestRegistrar.lambda$createResourceSpecification$7(McpManifestRegistrar.java:143)
+	at reactor.core.publisher.MonoCallable.call(MonoCallable.java:72)
+	at reactor.core.publisher.FluxSubscribeOnCallable$CallableSubscribeOnSubscription.run(FluxSubscribeOnCallable.java:228)
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:68)
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:28)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-01-08 18:12:12.490 [pool-2-thread-1] DEBUG io.modelcontextprotocol.server.transport.StdioServerTransportProvider - Received JSON message: {"jsonrpc":"2.0","id":6,"method":"resources/read","params":{"_meta":{"progressToken":6},"uri":"api_documentation"}}
+2026-01-08 18:12:12.491 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpSchema - Received JSON message: {"jsonrpc":"2.0","id":6,"method":"resources/read","params":{"_meta":{"progressToken":6},"uri":"api_documentation"}}
+2026-01-08 18:12:12.491 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpServerSession - Received request: JSONRPCRequest[jsonrpc=2.0, method=resources/read, id=6, params={_meta={progressToken=6}, uri=api_documentation}]
+2026-01-08 18:12:12.492 [boundedElastic-1] INFO io.cheshire.core.server.StdioDispatcher - Stdio Dispatching: blog/api_documentation
+2026-01-08 18:12:12.492 [boundedElastic-1] ERROR io.cheshire.core.CheshireSession - Pipeline execution failed unexpectedly: 
+java.lang.NullPointerException: Cannot invoke "io.cheshire.spi.pipeline.PipelineProcessor.name()" because "pipeline" is null
+	at io.cheshire.core.CheshireSession.execute(CheshireSession.java:162)
+	at io.cheshire.core.server.StdioDispatcher.dispatch(StdioDispatcher.java:30)
+	at io.cheshire.jetty.mcp.McpManifestRegistrar.lambda$createResourceSpecification$7(McpManifestRegistrar.java:143)
+	at reactor.core.publisher.MonoCallable.call(MonoCallable.java:72)
+	at reactor.core.publisher.FluxSubscribeOnCallable$CallableSubscribeOnSubscription.run(FluxSubscribeOnCallable.java:228)
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:68)
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:28)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-01-08 18:19:52.165 [pool-2-thread-1] DEBUG io.modelcontextprotocol.server.transport.StdioServerTransportProvider - Session transport closed
+2026-01-08 18:19:54.403 [main] INFO io.blog.BlogApp - Starting Blog Application...
+2026-01-08 18:19:54.404 [main] WARN io.blog.BlogApp - Unknown argument: --log-file, using default configuration
+2026-01-08 18:19:54.404 [main] INFO io.blog.BlogApp - Using configuration: blog-mcp-stdio-claude.yaml
+2026-01-08 18:19:54.646 [main] INFO io.cheshire.core.manager.ConfigurationManager - Cheshire configuration validation passed
+2026-01-08 18:19:54.702 [main] INFO io.cheshire.core.manager.LifecycleManager - Initializing Lifecycle Manager
+2026-01-08 18:19:54.711 [pool-1-thread-1] INFO io.cheshire.core.manager.SourceProviderManager - Found SourceProvider: io.cheshire.source.jdbc.JdbcDataSourceProviderFactory
+2026-01-08 18:19:54.712 [pool-1-thread-2] INFO io.cheshire.core.manager.QueryEngineManager - Found QueryEngineFactory: io.cheshire.query.engine.jdbc.JdbcQueryEngineFactory
+2026-01-08 18:19:54.713 [pool-1-thread-1] INFO io.cheshire.core.registry.Registry.SourceProvider - Registered SourceProvider 'blog-db' (type: JdbcDataSourceProvider)
+2026-01-08 18:19:54.713 [pool-1-thread-2] INFO io.cheshire.core.registry.Registry.QueryEngine - Registered QueryEngine 'jdbc' (type: JdbcQueryEngine)
+2026-01-08 18:19:54.715 [pool-1-thread-3] INFO io.cheshire.core.registry.Registry.Capability - Registered Capability 'blog' (type: Capability)
+2026-01-08 18:19:54.715 [pool-1-thread-3] INFO io.cheshire.core.manager.CapabilityManager - Registered capability: blog
+2026-01-08 18:19:54.723 [main] INFO io.cheshire.core.CheshireSession - Starting Cheshire Session...
+2026-01-08 18:19:54.741 [main] INFO io.cheshire.runtime.CheshireRuntime - -------------------------------------------
+  BLOG DATA HUB (v1.0.0)
+  Domain: Blog | Org: Blog Corp
+-------------------------------------------
+
+2026-01-08 18:19:54.743 [main] INFO io.cheshire.runtime.CheshireRuntime - Starting Cheshire Servers...
+2026-01-08 18:19:54.752 [] INFO io.cheshire.jetty.ServerRegistry - Creating dedicated STDIO transport for capability blog
+2026-01-08 18:19:54.757 [] INFO io.cheshire.stdio.StdioServerHandle - Starting STDIO server handle for capability blog
+2026-01-08 18:19:54.856 [] DEBUG reactor.util.Loggers - Using Slf4j logging framework
+2026-01-08 18:19:54.925 [pool-2-thread-1] DEBUG io.modelcontextprotocol.server.transport.StdioServerTransportProvider - Received JSON message: {"jsonrpc":"2.0","id":0,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{"sampling":{},"elicitation":{},"roots":{"listChanged":true}},"clientInfo":{"name":"inspector-client","version":"0.18.0"}}}
+2026-01-08 18:19:54.925 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpSchema - Received JSON message: {"jsonrpc":"2.0","id":0,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{"sampling":{},"elicitation":{},"roots":{"listChanged":true}},"clientInfo":{"name":"inspector-client","version":"0.18.0"}}}
+2026-01-08 18:19:54.938 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: create_author
+2026-01-08 18:19:54.941 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: create_author
+2026-01-08 18:19:54.941 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: update_author
+2026-01-08 18:19:54.941 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: update_author
+2026-01-08 18:19:54.941 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: delete_author
+2026-01-08 18:19:54.942 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: delete_author
+2026-01-08 18:19:54.942 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: create_article
+2026-01-08 18:19:54.942 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: create_article
+2026-01-08 18:19:54.942 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: update_article
+2026-01-08 18:19:54.942 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: update_article
+2026-01-08 18:19:54.942 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: delete_article
+2026-01-08 18:19:54.942 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: delete_article
+2026-01-08 18:19:54.942 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: publish_article
+2026-01-08 18:19:54.942 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: publish_article
+2026-01-08 18:19:54.942 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: create_comment
+2026-01-08 18:19:54.942 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: create_comment
+2026-01-08 18:19:54.942 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: update_comment
+2026-01-08 18:19:54.943 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: update_comment
+2026-01-08 18:19:54.943 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: delete_comment
+2026-01-08 18:19:54.943 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: delete_comment
+2026-01-08 18:19:54.943 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_author_schema
+2026-01-08 18:19:54.943 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_author_schema
+2026-01-08 18:19:54.943 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_article_schema
+2026-01-08 18:19:54.943 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_article_schema
+2026-01-08 18:19:54.943 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_comment_schema
+2026-01-08 18:19:54.944 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_comment_schema
+2026-01-08 18:19:54.944 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: list_authors
+2026-01-08 18:19:54.944 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: list_authors
+2026-01-08 18:19:54.944 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: list_author_by_id
+2026-01-08 18:19:54.944 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: list_author_by_id
+2026-01-08 18:19:54.944 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_articles_by_author
+2026-01-08 18:19:54.944 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_articles_by_author
+2026-01-08 18:19:54.945 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: list_articles
+2026-01-08 18:19:54.945 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: list_articles
+2026-01-08 18:19:54.945 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_article_by_id
+2026-01-08 18:19:54.945 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_article_by_id
+2026-01-08 18:19:54.945 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_comments_by_article
+2026-01-08 18:19:54.946 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_comments_by_article
+2026-01-08 18:19:54.946 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: list_comments
+2026-01-08 18:19:54.946 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: list_comments
+2026-01-08 18:19:54.946 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_comment_by_id
+2026-01-08 18:19:54.946 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_comment_by_id
+2026-01-08 18:19:54.947 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_article_stats
+2026-01-08 18:19:54.947 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_article_stats
+2026-01-08 18:19:54.947 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_top_authors
+2026-01-08 18:19:54.948 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_top_authors
+2026-01-08 18:19:54.948 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added tool handler: get_comments_activity
+2026-01-08 18:19:54.948 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound tool: get_comments_activity
+2026-01-08 18:19:54.951 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource handler: author_schema
+2026-01-08 18:19:54.951 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource: Author JSON Schema
+2026-01-08 18:19:54.951 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource handler: article_schema
+2026-01-08 18:19:54.951 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource: Article JSON Schema
+2026-01-08 18:19:54.951 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource handler: comment_schema
+2026-01-08 18:19:54.952 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource: Comment JSON Schema
+2026-01-08 18:19:54.952 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource handler: api_documentation
+2026-01-08 18:19:54.940 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpServerSession - Received request: JSONRPCRequest[jsonrpc=2.0, method=initialize, id=0, params={protocolVersion=2025-11-25, capabilities={sampling={}, elicitation={}, roots={listChanged=true}}, clientInfo={name=inspector-client, version=0.18.0}}]
+2026-01-08 18:19:54.952 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource: API Overview Documentation
+2026-01-08 18:19:54.954 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added prompt handler: create_blog_post
+2026-01-08 18:19:54.954 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound prompt: create_blog_post
+2026-01-08 18:19:54.955 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added prompt handler: search_articles
+2026-01-08 18:19:54.955 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound prompt: search_articles
+2026-01-08 18:19:54.955 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added prompt handler: get_article_with_comments
+2026-01-08 18:19:54.955 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound prompt: get_article_with_comments
+2026-01-08 18:19:54.955 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added prompt handler: author_analytics
+2026-01-08 18:19:54.956 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound prompt: author_analytics
+2026-01-08 18:19:54.957 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: list_authors{?page,limit,search,created_after}
+2026-01-08 18:19:54.957 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Authors Collection
+2026-01-08 18:19:54.957 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: list_author_by_id{?id}
+2026-01-08 18:19:54.957 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Author Resource
+2026-01-08 18:19:54.957 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: articles_by_author{?id,published_only,page,limit,sort}
+2026-01-08 18:19:54.957 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Author Articles Collection
+2026-01-08 18:19:54.957 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: list_articles{?author,published,search,category,page,limit,sort}
+2026-01-08 18:19:54.958 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Articles Collection
+2026-01-08 18:19:54.958 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: list_article_by_id{?id}
+2026-01-08 18:19:54.958 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Article Resource
+2026-01-08 18:19:54.958 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: comments_by_article{?id,page,limit,sort}
+2026-01-08 18:19:54.958 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Article Comments Collection
+2026-01-08 18:19:54.958 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: list_comments{?article,author_email,date_from,date_to,page,limit}
+2026-01-08 18:19:54.958 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Comments Collection
+2026-01-08 18:19:54.958 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: list_comment_by_id{?id}
+2026-01-08 18:19:54.958 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Comment Resource
+2026-01-08 18:19:54.958 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: article_stats{?author,start_date,end_date}
+2026-01-08 18:19:54.958 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Article Statistics Report
+2026-01-08 18:19:54.958 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: top_authors{?limit,timeframe}
+2026-01-08 18:19:54.958 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Top Authors Report
+2026-01-08 18:19:54.958 [] DEBUG io.modelcontextprotocol.server.McpAsyncServer - Added resource template handler: comments_activity{?article,timeframe,min_comments}
+2026-01-08 18:19:54.958 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Successfully bound resource template: Comments Activity Report
+2026-01-08 18:19:54.958 [] INFO io.cheshire.jetty.mcp.McpManifestRegistrar - Capability 'blog' registered with 24 tools, 4 resources, 11 resource templates, and 4 prompts
+2026-01-08 18:19:54.959 [] INFO io.cheshire.stdio.StdioMcpModule - Stdio MCP Module initialized for capability: blog
+2026-01-08 18:19:54.959 [] INFO io.cheshire.stdio.StdioServerContainer - Starting STDIO for Implementation[name=cheshire-mcp-jetty, title=null, version=1.0.0]
+2026-01-08 18:19:54.964 [main] INFO io.cheshire.runtime.CheshireRuntime - Runtime is now RUNNING
+2026-01-08 18:19:54.965 [main] INFO io.blog.BlogApp - Blog application started successfully
+Runtime started, awaiting termination...
+2026-01-08 18:19:54.965 [pool-2-thread-1] INFO io.modelcontextprotocol.server.McpAsyncServer - Client initialize request - Protocol: 2025-11-25, Capabilities: ClientCapabilities[experimental=null, roots=RootCapabilities[listChanged=true], sampling=Sampling[], elicitation=Elicitation[]], Info: Implementation[name=inspector-client, title=null, version=0.18.0]
+2026-01-08 18:19:54.971 [pool-2-thread-1] WARN io.modelcontextprotocol.server.McpAsyncServer - Client requested unsupported protocol version: 2025-11-25, so the server will suggest the 2024-11-05 version instead
+2026-01-08 18:19:54.988 [pool-2-thread-1] DEBUG io.modelcontextprotocol.server.transport.StdioServerTransportProvider - Received JSON message: {"jsonrpc":"2.0","method":"notifications/initialized"}
+2026-01-08 18:19:54.988 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpSchema - Received JSON message: {"jsonrpc":"2.0","method":"notifications/initialized"}
+2026-01-08 18:19:54.990 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpServerSession - Received notification: JSONRPCNotification[jsonrpc=2.0, method=notifications/initialized, params=null]
+2026-01-08 18:19:55.014 [pool-2-thread-1] DEBUG io.modelcontextprotocol.server.transport.StdioServerTransportProvider - Received JSON message: {"jsonrpc":"2.0","id":1,"method":"logging/setLevel","params":{"level":"debug"}}
+2026-01-08 18:19:55.014 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpSchema - Received JSON message: {"jsonrpc":"2.0","id":1,"method":"logging/setLevel","params":{"level":"debug"}}
+2026-01-08 18:19:55.014 [pool-2-thread-1] DEBUG io.modelcontextprotocol.spec.McpServerSession - Received request: JSONRPCRequest[jsonrpc=2.0, method=logging/setLevel, id=1, params={level=debug}]
+2026-01-08 18:23:20.952 [pool-2-thread-1] DEBUG io.modelcontextprotocol.server.transport.StdioServerTransportProvider - Session transport closed
+2026-01-08 18:48:10.707 [pool-2-thread-1] DEBUG io.modelcontextprotocol.server.transport.StdioServerTransportProvider - Session transport closed

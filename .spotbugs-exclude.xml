@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    SpotBugs exclusion filter for Anzar project.
+    Add bug patterns to exclude here if they are false positives or acceptable.
+
+    This is a centralized exclusion file used by all modules in the project.
+-->
+<FindBugsFilter>
+  <!-- Exclude low-severity CRLF injection warnings in logging (common false positive) -->
+  <Match>
+    <package name="io.cheshire.core"/>
+    <Bug pattern="SS_SHOULD_BE_STATIC"/>
+  </Match>
+  <Match>
+    <package name="io.cheshire.core"/>
+    <Bug pattern="EI_EXPOSE_REP2"/>
+  </Match>
+</FindBugsFilter>

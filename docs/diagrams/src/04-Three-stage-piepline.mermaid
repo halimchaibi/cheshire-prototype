@@ -1,0 +1,30 @@
+sequenceDiagram
+    participant P as Pipeline
+    participant Pre as Pre-Processor
+    participant Exec as Executor
+    participant Post as Post-Processor
+    
+    rect rgb(255, 250, 240)
+        Note over P, Post: Pipeline Processing
+        P->>+Pre: process(CanonicalInput)
+        Note over Pre: Stage 1: Validation
+        Pre->>Pre: Validate/Transform
+        Pre-->>-P: Validated Input
+        
+        P->>+Exec: execute(CanonicalInput, SessionTask)
+        
+        alt DSL Query Path
+            Exec->>Exec: DSL template → SQL
+            Exec->>Exec: Execute SQL query
+        else Custom Logic
+            Exec->>Exec: Custom business logic
+        end
+        
+        Exec-->>-P: CanonicalOutput
+        
+        P->>+Post: process(Output)
+        Note over Post: Stage 3: Formatting
+        Post->>Post: Format/Enrich
+        Post-->>-P: Formatted Output
+        P-->>C: TaskResult
+    end

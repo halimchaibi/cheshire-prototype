@@ -1,0 +1,306 @@
+# Cheshire Framework - Git Ignore File
+
+# ============================================
+# Maven Build Artifacts
+# ============================================
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# ============================================
+# Java
+# ============================================
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+hs_err_pid*
+replay_pid*
+
+# ============================================
+# IntelliJ IDEA
+# ============================================
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+.idea_modules/
+
+# ============================================
+# Eclipse
+# ============================================
+.classpath
+.project
+.settings/
+bin/
+tmp/
+.metadata
+.recommenders/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.loadpath
+.factorypath
+
+# ============================================
+# Visual Studio Code
+# ============================================
+.vscode/
+*.code-workspace
+.history/
+
+# ============================================
+# NetBeans
+# ============================================
+nbproject/private/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+# ============================================
+# Operating System Files
+# ============================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ============================================
+# Logs and Databases
+# ============================================
+*.log
+*.sql
+*.sqlite
+*.db
+logs/
+*.log.*
+
+# ============================================
+# Test Coverage Reports
+# ============================================
+*.exec
+jacoco.exec
+jacoco-ut.exec
+.jacoco/
+coverage/
+
+# ============================================
+# Compiled Documentation
+# ============================================
+*.pdf
+site/
+
+# ============================================
+# Package Files
+# ============================================
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# ============================================
+# Virtual Machine crash logs
+# ============================================
+hs_err_pid*
+replay_pid*
+
+# ============================================
+# Gradle (if ever used)
+# ============================================
+.gradle
+**/build/
+!src/**/build/
+gradle-app.setting
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+.gradletasknamecache
+
+# ============================================
+# Node.js (for documentation tools)
+# ============================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# ============================================
+# Temporary Files
+# ============================================
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.#*
+
+# ============================================
+# Security and Credentials
+# ============================================
+# Never commit these!
+*.key
+*.pem
+*.p12
+*.pfx
+*.jks
+*.keystore
+secrets.yml
+secrets.yaml
+credentials.yml
+credentials.yaml
+.env
+.env.local
+.env.*.local
+
+# ============================================
+# Application Specific
+# ============================================
+# H2 Database files (from blog-app and tests)
+*.h2.db
+*.mv.db
+*.trace.db
+
+# Configuration overrides (local development)
+*-local.yaml
+*-local.yml
+*-local.properties
+application-local.yml
+application-local.yaml
+
+# ============================================
+# Documentation Build Artifacts
+# ============================================
+docs/_build/
+docs/.doctrees/
+.sphinx/
+
+# Mermaid diagrams output (keep source .mermaid files)
+docs/diagrams/output/
+*.mermaid.png
+*.mermaid.svg
+
+# ============================================
+# Cheshire Specific
+# ============================================
+# Cheshire runtime artifacts
+cheshire-home/
+.cheshire/
+
+# Test data and fixtures
+**/test-data/
+**/test-fixtures/
+
+# Performance test results
+performance-results/
+benchmark-results/
+
+# ============================================
+# Archives and Backups
+# ============================================
+*.bak
+*.backup
+*.old
+*.orig
+
+# ============================================
+# Misc
+# ============================================
+.attach_pid*
+.java-version
+.sdkmanrc
+
+# ============================================
+# Keep These Files
+# ============================================
+# These should NOT be ignored
+
+# Maven Wrapper (MUST be committed!)
+!.mvn/
+!.mvn/wrapper/
+!.mvn/wrapper/maven-wrapper.properties
+!.mvn/wrapper/maven-wrapper.jar
+!mvnw
+!mvnw.cmd
+
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Keep documentation source files
+!docs/**/*.md
+!docs/**/*.mermaid
+!docs/**/*.svg
+!docs/**/*.png
+
+# Keep example configurations (but not local overrides)
+!**/src/main/resources/config/*.yaml
+!**/src/main/resources/config/*.yml
+!**/src/main/resources/*.yaml
+!**/src/main/resources/*.yml
+
+# Keep README files
+!README.md
+!**/README.md
+
+# Keep LICENSE files
+!LICENSE
+!**/LICENSE
+
+# Keep GitHub Actions workflows
+!.github/
+!.github/workflows/
+!.github/**/*
+

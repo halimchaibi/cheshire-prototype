@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant C as Client<br/>(LLM/Browser/CLI)
+    participant S as Server<br/>(Jetty/stdio)
+    participant A as Protocol Adapter
+    
+    rect rgb(240, 248, 255)
+        Note over C, A: Protocol Layer
+        C->>+S: HTTP Request / MCP message
+        Note right of C: GET /api/v1/articles/{id}<br/>or tool call
+        S->>+A: Raw request
+        A->>A: Parse headers/body
+        A->>A: Extract parameters
+        A-->>-S: RequestEnvelope
+        Note over S: Contains:<br/>• RequestContext<br/>• RequestPayload<br/>• Metadata
+    end

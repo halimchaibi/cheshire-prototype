@@ -1,0 +1,18 @@
+sequenceDiagram
+    participant Stage as Any Stage
+    participant Pipeline
+    participant Capability
+    participant Dispatcher
+    participant Client
+    
+    rect rgb(255, 240, 240)
+        Note over Stage, Client: Error Handling
+        Stage->>Stage: Exception thrown
+        Stage-->>Pipeline: Failure
+        Pipeline-->>Capability: TaskResult.Failure
+        Capability-->>Dispatcher: TaskResult.Failure
+        Dispatcher->>Dispatcher: Map to error
+        Dispatcher-->>Server: ResponseEntity.failure()
+        Server-->>Client: HTTP 4xx/5xx or MCP error
+        Note right of Client: Error details in response
+    end

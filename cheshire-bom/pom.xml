@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- BOM should be standalone -->
+  <groupId>io.cheshire</groupId>
+  <artifactId>cheshire-bom</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>Cheshire :: Bill of Materials</name>
+  <description>Bill of Materials (BOM) for cheshire framework dependencies</description>
+
+  <dependencyManagement>
+    <dependencies>
+
+      <!-- Core cheshire modules (internal) -->
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-common</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- SPIs -->
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-pipeline-spi</artifactId>
+        <version>1.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-server</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-query-engine-spi</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-source-provider-spi</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- Protocol implementations -->
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-protocol-graphql</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- Source providers -->
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-source-provider-jdbc</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-source-provider-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- Query engines -->
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-query-engine-jdbc</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-query-engine-calcite</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- Security -->
+      <!--      <dependency>-->
+      <!--        <groupId>io.cheshire</groupId>-->
+      <!--        <artifactId>cheshire-security</artifactId>-->
+      <!--        <version>${project.version}</version>-->
+      <!--      </dependency>-->
+
+      <!-- Runtime / testing / examples / dev-utils -->
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-runtime</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-testing</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>dev-utils</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+</project>
+

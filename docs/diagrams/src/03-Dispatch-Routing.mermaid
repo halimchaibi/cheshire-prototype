@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant S as Server
+    participant D as Dispatcher
+    participant C as Session
+    
+    rect rgb(245, 255, 245)
+        Note over S, C: Dispatch Layer
+        S->>+D: dispatch(RequestEnvelope)
+        D->>D: Route to capability
+        D->>D: Resolve action
+        D->>D: Build SessionTask
+        D->>+C: execute(SessionTask)
+        Note over C: Capability owns:<br/>• Actions (tools)<br/>• Pipelines<br/>• Config
+        C->>C: Lookup action
+        C->>C: Get pipeline
+        C-->>-D: TaskResult
+    end
