@@ -1,0 +1,57 @@
+# PR Auto-labeling Configuration
+
+# Documentation changes
+documentation:
+  - changed-files:
+      - any-glob-to-any-file: ['docs/**', '*.md', 'README*']
+
+# Source code changes
+java:
+  - changed-files:
+      - any-glob-to-any-file: ['**/*.java']
+
+# Configuration changes
+configuration:
+  - changed-files:
+      - any-glob-to-any-file: ['**/*.yml', '**/*.yaml', '**/*.properties', '**/*.xml']
+
+# Test changes
+tests:
+  - changed-files:
+      - any-glob-to-any-file: ['**/src/test/**', '**/*Test.java', '**/*Tests.java']
+
+# Build system changes
+build:
+  - changed-files:
+      - any-glob-to-any-file: ['pom.xml', '**/pom.xml', 'mvnw*', '.mvn/**']
+
+# CI/CD changes
+ci:
+  - changed-files:
+      - any-glob-to-any-file: ['.github/**']
+
+# Core module changes
+core:
+  - changed-files:
+      - any-glob-to-any-file: ['cheshire-core/**']
+
+# Server module changes
+server:
+  - changed-files:
+      - any-glob-to-any-file: ['cheshire-server/**']
+
+# Query engine changes
+query-engine:
+  - changed-files:
+      - any-glob-to-any-file: ['cheshire-query-engine-*/**']
+
+# SPI changes
+spi:
+  - changed-files:
+      - any-glob-to-any-file: ['**/*-spi/**']
+
+# Dependencies
+dependencies:
+  - changed-files:
+      - any-glob-to-any-file: ['pom.xml', '**/pom.xml']
+

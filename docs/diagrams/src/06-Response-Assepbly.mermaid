@@ -1,0 +1,19 @@
+sequenceDiagram
+    participant D as Dispatcher
+    participant S as Server
+    participant A as Adapter
+    participant C as Client
+    
+    rect rgb(255, 245, 255)
+        Note over D, C: Response Assembly
+        D->>D: Map to ResponseEntity
+        D-->>S: ResponseEntity
+        
+        S->>+A: fromResponseEntity()
+        A->>A: Format JSON/MCP
+        A->>A: Add protocol headers
+        A-->>-S: Protocol Response
+        
+        S-->>C: HTTP 200 OK / Response
+        Note right of C: JSON response with data
+    end

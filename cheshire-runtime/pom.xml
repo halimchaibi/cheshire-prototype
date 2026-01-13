@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>io.cheshire</groupId>
+    <artifactId>cheshire</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>cheshire-runtime</artifactId>
+  <name>Cheshire :: Runtime</name>
+  <description>Runtime components and application entry points</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>io.cheshire</groupId>
+      <artifactId>cheshire-common</artifactId>
+    </dependency>
+    <!--    <dependency>-->
+    <!--      <groupId>io.cheshire</groupId>-->
+    <!--      <artifactId>cheshire-security</artifactId>-->
+    <!--    </dependency>-->
+    <!--    <dependency>-->
+    <!--      <groupId>io.cheshire</groupId>-->
+    <!--      <artifactId>cheshire-pipeline-spi</artifactId>-->
+    <!--    </dependency>-->
+    <!--    <dependency>-->
+    <!--      <groupId>io.cheshire</groupId>-->
+    <!--      <artifactId>cheshire-source-provider-spi</artifactId>-->
+    <!--    </dependency>-->
+    <!--    <dependency>-->
+    <!--      <groupId>io.cheshire</groupId>-->
+    <!--      <artifactId>cheshire-source-provider-jdbc</artifactId>-->
+    <!--    </dependency>-->
+    <!--    <dependency>-->
+    <!--      <groupId>io.cheshire</groupId>-->
+    <!--      <artifactId>cheshire-source-provider-api</artifactId>-->
+    <!--    </dependency>-->
+    <!--    <dependency>-->
+    <!--      <groupId>io.cheshire</groupId>-->
+    <!--      <artifactId>cheshire-query-engine-spi</artifactId>-->
+    <!--    </dependency>-->
+    <!--    <dependency>-->
+    <!--      <groupId>io.cheshire</groupId>-->
+    <!--      <artifactId>cheshire-query-engine-jdbc</artifactId>-->
+    <!--    </dependency>-->
+    <!--    <dependency>-->
+    <!--      <groupId>io.cheshire</groupId>-->
+    <!--      <artifactId>cheshire-query-engine-calcite</artifactId>-->
+    <!--    </dependency>-->
+    <dependency>
+      <groupId>io.cheshire</groupId>
+      <artifactId>cheshire-server</artifactId>
+    </dependency>
+    <!-- Deserialization -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+
+    <!-- Jetty jetty core -->
+    <dependency>
+      <groupId>org.eclipse.jetty.ee10</groupId>
+      <artifactId>jetty-ee10-servlet</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.ee10</groupId>
+      <artifactId>jetty-ee10-servlets</artifactId>
+    </dependency>
+
+    <!-- Logging  -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+    </dependency>
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.tngtech.archunit</groupId>
+      <artifactId>archunit-junit5</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <!--  <build>-->
+  <!--    <plugins>-->
+  <!--      <plugin>-->
+  <!--        <groupId>org.codehaus.mojo</groupId>-->
+  <!--        <artifactId>exec-maven-plugin</artifactId>-->
+  <!--        <version>3.1.0</version>-->
+  <!--        <configuration>-->
+  <!--          <mainClass>io.cheshire.io.chechire.chinook.runtime.CheshireRuntime</mainClass>-->
+  <!--          <arguments>-->
+  <!--            <argument>application-example.yaml</argument>-->
+  <!--          </arguments>-->
+  <!--        </configuration>-->
+  <!--      </plugin>-->
+  <!--    </plugins>-->
+  <!--  </build>-->
+
+</project>
