@@ -6,4 +6,4 @@ This module currently **compiles successfully**, but its features are **not yet 
 It is included in the repository for reference and ongoing development.
 
 **Next steps / TODOs:**
-- [ ] Review and finalize security design and architecture 👉 [RBAC/ABAC: ](../docs/TODOs/SECURITY.md)
+- [ ] Review and finalize security design and architecture 👉 [RBAC/ABAC: ](../docs/TODOs/02-SECURITY.MD)
