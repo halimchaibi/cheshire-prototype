@@ -192,7 +192,7 @@ See the complete [blog-app example](https://github.com/halimchaibi/cheshire-blog
 
 ### Exploration Topics
 
-- **[List-O-Mania](docs/TODOs/)** - Research topics and architectural patterns under investigation
+- **[TODOs](docs/TODOs/)** - Research topics and architectural patterns under investigation
   - Performance optimizations (Bloom filters, off-heap streaming, probabilistic data structures)
   - Security patterns (RBAC/ABAC with Cedar Policy)
   - Query federation (Apache Calcite integration)
@@ -582,7 +582,7 @@ See [cheshire-blog-app/TESTING.md](https://github.com/halimchaibi/cheshire-blog-
 │       ├── guides/user/             # User guides and tutorials
 │       ├── guides/developer/        # Developer guides
 │       ├── reference/               # Reference documentation
-│       └── List-O-Mania/            # Exploration topics and research
+│       └── TODOs/            # Exploration topics and research
 ```
 
 ### Code Style
