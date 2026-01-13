@@ -171,7 +171,7 @@ java -jar blog-app.jar --config blog-mcp-stdio.yaml \
 java -jar blog-app.jar --config blog-mcp-streamable-http.yaml
 ```
 
-See the complete [blog-app example](https://github.com/halimchaibi/cheshire-blog-app/blob/64126cd58f100470fea3055c75624b65aecc2dca/README.md) for full source code, comprehensive documentation, and testing guides.
+See the complete [blog-app example](https://github.com/halimchaibi/cheshire-blog-app/blob/main/README.md) for full source code, comprehensive documentation, and testing guides.
 
 ## 📚 Documentation
 
@@ -558,7 +558,7 @@ curl "http://localhost:9000/api/v1/blog/create_author?username=demo_user&email=d
 curl "http://localhost:9000/api/v1/blog/stats_overview"
 ```
 
-See [cheshire-blog-app/TESTING.md](https://github.com/halimchaibi/cheshire-blog-app/blob/64126cd58f100470fea3055c75624b65aecc2dca/TESTING.md) for comprehensive testing guide.
+See [cheshire-blog-app/TESTING.md](https://github.com/halimchaibi/cheshire-blog-app/blob/main/TESTING.md) for comprehensive testing guide.
 
 ## 🧑‍💻 Development
 
@@ -632,7 +632,7 @@ mvn clean test jacoco:report
 
 ## 🌟 Reference Application
 
-The **[Blog Application](https://github.com/halimchaibi/cheshire-blog-app/blob/64126cd58f100470fea3055c75624b65aecc2dca/README.md)** serves as the primary reference implementation, featuring:
+The **[Blog Application](https://github.com/halimchaibi/cheshire-blog-app/blob/main/README.md)** serves as the primary reference implementation, featuring:
 
 - Complete CRUD operations for Authors, Articles, and Comments
 - Multi-protocol support (REST, MCP stdio, MCP HTTP)
@@ -643,7 +643,7 @@ The **[Blog Application](https://github.com/halimchaibi/cheshire-blog-app/blob/6
 - OpenAPI 3.0 and Postman collections
 - Production-ready pipeline configurations
 
-See [cheshire-blog-app/README.md](https://github.com/halimchaibi/cheshire-blog-app/blob/64126cd58f100470fea3055c75624b65aecc2dca/README.md) for complete documentation.
+See [cheshire-blog-app/README.md](https://github.com/halimchaibi/cheshire-blog-app/blob/main/README.md) for complete documentation.
 
 ## 📞 Support
 
