@@ -1,7 +1,7 @@
 # 🧪 Cheshire-Calcite Bridge (WIP)
 ### Current State: 🏗️ Architectural Prototype
 
-This module successfully is intended to leverage Apache Calcite as Query Engine. 
+This module is intended to leverage Apache Calcite as Query Engine. 
 
 ### Technical Goals:
 
