@@ -13,15 +13,4 @@
   <artifactId>cheshire-pipeline-spi</artifactId>
   <name>Cheshire :: Pipeline :: SPI</name>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>io.cheshire</groupId>
-        <artifactId>cheshire-bom</artifactId>
-        <version>${project.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 </project>

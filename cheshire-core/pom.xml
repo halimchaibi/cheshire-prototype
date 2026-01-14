@@ -3,10 +3,12 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+  
   <parent>
     <groupId>io.cheshire</groupId>
     <artifactId>cheshire</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>cheshire-core</artifactId>
@@ -16,17 +18,6 @@
   <properties>
     <spotbugs.exclude>../.spotbugs-exclude.xml</spotbugs.exclude>
   </properties>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>io.cheshire</groupId>
-        <artifactId>cheshire-bom</artifactId>
-        <version>${project.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <dependencies>
     <!-- Core dependencies -->
@@ -103,5 +94,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
 </project>
