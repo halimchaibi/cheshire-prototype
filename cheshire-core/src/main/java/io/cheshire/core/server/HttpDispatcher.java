@@ -24,7 +24,8 @@ import java.util.Map;
  * Clean, stateless-ish dispatcher that manages Task execution.
  */
 @Slf4j
-public record HttpDispatcher(CheshireSession session) implements CheshireDispatcher {
+public record HttpDispatcher(
+        CheshireSession session) implements CheshireDispatcher {
     @Override
     public ResponseEntity dispatch(RequestEnvelope envelope) {
 

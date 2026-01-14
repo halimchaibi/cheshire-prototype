@@ -81,9 +81,22 @@ import java.util.concurrent.Executors;
  * @see Context
  * @since 1.0.0
  */
-public record PipelineProcessor<I extends CanonicalInput<?>, O extends CanonicalOutput<?>>(String name,
-        Class<I> inputClass, Class<O> outputClass, List<PreProcessor<I>> preProcessors, Executor<I, O> executor,
+public record PipelineProcessor<I extends CanonicalInput<?>, O extends CanonicalOutput<?>>(
+        String name,
+        Class<I> inputClass,
+        Class<O> outputClass,
+        List<PreProcessor<I>> preProcessors,
+        Executor<I, O> executor,
         List<PostProcessor<O>> postProcessors) {
+
+    /**
+     * Compact constructor to prevent EI_EXPOSE_REP Mitigate CWE-374 - Defensively copied via List.copyOf")
+     */
+    public PipelineProcessor {
+        preProcessors = List.copyOf(preProcessors);
+        postProcessors = List.copyOf(postProcessors);
+    }
+
     /**
      * Executes the complete pipeline synchronously.
      * <p>
@@ -119,6 +132,8 @@ public record PipelineProcessor<I extends CanonicalInput<?>, O extends Canonical
 
         ctx.putIfAbsent("pipeline-processor-at", Instant.now().toString());
 
+        // TODO: no need for reduce here - can be replaced with simple for-loop for better readability, but kept for
+        // future use cases.
         I processedInput = preProcessors.stream().reduce(input, (in, processor) -> processor.apply(in, ctx),
                 (a, b) -> b);
 

@@ -12,13 +12,16 @@
 
   <artifactId>cheshire-pipeline-spi</artifactId>
   <name>Cheshire :: Pipeline :: SPI</name>
-  <description></description>
 
-  <properties>
-  </properties>
-
-  <dependencies>
-    <!-- No external dependencies - SPI should be self-contained -->
-  </dependencies>
-
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-bom</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 </project>

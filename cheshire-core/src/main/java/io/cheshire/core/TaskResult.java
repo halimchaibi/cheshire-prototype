@@ -77,7 +77,9 @@ public sealed interface TaskResult permits TaskResult.Failure, TaskResult.Succes
      * @param metadata
      *            Operational metadata (e.g., execution time, trace IDs).
      */
-    record Success(Object output, java.util.Map<String, Object> metadata) implements TaskResult {
+    record Success(
+            Object output,
+            java.util.Map<String, Object> metadata) implements TaskResult {
         public Success {
             metadata = java.util.Map.copyOf(metadata != null ? metadata : java.util.Map.of("empty-metadata", true));
         }
@@ -133,7 +135,10 @@ public sealed interface TaskResult permits TaskResult.Failure, TaskResult.Succes
      * @param metadata
      *            Optional context about the failure state.
      */
-    record Failure(Status status, Throwable cause, java.util.Map<String, Object> metadata) implements TaskResult {
+    record Failure(
+            Status status,
+            Throwable cause,
+            java.util.Map<String, Object> metadata) implements TaskResult {
         public Failure {
             metadata = java.util.Map.copyOf(metadata != null ? metadata : java.util.Map.of());
         }

@@ -132,7 +132,9 @@ public sealed interface ResponseEntity permits ResponseEntity.Success, ResponseE
      * @param metadata
      *            Contextual key-value pairs (e.g., execution metrics).
      */
-    record Success(Object data, Map<String, Object> metadata) implements ResponseEntity {
+    record Success(
+            Object data,
+            Map<String, Object> metadata) implements ResponseEntity {
     }
 
     /**
@@ -143,6 +145,9 @@ public sealed interface ResponseEntity permits ResponseEntity.Success, ResponseE
      * @param message
      *            A descriptive summary of why the operation failed.
      */
-    record Failure(Status status, Throwable error, String message) implements ResponseEntity {
+    record Failure(
+            Status status,
+            Throwable error,
+            String message) implements ResponseEntity {
     }
 }

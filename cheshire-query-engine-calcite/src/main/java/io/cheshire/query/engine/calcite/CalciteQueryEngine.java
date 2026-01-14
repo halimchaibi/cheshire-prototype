@@ -20,9 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Simple in-memory Calcite-like query engine for Cheshire framework.
- */
 public class CalciteQueryEngine implements QueryEngine<SqlQueryRequest, SchemaManager> {
 
     private final String engineName;
@@ -36,7 +33,6 @@ public class CalciteQueryEngine implements QueryEngine<SqlQueryRequest, SchemaMa
         this.sourceNames = config.sources();
     }
 
-    // --- Helper methods ---
     private static Object parseLiteral(String val) {
         val = val.trim();
         if (val.matches("'[^']*'")) {

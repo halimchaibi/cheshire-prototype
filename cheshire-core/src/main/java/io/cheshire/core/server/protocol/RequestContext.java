@@ -93,8 +93,14 @@ import java.util.concurrent.ConcurrentMap;
  * @author Cheshire Framework
  * @since 1.0.0
  */
-public record RequestContext(String sessionId, String userId, String traceId, Map<String, Object> securityContext,
-        Map<String, String> transportHeaders, ConcurrentMap<String, Object> attributes, Instant arrivalTime,
+public record RequestContext(
+        String sessionId,
+        String userId,
+        String traceId,
+        Map<String, Object> securityContext,
+        Map<String, String> transportHeaders,
+        ConcurrentMap<String, Object> attributes,
+        Instant arrivalTime,
         Instant deadline) {
 
     /**

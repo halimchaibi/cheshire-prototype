@@ -62,8 +62,14 @@ package io.cheshire.core.server.protocol;
  *            The exact timestamp when the request entered the Cheshire system. * @author Cheshire Framework
  * @since 1.0.0
  */
-public record RequestEnvelope(String requestId, String capability, String action, ProtocolMetadata protocolMetadata,
-        RequestPayload payload, RequestContext context, java.time.Instant receivedAt) {
+public record RequestEnvelope(
+        String requestId,
+        String capability,
+        String action,
+        ProtocolMetadata protocolMetadata,
+        RequestPayload payload,
+        RequestContext context,
+        java.time.Instant receivedAt) {
     /**
      * Compact constructor for field validation and normalization.
      *

@@ -84,7 +84,10 @@ public final class MapQueryResult implements QueryResult<Map<String, Object>, Ma
      * @param nullable
      *            true if the column allows NULL values, false otherwise
      */
-    public record Column(String name, String type, boolean nullable) {
+    public record Column(
+            String name,
+            String type,
+            boolean nullable) {
         /**
          * Creates a new Column with the specified properties.
          *

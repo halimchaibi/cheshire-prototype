@@ -14,6 +14,18 @@
   <name>Cheshire :: Query Engine :: Calcite</name>
   <description>Apache Calcite query engine implementation for Cheshire</description>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-bom</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
     <!-- Cheshire dependencies -->
     <dependency>

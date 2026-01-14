@@ -57,7 +57,9 @@ import java.util.function.UnaryOperator;
  * @author Cheshire Framework
  * @since 1.0.0
  */
-public record SessionTask(java.util.Map<String, Object> data, java.util.Map<String, Object> metadata) {
+public record SessionTask(
+        java.util.Map<String, Object> data,
+        java.util.Map<String, Object> metadata) {
 
     public SessionTask(java.util.Map<String, Object> data, java.util.Map<String, Object> metadata) {
         this.data = java.util.Collections.unmodifiableMap(new java.util.HashMap<>(data));

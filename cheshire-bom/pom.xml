@@ -35,11 +35,37 @@
     <jetbrains.annotations.version>24.0.1</jetbrains.annotations.version>
     <json-smart.version>2.5.2</json-smart.version>
     <commons-lang3.version>3.20.0</commons-lang3.version>
+    <!-- Dependency versions -->
+    <lombok.version>1.18.42</lombok.version>
+    <slf4j.version>2.0.17</slf4j.version>
+    <h2.version>2.4.240</h2.version>
+    <calcite.version>1.41.0</calcite.version>
+    <jooq.version>3.20.10</jooq.version>
+    <hikari.version>7.0.2</hikari.version>
+    <swagger.version>2.2.22</swagger.version>
+    <jackson.version>2.18.2</jackson.version>
+    <snakeyaml.version>2.2</snakeyaml.version>
+    <jetty.version>12.1.5</jetty.version>
+    <jakarta.servlet.version>6.1.0</jakarta.servlet.version>
+    <jakarta.websocket-api.version>2.1.0</jakarta.websocket-api.version>
+    <okhttp.version>4.12.0</okhttp.version>
+    <mcp.version>0.17.0</mcp.version>
+    <reactive-streams.version>1.0.4</reactive-streams.version>
+    <jetbrains.annotations.version>24.0.1</jetbrains.annotations.version>
+    <spotbugs-annotations.version>4.7.3</spotbugs-annotations.version>
+    <!-- Test dependency versions -->
+    <junit.version>5.13.4</junit.version>
+    <assertj.version>3.27.6</assertj.version>
+    <archunit.version>1.4.1</archunit.version>
+    <mockito.version>5.14.2</mockito.version>
+
+    <!-- enforced tranitive depenecies version -->
+    <json-smart.version>2.5.2</json-smart.version>
+    <commons-lang3.version>3.20.0</commons-lang3.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
-
       <!-- Core cheshire modules (internal) -->
       <dependency>
         <groupId>io.cheshire</groupId>
@@ -276,20 +302,56 @@
         <version>${jetbrains.annotations.version}</version>
       </dependency>
 
-      <!-- Transitive dependency for calcite: https://www.mend.io/vulnerability-database/CVE-2024-57699 -->
+      <!-- Test dependencies -->
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <version>${junit.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>${assertj.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.tngtech.archunit</groupId>
+        <artifactId>archunit-junit5</artifactId>
+        <version>${archunit.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>${mockito.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-junit-jupiter</artifactId>
+        <version>${mockito.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>com.github.spotbugs</groupId>
+        <artifactId>spotbugs-annotations</artifactId>
+        <version>${spotbugs-annotations.version}</version>
+        <optional>true</optional>
+      </dependency>
+
+      <!-- transitive dependency for calcite:  https://www.mend.io/vulnerability-database/CVE-2024-57699 -->
       <dependency>
         <groupId>net.minidev</groupId>
         <artifactId>json-smart</artifactId>
         <version>${json-smart.version}</version>
       </dependency>
-
-      <!-- Commons Lang3 -->
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
         <version>${commons-lang3.version}</version>
       </dependency>
-
     </dependencies>
   </dependencyManagement>
 </project>

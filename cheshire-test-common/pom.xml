@@ -20,7 +20,17 @@
     <archunit.version>1.2.1</archunit.version>
     <junit.version>5.10.1</junit.version>
   </properties>
-
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-bom</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <dependencies>
     <!-- ArchUnit for architecture testing -->
     <dependency>

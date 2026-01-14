@@ -14,43 +14,24 @@
   <name>Cheshire :: Runtime</name>
   <description>Runtime components and application entry points</description>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-bom</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
     <dependency>
       <groupId>io.cheshire</groupId>
       <artifactId>cheshire-common</artifactId>
     </dependency>
-    <!--    <dependency>-->
-    <!--      <groupId>io.cheshire</groupId>-->
-    <!--      <artifactId>cheshire-security</artifactId>-->
-    <!--    </dependency>-->
-    <!--    <dependency>-->
-    <!--      <groupId>io.cheshire</groupId>-->
-    <!--      <artifactId>cheshire-pipeline-spi</artifactId>-->
-    <!--    </dependency>-->
-    <!--    <dependency>-->
-    <!--      <groupId>io.cheshire</groupId>-->
-    <!--      <artifactId>cheshire-source-provider-spi</artifactId>-->
-    <!--    </dependency>-->
-    <!--    <dependency>-->
-    <!--      <groupId>io.cheshire</groupId>-->
-    <!--      <artifactId>cheshire-source-provider-jdbc</artifactId>-->
-    <!--    </dependency>-->
-    <!--    <dependency>-->
-    <!--      <groupId>io.cheshire</groupId>-->
-    <!--      <artifactId>cheshire-source-provider-api</artifactId>-->
-    <!--    </dependency>-->
-    <!--    <dependency>-->
-    <!--      <groupId>io.cheshire</groupId>-->
-    <!--      <artifactId>cheshire-query-engine-spi</artifactId>-->
-    <!--    </dependency>-->
-    <!--    <dependency>-->
-    <!--      <groupId>io.cheshire</groupId>-->
-    <!--      <artifactId>cheshire-query-engine-jdbc</artifactId>-->
-    <!--    </dependency>-->
-    <!--    <dependency>-->
-    <!--      <groupId>io.cheshire</groupId>-->
-    <!--      <artifactId>cheshire-query-engine-calcite</artifactId>-->
-    <!--    </dependency>-->
+
     <dependency>
       <groupId>io.cheshire</groupId>
       <artifactId>cheshire-server</artifactId>

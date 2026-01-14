@@ -98,7 +98,8 @@ import java.util.*;
  * @author Cheshire Framework
  * @since 1.0.0
  */
-public record MaterializedOutput(Map<String, Object> data,
+public record MaterializedOutput(
+        Map<String, Object> data,
         Map<String, Object> metadata) implements CanonicalOutput<MaterializedOutput> {
 
     public MaterializedOutput() {

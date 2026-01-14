@@ -21,7 +21,8 @@ import java.time.Instant;
 import java.util.Map;
 
 @Slf4j
-public record StdioDispatcher(CheshireSession session) implements CheshireDispatcher {
+public record StdioDispatcher(
+        CheshireSession session) implements CheshireDispatcher {
 
     @Override
     public ResponseEntity dispatch(RequestEnvelope envelope) {

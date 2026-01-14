@@ -55,7 +55,11 @@ package io.cheshire.core.server.protocol;
  * @author Cheshire Framework
  * @since 1.0.0
  */
-public record ProtocolMetadata(String protocolType, String version, java.util.Map<String, String> headers, String path,
+public record ProtocolMetadata(
+        String protocolType,
+        String version,
+        java.util.Map<String, String> headers,
+        String path,
         String method) {
     /**
      * Canonical constructor with defensive copies for collection safety.
