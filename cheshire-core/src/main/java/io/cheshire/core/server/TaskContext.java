@@ -113,8 +113,14 @@ import java.util.concurrent.ConcurrentMap;
  * @author Cheshire Framework
  * @since 1.0.0
  */
-public record TaskContext(String sessionId, String userId, String traceId, Map<String, Object> securityContext,
-        ConcurrentMap<String, Object> attributes, Instant arrivalTime, Instant deadline) implements Context {
+public record TaskContext(
+        String sessionId,
+        String userId,
+        String traceId,
+        Map<String, Object> securityContext,
+        ConcurrentMap<String, Object> attributes,
+        Instant arrivalTime,
+        Instant deadline) implements Context {
 
     /**
      * Canonical constructor providing defensive copies and immutability guarantees.

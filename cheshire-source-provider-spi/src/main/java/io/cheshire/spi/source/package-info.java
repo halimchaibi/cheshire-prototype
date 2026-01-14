@@ -69,7 +69,7 @@
  *         return new JdbcDataSourceProvider(config, ds);
  *     }
  *
- *     @Override
+ *     &#64;Override
  *     public ConfigAdapter<CheshireConfig.Source> adapter() {
  *         return (name, sourceDef) -> JdbcDataSourceConfig.from(name, sourceDef);
  *     }
@@ -137,17 +137,13 @@
  *
  * <pre>{@code
  * // Named parameters in query
- * SqlQuery query = SqlQuery.of(
- *     "SELECT * FROM users WHERE id = :userId AND status = :status",
- *     Map.of("userId", 123, "status", "active")
- * );
+ * SqlQuery query = SqlQuery.of("SELECT * FROM users WHERE id = :userId AND status = :status",
+ *         Map.of("userId", 123, "status", "active"));
  *
  * // Provider converts to prepared statement
- * PreparedStatement stmt = conn.prepareStatement(
- *     "SELECT * FROM users WHERE id = ? AND status = ?"
- * );
+ * PreparedStatement stmt = conn.prepareStatement("SELECT * FROM users WHERE id = ? AND status = ?");
  * stmt.setInt(1, 123);
- *stmt.setString(2, "active");
+ * stmt.setString(2, "active");
  * }</pre>
  * <p>
  * <strong>Result Conversion:</strong>
@@ -162,8 +158,8 @@
  *     ResultSetMetaData meta = rs.getMetaData();
  *     for (int i = 1; i <= meta.getColumnCount(); i++) {
  *         row.put(meta.getColumnName(i), rs.getObject(i));
- * }
- * rows.add(row);
+ *     }
+ *     rows.add(row);
  * }
  * }</pre>
  * <p>

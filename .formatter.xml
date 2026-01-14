@@ -400,6 +400,10 @@
     <setting id="org.eclipse.jdt.core.formatter.insert_new_line_in_empty_enum_declaration" value="do not insert"/>
     <setting id="org.eclipse.jdt.core.formatter.insert_new_line_in_empty_method_body" value="do not insert"/>
     <setting id="org.eclipse.jdt.core.formatter.insert_new_line_in_empty_type_declaration" value="do not insert"/>
+
+    <setting id="org.eclipse.jdt.core.formatter.alignment_for_record_components" value="49"/>
+    <setting id="org.eclipse.jdt.core.formatter.insert_new_line_after_opening_paren_in_record_declaration" value="insert"/>
+    <setting id="org.eclipse.jdt.core.formatter.insert_new_line_before_closing_paren_in_record_declaration" value="insert"/>
   </profile>
 </profiles>
 

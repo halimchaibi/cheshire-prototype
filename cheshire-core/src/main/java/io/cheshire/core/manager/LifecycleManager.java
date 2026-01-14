@@ -262,7 +262,9 @@ public class LifecycleManager {
      * @param phase
      *            the initialization phase for ordering
      */
-    private record ComponentEntry(Initializable component, InitializationPhase phase) {
+    private record ComponentEntry(
+            Initializable component,
+            InitializationPhase phase) {
     }
 
 }

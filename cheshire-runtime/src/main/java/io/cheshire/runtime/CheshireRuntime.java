@@ -185,7 +185,7 @@ public final class CheshireRuntime implements AutoCloseable {
         printBanner(this.session.config());
         metrics.recordStart();
 
-        try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+        try (var scope = StructuredTaskScope.open()) {
             log.info("Starting Cheshire Servers...");
 
             session.capabilities().all().forEach(capability -> scope.fork(() -> {
@@ -197,7 +197,7 @@ public final class CheshireRuntime implements AutoCloseable {
                 return null;
             }));
 
-            scope.join().throwIfFailed();
+            scope.join();
 
             state.set(State.RUNNING);
             health.setStatus(RuntimeHealth.Status.RUNNING, "System is operational");
@@ -300,10 +300,11 @@ public final class CheshireRuntime implements AutoCloseable {
         if (!state.compareAndSet(State.RUNNING, State.STOPPING) && !state.compareAndSet(State.STARTING, State.STOPPING))
             return;
 
+        //TODO: Remove the preview feature usage when stable
         log.info("Initiating graceful shutdown...");
         terminalLock.lock();
         try {
-            try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+            try (var scope = StructuredTaskScope.open()) {
                 // Shut down network listeners first, then the core engine
                 servers.forEach(s -> scope.fork(() -> {
                     s.stop();
@@ -313,8 +314,8 @@ public final class CheshireRuntime implements AutoCloseable {
                     session.stop();
                     return null;
                 });
+                scope.join();
 
-                scope.joinUntil(Instant.now().plus(Duration.ofSeconds(30)));
             } catch (Exception e) {
                 log.error("Error during parallel shutdown", e);
             } finally {

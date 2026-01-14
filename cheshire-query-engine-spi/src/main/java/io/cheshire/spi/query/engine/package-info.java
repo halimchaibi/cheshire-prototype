@@ -63,7 +63,7 @@
  *         return new JdbcQueryEngine(config);
  *     }
  *
- *     @Override
+ *     &#64;Override
  *     public ConfigAdapter<CheshireConfig.QueryEngine> adapter() {
  *         return (name, engineDef) -> JdbcQueryEngineConfig.from(name, engineDef);
  *     }
@@ -105,10 +105,12 @@
  *
  * <pre>{@code
  * public record MapQueryResult(
- *     List<Column> columns,
- *     List<Map<String, Object>> rows
- * ) {
- *     public record Column(String name, String type, boolean nullable) {
+ *         List<Column> columns,
+ *         List<Map<String, Object>> rows) {
+ *     public record Column(
+ *             String name,
+ *             String type,
+ *             boolean nullable) {
  *     }
  * }
  * }</pre>

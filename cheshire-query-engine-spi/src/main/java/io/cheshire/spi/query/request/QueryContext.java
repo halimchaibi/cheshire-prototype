@@ -109,8 +109,14 @@ import java.util.concurrent.ConcurrentMap;
  * @author Cheshire Framework
  * @since 1.0.0
  */
-public record QueryContext(String sessionId, String userId, String traceId, Map<String, Object> securityContext,
-        ConcurrentMap<String, Object> attributes, Instant arrivalTime, Instant deadline) {
+public record QueryContext(
+        String sessionId,
+        String userId,
+        String traceId,
+        Map<String, Object> securityContext,
+        ConcurrentMap<String, Object> attributes,
+        Instant arrivalTime,
+        Instant deadline) {
 
     /**
      * Canonical constructor providing defensive copies and immutability guarantees.

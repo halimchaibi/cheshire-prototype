@@ -65,7 +65,8 @@ import java.util.*;
  * @since 1.0.0
  */
 
-public record MaterializedInput(Map<String, Object> data,
+public record MaterializedInput(
+        Map<String, Object> data,
         Map<String, Object> metadata) implements CanonicalInput<MaterializedInput> {
 
     public MaterializedInput() {

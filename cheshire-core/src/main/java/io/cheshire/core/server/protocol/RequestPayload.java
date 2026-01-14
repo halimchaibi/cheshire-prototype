@@ -57,7 +57,10 @@ import java.util.Map;
  * @author Cheshire Framework
  * @since 1.0.0
  */
-public record RequestPayload(PayloadType type, Object data, java.util.Map<String, Object> parameters,
+public record RequestPayload(
+        PayloadType type,
+        Object data,
+        java.util.Map<String, Object> parameters,
         java.util.Map<String, Object> metadata) {
 
     /**

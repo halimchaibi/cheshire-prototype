@@ -68,7 +68,14 @@ import java.util.Map;
  * @see CheshireConfig.Transport
  * @since 1.0.0
  */
-public record Capability(String name, String description, String domain, CheshireConfig.Exposure exposure,
-        CheshireConfig.Transport transport, List<String> sources, String engine,
-        Map<String, PipelineProcessor<CanonicalInput<?>, CanonicalOutput<?>>> pipelines, ActionsConfig actions) {
+public record Capability(
+        String name,
+        String description,
+        String domain,
+        CheshireConfig.Exposure exposure,
+        CheshireConfig.Transport transport,
+        List<String> sources,
+        String engine,
+        Map<String, PipelineProcessor<CanonicalInput<?>, CanonicalOutput<?>>> pipelines,
+        ActionsConfig actions) {
 }
