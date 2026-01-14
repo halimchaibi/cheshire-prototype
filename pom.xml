@@ -32,7 +32,6 @@
     <java.version>25</java.version>
     <maven.compiler.release>${java.version}</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <spotbugs-annotations.version>4.9.7</spotbugs-annotations.version>
     <!-- Plugin versions -->
     <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
     <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
@@ -52,6 +51,73 @@
     <maven-failsafe-plugin.version>3.5.0</maven-failsafe-plugin.version>
     <license-maven-plugin.version>2.7.1</license-maven-plugin.version>
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-bom</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-common</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-pipeline-spi</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-query-engine-spi</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-source-provider-spi</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-source-provider-jdbc</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-query-engine-jdbc</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-query-engine-calcite</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-runtime</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-server</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-test-common</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <build>
     <pluginManagement>
@@ -86,7 +152,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
-          <version>${maven-failsafe-plugin}</version>
+          <version>${maven-failsafe-plugin.version}</version>
         </plugin>
 
         <!-- OWASP Dependency Check -->

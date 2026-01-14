@@ -8,6 +8,7 @@
     <groupId>io.cheshire</groupId>
     <artifactId>cheshire</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>cheshire-source-provider-jdbc</artifactId>
@@ -18,19 +19,7 @@
   <properties>
     <spotbugs.exclude>../.spotbugs-exclude.xml</spotbugs.exclude>
   </properties>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>io.cheshire</groupId>
-        <artifactId>cheshire-bom</artifactId>
-        <version>${project.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
+  
   <dependencies>
     <dependency>
       <groupId>io.cheshire</groupId>
