@@ -304,20 +304,39 @@ public final class CheshireRuntime implements AutoCloseable {
         log.info("Initiating graceful shutdown...");
         terminalLock.lock();
         try {
-            try (var scope = StructuredTaskScope.open()) {
-                // Shut down network listeners first, then the core engine
-                servers.forEach(s -> scope.fork(() -> {
-                    s.stop();
-                    return null;
-                }));
-                scope.fork(() -> {
-                    session.stop();
-                    return null;
-                });
-                scope.join();
+            // Use a virtual thread with timeout for shutdown to prevent hanging
+            Thread shutdownThread = Thread.ofVirtual().start(() -> {
+                try (var scope = StructuredTaskScope.open()) {
+                    // Shut down network listeners first, then the core engine
+                    servers.forEach(s -> scope.fork(() -> {
+                        s.stop();
+                        return null;
+                    }));
+                    scope.fork(() -> {
+                        session.stop();
+                        return null;
+                    });
+                    scope.join();
 
-            } catch (Exception e) {
-                log.error("Error during parallel shutdown", e);
+                } catch (InterruptedException e) {
+                    log.warn("Shutdown interrupted due to timeout");
+                    Thread.currentThread().interrupt();
+                } catch (Exception e) {
+                    log.error("Error during parallel shutdown", e);
+                }
+            });
+
+            try {
+                // Wait for shutdown to complete with 30-second timeout
+                if (!shutdownThread.join(Duration.ofSeconds(30))) {
+                    log.warn("Shutdown timeout exceeded (30s), forcing termination");
+                    shutdownThread.interrupt();
+                    // Give it a brief moment to respond to interrupt
+                    shutdownThread.join(Duration.ofSeconds(2));
+                }
+            } catch (InterruptedException e) {
+                log.error("Interrupted while waiting for shutdown", e);
+                Thread.currentThread().interrupt();
             } finally {
                 finalizeShutdown();
             }
