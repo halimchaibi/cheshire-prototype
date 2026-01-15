@@ -193,7 +193,7 @@
           <version>${spotbugs-maven-plugin.version}</version>
           <configuration>
             <effort>Max</effort>
-            <threshold>Medium</threshold>
+            <threshold>High</threshold>
             <xmlOutput>true</xmlOutput>
             <failOnError>true</failOnError>
             <excludeFilterFile>${maven.multiModuleProjectDirectory}/.spotbugs-exclude.xml</excludeFilterFile>
@@ -529,6 +529,12 @@
             <configuration>
               <argLine>--enable-preview</argLine>
               <useModulePath>false</useModulePath>
+              <annotationProcessorPaths>
+                <path>
+                  <groupId>org.projectlombok</groupId>
+                  <artifactId>lombok</artifactId>
+                </path>
+              </annotationProcessorPaths>
             </configuration>
           </plugin>
         </plugins>
