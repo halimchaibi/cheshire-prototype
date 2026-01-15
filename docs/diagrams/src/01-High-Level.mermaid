@@ -2,11 +2,12 @@ graph TB
     Client[Client Apps<br/>LLM/Browser/CLI] --> Protocol[Protocol Layer<br/>HTTP/MCP]
     Protocol --> Cheshire[Cheshire Core<br/>Dispatcher + Pipelines]
     Cheshire --> Capabilities[Capabilities<br/>Business Domains]
-    Capabilities --> Data[Data Layer<br/>Query Engine + Providers]
-    
-    subgraph "Three-Stage Pipeline"
+
+    subgraph PipelineProcessor["Pipeline Processor"]
         direction LR
         Pre[Pre-Processor] --> Exec[Executor] --> Post[Post-Processor]
     end
-    
-    Cheshire --> Pipeline
+
+    PipelineProcessor --> Data[Data Layer<br/>Query Engine + Providers]
+
+    Cheshire --> PipelineProcessor
