@@ -615,6 +615,7 @@ mvn clean test jacoco:report
 ```
 
 ## 📋 Roadmap
+Current progress, upcoming features, and bug fixes: [GitHub Project Board](https://github.com/users/halimchaibi/projects/2).
 
 ### ✅ Completed (v1.0)
 
