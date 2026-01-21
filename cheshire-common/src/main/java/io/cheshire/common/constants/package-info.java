@@ -10,25 +10,27 @@
 
 /**
  * Framework-wide constants and enumerations.
- * <p>
- * <strong>Package Overview:</strong>
- * <p>
- * This package contains constant definitions used across the framework:
+ *
+ * <p><strong>Package Overview:</strong>
+ *
+ * <p>This package contains constant definitions used across the framework:
+ *
  * <ul>
- * <li>Protocol type constants (REST, MCP, WebSocket)</li>
- * <li>Binding type constants (HTTP-JSON, MCP-RPC)</li>
- * <li>Configuration keys</li>
- * <li>Default values</li>
+ *   <li>Protocol type constants (REST, MCP, WebSocket)
+ *   <li>Binding type constants (HTTP-JSON, MCP-RPC)
+ *   <li>Configuration keys
+ *   <li>Default values
  * </ul>
- * <p>
- * <strong>Constant Naming Conventions:</strong>
+ *
+ * <p><strong>Constant Naming Conventions:</strong>
+ *
  * <ul>
- * <li>ALL_CAPS for static final constants</li>
- * <li>Grouped by functionality in separate classes</li>
- * <li>Enums for fixed sets of values</li>
+ *   <li>ALL_CAPS for static final constants
+ *   <li>Grouped by functionality in separate classes
+ *   <li>Enums for fixed sets of values
  * </ul>
- * <p>
- * <strong>Example Constants:</strong>
+ *
+ * <p><strong>Example Constants:</strong>
  *
  * <pre>{@code
  * public final class CheshireConstants {
@@ -45,8 +47,8 @@
  *     }
  * }
  * }</pre>
- * <p>
- * <strong>Usage:</strong>
+ *
+ * <p><strong>Usage:</strong>
  *
  * <pre>{@code
  * // Use constants for configuration

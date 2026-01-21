@@ -10,21 +10,23 @@
 
 /**
  * Manager classes responsible for lifecycle, configuration, and registry management.
- * <p>
- * <strong>Package Overview:</strong>
- * <p>
- * This package contains the core management infrastructure of the Cheshire Framework:
+ *
+ * <p><strong>Package Overview:</strong>
+ *
+ * <p>This package contains the core management infrastructure of the Cheshire Framework:
+ *
  * <ul>
- * <li><strong>ConfigurationManager</strong> - YAML loading, resolution, and validation</li>
- * <li><strong>LifecycleManager</strong> - Three-phase initialization and LIFO shutdown</li>
- * <li><strong>CapabilityManager</strong> - Capability registration and pipeline factory</li>
- * <li><strong>SourceProviderManager</strong> - Data source lifecycle and SPI loading</li>
- * <li><strong>QueryEngineManager</strong> - Query engine lifecycle and SPI loading</li>
+ *   <li><strong>ConfigurationManager</strong> - YAML loading, resolution, and validation
+ *   <li><strong>LifecycleManager</strong> - Three-phase initialization and LIFO shutdown
+ *   <li><strong>CapabilityManager</strong> - Capability registration and pipeline factory
+ *   <li><strong>SourceProviderManager</strong> - Data source lifecycle and SPI loading
+ *   <li><strong>QueryEngineManager</strong> - Query engine lifecycle and SPI loading
  * </ul>
- * <p>
- * <strong>Lifecycle Management:</strong>
- * <p>
- * The {@link io.cheshire.core.manager.LifecycleManager} orchestrates a three-phase initialization:
+ *
+ * <p><strong>Lifecycle Management:</strong>
+ *
+ * <p>The {@link io.cheshire.core.manager.LifecycleManager} orchestrates a three-phase
+ * initialization:
  *
  * <pre>
  * Phase 1: Initialize Source Providers (SPI discovery via ServiceLoader)
@@ -33,22 +35,23 @@
  *    ↓
  * Phase 3: Initialize Capabilities (Pipeline factory creation)
  * </pre>
- * <p>
- * Shutdown follows reverse order (LIFO: Capabilities → Engines → Sources).
- * <p>
- * <strong>Configuration Management:</strong>
- * <p>
- * The {@link io.cheshire.core.manager.ConfigurationManager} handles:
+ *
+ * <p>Shutdown follows reverse order (LIFO: Capabilities → Engines → Sources).
+ *
+ * <p><strong>Configuration Management:</strong>
+ *
+ * <p>The {@link io.cheshire.core.manager.ConfigurationManager} handles:
+ *
  * <ul>
- * <li>Loading main configuration (cheshire.yaml or custom)</li>
- * <li>Recursive loading of actions and pipelines files</li>
- * <li>Configuration validation and consistency checks</li>
- * <li>Support for both classpath and filesystem sources</li>
+ *   <li>Loading main configuration (cheshire.yaml or custom)
+ *   <li>Recursive loading of actions and pipelines files
+ *   <li>Configuration validation and consistency checks
+ *   <li>Support for both classpath and filesystem sources
  * </ul>
- * <p>
- * <strong>SPI Integration:</strong>
- * <p>
- * Manager classes integrate with Service Provider Interface (SPI) for extensibility:
+ *
+ * <p><strong>SPI Integration:</strong>
+ *
+ * <p>Manager classes integrate with Service Provider Interface (SPI) for extensibility:
  *
  * <pre>{@code
  * // Source providers discovered via SPI
@@ -61,18 +64,19 @@
  * engineManager.initialize(config.getQueryEngines());
  * // Automatically loads JdbcQueryEngineFactory, etc.
  * }</pre>
- * <p>
- * <strong>Registry Pattern:</strong>
- * <p>
- * All managers maintain thread-safe registries for their respective components, providing consistent lookup and
- * lifecycle management interfaces.
- * <p>
- * <strong>Design Patterns:</strong>
+ *
+ * <p><strong>Registry Pattern:</strong>
+ *
+ * <p>All managers maintain thread-safe registries for their respective components, providing
+ * consistent lookup and lifecycle management interfaces.
+ *
+ * <p><strong>Design Patterns:</strong>
+ *
  * <ul>
- * <li><strong>Manager Pattern:</strong> Centralized lifecycle and registry management</li>
- * <li><strong>Service Locator:</strong> Registry-based component lookup</li>
- * <li><strong>Factory Method:</strong> SPI-based component instantiation</li>
- * <li><strong>Template Method:</strong> Consistent initialization/shutdown flow</li>
+ *   <li><strong>Manager Pattern:</strong> Centralized lifecycle and registry management
+ *   <li><strong>Service Locator:</strong> Registry-based component lookup
+ *   <li><strong>Factory Method:</strong> SPI-based component instantiation
+ *   <li><strong>Template Method:</strong> Consistent initialization/shutdown flow
  * </ul>
  *
  * @see io.cheshire.core.manager.ConfigurationManager

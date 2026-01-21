@@ -11,178 +11,174 @@
 package io.cheshire.spi.query.engine;
 
 import io.cheshire.spi.query.exception.QueryEngineException;
-import io.cheshire.spi.query.exception.QueryExecutionException;
-import io.cheshire.spi.query.request.QueryRequest;
-import io.cheshire.spi.query.result.MapQueryResult;
+import io.cheshire.spi.query.request.LogicalQuery;
+import io.cheshire.spi.query.request.QueryEngineContext;
+import io.cheshire.spi.query.result.QueryEngineResult;
 
 /**
- * Generic interface for a query engine.
+ * Service Provider Interface (SPI) for pluggable query execution engines.
  *
- * <p>
- * A query engine is responsible for parsing, validating, planning, optimizing, and executing queries against one or
- * more data sources. Implementations may use different underlying technologies (e.g., Apache Calcite, direct JDBC) but
- * provide a unified interface for query execution.
- * </p>
+ * <p>A {@code QueryEngine} processes logical queries against one or more data sources provided in
+ * the {@link QueryEngineContext}. Implementations can range from simple pass-through engines to
+ * sophisticated query planners with optimization and federation capabilities.
  *
- * <p>
- * <strong>Lifecycle:</strong>
- * </p>
+ * <h2>Engine Capabilities</h2>
+ *
  * <ul>
- * <li>Create engine instance via factory</li>
- * <li>Call {@link #open()} to initialize and prepare the engine</li>
- * <li>Execute queries using {@link #execute(QueryRequest, Object)}</li>
- * <li>Call {@link #close()} when done to release resources</li>
+ *   <li><b>Direct Execution</b>: Pass-through to single source (e.g., JDBC engine)
+ *   <li><b>Query Planning</b>: Cost-based optimization (e.g., Calcite engine)
+ *   <li><b>Federation</b>: Join data from multiple heterogeneous sources
+ *   <li><b>Streaming</b>: Process large result sets incrementally
  * </ul>
  *
- * <p>
- * <strong>Thread Safety:</strong> Implementations should document their thread-safety guarantees. Generally, engines
- * should be safe for concurrent query execution but may require external synchronization for manager operations
- * (open/close).
- * </p>
+ * <h2>Lifecycle</h2>
  *
- * <p>
- * <strong>Resource Management:</strong> This interface extends {@link AutoCloseable}. Always ensure proper resource
- * cleanup by calling {@link #close()} or using try-with-resources patterns.
- * </p>
+ * <ol>
+ *   <li><b>Creation</b>: Instantiated via {@link QueryEngineFactory}
+ *   <li><b>Opening</b>: Initialized via {@link #open()}
+ *   <li><b>Execution</b>: Queries executed via {@link #execute(LogicalQuery, QueryEngineContext)}
+ *   <li><b>Closing</b>: Resources released via {@link #close()}
+ * </ol>
  *
- * @param <Q>
- *            type of query request payload (e.g., SqlQueryRequest)
- * @param <T>
- *            type of context object (e.g., SchemaManager, SourceProvider)
- * @author Cheshire Framework
- * @since 1.0.0
+ * <h2>Example Usage</h2>
+ *
+ * <pre>{@code
+ * // Create context with source providers
+ * QueryEngineContext context = new QueryEngineContext(
+ *     sessionId, userId, traceId,
+ *     securityContext,
+ *     List.of(jdbcSourceProvider, restSourceProvider),
+ *     new ConcurrentHashMap<>(),
+ *     Instant.now(),
+ *     Instant.now().plusSeconds(30)
+ * );
+ *
+ * // Execute query
+ * try (QueryEngine<SqlQuery> engine = factory.create(config)) {
+ *     engine.open();
+ *
+ *     SqlQuery query = new SqlQuery("SELECT * FROM users WHERE age > :minAge");
+ *     QueryEngineResult result = engine.execute(query, context);
+ *
+ *     System.out.println("Columns: " + result.columns());
+ *     result.rows().forEach(row -> System.out.println(row));
+ * }
+ * }</pre>
+ *
+ * @param <Q> the logical query type extending {@link LogicalQuery}
+ * @see QueryEngineFactory
+ * @see QueryEngineContext
+ * @see QueryEngineResult
+ * @since 1.0
  */
-public interface QueryEngine<Q extends QueryRequest<?, ?>, T> extends AutoCloseable {
+public interface QueryEngine<Q extends LogicalQuery> extends AutoCloseable {
 
-    String name();
+  /**
+   * Returns the unique name or identifier of this query engine.
+   *
+   * @return the engine name, never {@code null}
+   */
+  String name();
 
-    /**
-     * Initialize and open the engine for queries.
-     *
-     * <p>
-     * This method prepares the engine for query execution. It may:
-     * <ul>
-     * <li>Initialize connection pools</li>
-     * <li>Register schemas and data sources</li>
-     * <li>Load configuration and validate settings</li>
-     * <li>Prepare query parsers and optimizers</li>
-     * </ul>
-     * </p>
-     *
-     * <p>
-     * This method must be called before any query operations. Calling it multiple times should be idempotent.
-     * </p>
-     *
-     * @throws QueryEngineException
-     *             if initialization fails (e.g., invalid configuration, connection failures, resource allocation
-     *             errors)
-     */
-    void open() throws QueryEngineException;
+  /**
+   * Opens and initializes the query engine.
+   *
+   * <p>This method allocates resources and prepares the engine for query execution. It should be
+   * called before {@link #execute(LogicalQuery, QueryEngineContext)}. Calling {@code open()} on an
+   * already open engine should be idempotent.
+   *
+   * @throws io.cheshire.spi.query.exception.QueryEngineInitializationException if initialization
+   *     fails
+   * @throws QueryEngineException if any other error occurs
+   */
+  void open() throws QueryEngineException;
 
-    /**
-     * Execute a query request and return a typed result.
-     *
-     * <p>
-     * This method performs the complete query execution pipeline:
-     * <ol>
-     * <li>Parse the query</li>
-     * <li>Validate against schemas</li>
-     * <li>Create and optimize execution plan</li>
-     * <li>Execute the plan</li>
-     * <li>Transform and return results</li>
-     * </ol>
-     * </p>
-     *
-     * <p>
-     * The context parameter provides access to data sources, schemas, or other runtime information needed for query
-     * execution.
-     * </p>
-     *
-     * @param query
-     *            the query request to execute
-     * @param context
-     *            the execution context (e.g., schema manager, source provider)
-     * @return the query result containing rows and column metadata
-     * @throws QueryExecutionException
-     *             if query execution fails (e.g., syntax errors, validation errors, execution failures, timeout)
-     * @throws IllegalStateException
-     *             if the engine is not open
-     */
-    MapQueryResult execute(Q query, T context) throws QueryExecutionException;
+  /**
+   * Executes a logical query against the sources provided in the context.
+   *
+   * <p>The engine transforms the logical query into physical queries for the available sources,
+   * executes them, and merges the results into a unified {@link QueryEngineResult}.
+   *
+   * <h3>Execution Flow</h3>
+   *
+   * <ol>
+   *   <li>Validate the query via {@link #validate(LogicalQuery)}
+   *   <li>Extract sources from {@link QueryEngineContext#sources()}
+   *   <li>Plan query execution (optimization, source selection)
+   *   <li>Execute physical queries against sources
+   *   <li>Merge and transform results
+   *   <li>Check deadline from {@link QueryEngineContext#deadline()}
+   * </ol>
+   *
+   * @param query the logical query to execute, must not be {@code null}
+   * @param ctx the execution context with sources and metadata, must not be {@code null}
+   * @return the query result with columns and rows, never {@code null}
+   * @throws io.cheshire.spi.query.exception.QueryExecutionException if execution fails
+   * @throws io.cheshire.spi.query.exception.QueryValidationException if the query is invalid
+   * @throws io.cheshire.spi.query.exception.QueryTimeoutException if execution times out
+   * @throws QueryEngineException if any other error occurs
+   */
+  QueryEngineResult execute(Q query, QueryEngineContext ctx) throws QueryEngineException;
 
-    /**
-     * Explain how the query will be executed (query plan, steps, etc.).
-     *
-     * <p>
-     * This method generates an execution plan without actually executing the query. The returned string typically
-     * includes:
-     * <ul>
-     * <li>Logical query plan</li>
-     * <li>Optimized physical plan</li>
-     * <li>Estimated costs</li>
-     * <li>Execution steps</li>
-     * </ul>
-     * </p>
-     *
-     * <p>
-     * Useful for debugging, optimization, and understanding query behavior.
-     * </p>
-     *
-     * @param query
-     *            the query request to explain
-     * @return a human-readable string representation of the execution plan
-     * @throws QueryExecutionException
-     *             if planning fails (e.g., invalid query syntax, validation errors)
-     * @throws IllegalStateException
-     *             if the engine is not open
-     */
-    String explain(Q query) throws QueryExecutionException;
+  /**
+   * Returns an explanation of how the query would be executed.
+   *
+   * <p>The explanation typically includes:
+   *
+   * <ul>
+   *   <li>Query plan (logical and physical)
+   *   <li>Source selection and pushdown strategies
+   *   <li>Join strategies and ordering
+   *   <li>Estimated costs (if available)
+   * </ul>
+   *
+   * @param query the query to explain, must not be {@code null}
+   * @return a human-readable execution plan, never {@code null}
+   * @throws QueryEngineException if plan generation fails
+   */
+  String explain(Q query) throws QueryEngineException;
 
-    /**
-     * Validate the query request before execution.
-     *
-     * <p>
-     * This method performs syntax and semantic validation without executing the query. It checks:
-     * <ul>
-     * <li>Query syntax correctness</li>
-     * <li>Schema and table existence</li>
-     * <li>Column references</li>
-     * <li>Type compatibility</li>
-     * </ul>
-     * </p>
-     *
-     * <p>
-     * Note: This is a lightweight validation. Full validation may occur during {@link #execute(QueryRequest, Object)}.
-     * </p>
-     *
-     * @param query
-     *            the query request to validate
-     * @return true if the query is valid, false otherwise
-     */
-    boolean validate(Q query);
+  /**
+   * Validates the query without executing it.
+   *
+   * <p>Validation checks include:
+   *
+   * <ul>
+   *   <li>Query syntax correctness
+   *   <li>Semantic validity (referenced tables/columns exist)
+   *   <li>Type compatibility
+   * </ul>
+   *
+   * @param query the query to validate, must not be {@code null}
+   * @return {@code true} if the query is valid, {@code false} otherwise
+   * @throws QueryEngineException if validation fails with an error
+   */
+  boolean validate(Q query) throws QueryEngineException;
 
-    boolean isOpen();
+  /**
+   * Indicates whether this engine supports streaming result sets.
+   *
+   * <p>Streaming engines can process large result sets without loading all data into memory.
+   *
+   * @return {@code true} if streaming is supported, {@code false} otherwise
+   */
+  boolean supportsStreaming();
 
-    /**
-     * Close and clean up resources.
-     *
-     * <p>
-     * This method releases all resources associated with the engine:
-     * <ul>
-     * <li>Closes connections and connection pools</li>
-     * <li>Unregisters schemas</li>
-     * <li>Cleans up internal caches</li>
-     * <li>Shuts down background threads</li>
-     * </ul>
-     * </p>
-     *
-     * <p>
-     * After calling this method, the engine should not be used. Calling it multiple times should be safe (idempotent).
-     * </p>
-     *
-     * @throws QueryEngineException
-     *             if an error occurs during cleanup
-     */
-    @Override
-    void close() throws QueryEngineException;
+  /**
+   * Checks whether this query engine is currently open and ready for execution.
+   *
+   * @return {@code true} if the engine is open, {@code false} otherwise
+   */
+  boolean isOpen();
+
+  /**
+   * Closes the query engine and releases all associated resources.
+   *
+   * <p>After closing, the engine should not be used for query execution. This method should be
+   * idempotent (safe to call multiple times).
+   *
+   * @throws QueryEngineException if an error occurs during cleanup
+   */
+  @Override
+  void close() throws QueryEngineException;
 }

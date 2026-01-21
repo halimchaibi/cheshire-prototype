@@ -10,26 +10,28 @@
 
 /**
  * Deployment utilities for production environments.
- * <p>
- * <strong>Package Overview:</strong>
- * <p>
- * This package provides utilities for deploying Cheshire applications in production:
+ *
+ * <p><strong>Package Overview:</strong>
+ *
+ * <p>This package provides utilities for deploying Cheshire applications in production:
+ *
  * <ul>
- * <li>Configuration management (externalized config)</li>
- * <li>Environment variable resolution</li>
- * <li>Cloud platform integration</li>
- * <li>Container orchestration support</li>
+ *   <li>Configuration management (externalized config)
+ *   <li>Environment variable resolution
+ *   <li>Cloud platform integration
+ *   <li>Container orchestration support
  * </ul>
- * <p>
- * <strong>Deployment Patterns:</strong>
+ *
+ * <p><strong>Deployment Patterns:</strong>
+ *
  * <ul>
- * <li><strong>Standalone JAR:</strong> Single executable with embedded config</li>
- * <li><strong>Docker Container:</strong> Containerized deployment with volume-mounted config</li>
- * <li><strong>Kubernetes:</strong> ConfigMaps and Secrets for configuration</li>
- * <li><strong>Cloud Functions:</strong> Serverless deployment with environment variables</li>
+ *   <li><strong>Standalone JAR:</strong> Single executable with embedded config
+ *   <li><strong>Docker Container:</strong> Containerized deployment with volume-mounted config
+ *   <li><strong>Kubernetes:</strong> ConfigMaps and Secrets for configuration
+ *   <li><strong>Cloud Functions:</strong> Serverless deployment with environment variables
  * </ul>
- * <p>
- * <strong>Example Docker Deployment:</strong>
+ *
+ * <p><strong>Example Docker Deployment:</strong>
  *
  * <pre>{@code
  * # Dockerfile
@@ -41,8 +43,8 @@
  * # Run with external config
  * docker run -v /path/to/config:/config -p 8080:8080 app:latest --config /config/app.yaml
  * }</pre>
- * <p>
- * <strong>Example Kubernetes Deployment:</strong>
+ *
+ * <p><strong>Example Kubernetes Deployment:</strong>
  *
  * <pre>{@code
  * apiVersion: v1

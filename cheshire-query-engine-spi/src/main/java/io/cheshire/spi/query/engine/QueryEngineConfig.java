@@ -10,66 +10,62 @@
 
 package io.cheshire.spi.query.engine;
 
+import io.cheshire.spi.query.exception.QueryEngineException;
 import java.util.Map;
 
 /**
  * Configuration interface for query engines.
  *
- * <p>
- * Implementations of this interface provide configuration data for query engine instances. Configuration typically
- * includes:
- * <ul>
- * <li>Engine name/identifier</li>
- * <li>Data source references</li>
- * <li>Engine-specific settings</li>
- * <li>Performance tuning parameters</li>
- * </ul>
- * </p>
+ * <p>Implementations provide type-safe access to engine configuration. Configs should be immutable
+ * after construction and validate themselves.
  *
- * <p>
- * Configuration objects should be immutable and validated before use.
- * </p>
+ * <h2>Example Implementation</h2>
  *
- * @author Cheshire Framework
- * @since 1.0.0
+ * <pre>{@code
+ * public record JdbcQueryEngineConfig(String name, List<String> sources)
+ *         implements QueryEngineConfig {
+ *
+ *     @Override
+ *     public boolean validate() throws QueryEngineException {
+ *         if (name == null || name.isBlank()) {
+ *             throw new QueryEngineConfigurationException("Engine name is required");
+ *         }
+ *         return true;
+ *     }
+ *
+ *     @Override
+ *     public Map<String, Object> asMap() {
+ *         return Map.of("name", name, "sources", sources);
+ *     }
+ * }
+ * }</pre>
+ *
+ * @since 1.0
  */
 public interface QueryEngineConfig {
 
-    /**
-     * Returns the unique name/identifier for this query engine instance.
-     *
-     * @return the engine name, must not be null or empty
-     */
-    String name();
+  /**
+   * Returns the unique name of the query engine.
+   *
+   * @return the engine name, never {@code null}
+   */
+  String name();
 
-    /**
-     * Returns the configuration as a map of key-value pairs.
-     *
-     * <p>
-     * This method provides a generic representation of the configuration, useful for serialization, logging, and
-     * debugging.
-     * </p>
-     *
-     * @return an immutable map containing all configuration properties
-     */
-    default Map<String, Object> asMap() {
-        return Map.of();
-    }
+  /**
+   * Returns an immutable map representation of this configuration.
+   *
+   * @return a map of configuration properties, never {@code null}
+   */
+  default Map<String, Object> asMap() {
+    return Map.of();
+  }
 
-    /**
-     * Validates the configuration for correctness and completeness.
-     *
-     * <p>
-     * This method should check:
-     * <ul>
-     * <li>Required fields are present and non-null</li>
-     * <li>Values are within acceptable ranges</li>
-     * <li>References to other resources are valid</li>
-     * <li>No conflicting settings</li>
-     * </ul>
-     * </p>
-     *
-     * @return true if the configuration is valid, false otherwise
-     */
-    boolean validate();
+  /**
+   * Validates this configuration.
+   *
+   * @return {@code true} if valid
+   * @throws io.cheshire.spi.query.exception.QueryEngineConfigurationException if validation fails
+   * @throws QueryEngineException if any other error occurs
+   */
+  boolean validate() throws QueryEngineException;
 }

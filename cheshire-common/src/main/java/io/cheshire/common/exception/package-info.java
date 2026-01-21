@@ -10,10 +10,10 @@
 
 /**
  * Common exception classes for consistent error handling across the framework.
- * <p>
- * <strong>Package Overview:</strong>
- * <p>
- * This package defines the exception hierarchy for the Cheshire Framework:
+ *
+ * <p><strong>Package Overview:</strong>
+ *
+ * <p>This package defines the exception hierarchy for the Cheshire Framework:
  *
  * <pre>
  * RuntimeException
@@ -23,50 +23,52 @@
  *       ├─ ExecutionException - Runtime execution errors
  *       └─ CheshireRuntimeError - Fatal runtime errors
  * </pre>
- * <p>
- * <strong>Base Exception:</strong>
- * <p>
- * {@link io.cheshire.common.exception.CheshireException} is the base runtime exception for all framework errors,
- * providing:
+ *
+ * <p><strong>Base Exception:</strong>
+ *
+ * <p>{@link io.cheshire.common.exception.CheshireException} is the base runtime exception for all
+ * framework errors, providing:
+ *
  * <ul>
- * <li>Consistent error message format</li>
- * <li>Cause chain preservation</li>
- * <li>Unchecked exception model (extends RuntimeException)</li>
+ *   <li>Consistent error message format
+ *   <li>Cause chain preservation
+ *   <li>Unchecked exception model (extends RuntimeException)
  * </ul>
- * <p>
- * <strong>Exception Types:</strong>
- * <p>
- * <strong>ConfigurationException:</strong> Configuration-related errors
+ *
+ * <p><strong>Exception Types:</strong>
+ *
+ * <p><strong>ConfigurationException:</strong> Configuration-related errors
  *
  * <pre>{@code
  * throw new ConfigurationException("Missing required field: database.url");
  * throw new ConfigurationException("Invalid port: " + port, cause);
  * }</pre>
- * <p>
- * <strong>ValidationException:</strong> Input validation failures
+ *
+ * <p><strong>ValidationException:</strong> Input validation failures
  *
  * <pre>{@code
  * throw new ValidationException("Field 'email' must be a valid email address");
  * throw new ValidationException("Age must be between 0 and 150");
  * }</pre>
- * <p>
- * <strong>ExecutionException:</strong> Runtime execution failures
+ *
+ * <p><strong>ExecutionException:</strong> Runtime execution failures
  *
  * <pre>{@code
  * throw new ExecutionException("Failed to execute query", sqlException);
  * throw new ExecutionException("Pipeline execution failed");
  * }</pre>
- * <p>
- * <strong>Design Philosophy:</strong>
- * <p>
- * Cheshire uses unchecked exceptions (RuntimeException) to avoid:
+ *
+ * <p><strong>Design Philosophy:</strong>
+ *
+ * <p>Cheshire uses unchecked exceptions (RuntimeException) to avoid:
+ *
  * <ul>
- * <li>Checked exception proliferation through call stacks</li>
- * <li>Forced try-catch blocks for recoverable errors</li>
- * <li>Verbose exception declarations on every method</li>
+ *   <li>Checked exception proliferation through call stacks
+ *   <li>Forced try-catch blocks for recoverable errors
+ *   <li>Verbose exception declarations on every method
  * </ul>
- * <p>
- * Instead, exceptions are caught at appropriate boundaries:
+ *
+ * <p>Instead, exceptions are caught at appropriate boundaries:
  *
  * <pre>{@code
  * // Framework boundary - catch and convert to ResponseEntity
@@ -78,10 +80,10 @@
  *     return ResponseEntity.failure(e.getMessage());
  * }
  * }</pre>
- * <p>
- * <strong>Error Handling Patterns:</strong>
- * <p>
- * <strong>1. Fail Fast (Configuration):</strong>
+ *
+ * <p><strong>Error Handling Patterns:</strong>
+ *
+ * <p><strong>1. Fail Fast (Configuration):</strong>
  *
  * <pre>{@code
  * public void validateConfig(Config config) {
@@ -90,8 +92,8 @@
  *     }
  * }
  * }</pre>
- * <p>
- * <strong>2. Error Propagation (Execution):</strong>
+ *
+ * <p><strong>2. Error Propagation (Execution):</strong>
  *
  * <pre>{@code
  * public Result executeQuery(Query query) {
@@ -102,8 +104,8 @@
  *     }
  * }
  * }</pre>
- * <p>
- * <strong>3. Boundary Conversion (API):</strong>
+ *
+ * <p><strong>3. Boundary Conversion (API):</strong>
  *
  * <pre>{@code
  * // Convert exceptions to API responses at boundaries
@@ -117,10 +119,10 @@
  *     }
  * }
  * }</pre>
- * <p>
- * <strong>Logging:</strong>
- * <p>
- * Exceptions should be logged at appropriate levels:
+ *
+ * <p><strong>Logging:</strong>
+ *
+ * <p>Exceptions should be logged at appropriate levels:
  *
  * <pre>{@code
  * try {
@@ -134,10 +136,10 @@
  *     log.error("Execution failed", e); // ERROR
  * }
  * }</pre>
- * <p>
- * <strong>Custom Exceptions:</strong>
- * <p>
- * Applications can extend CheshireException for domain-specific errors:
+ *
+ * <p><strong>Custom Exceptions:</strong>
+ *
+ * <p>Applications can extend CheshireException for domain-specific errors:
  *
  * <pre>{@code
  * public class BlogException extends CheshireException {

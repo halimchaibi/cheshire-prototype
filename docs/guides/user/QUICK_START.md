@@ -24,11 +24,13 @@ cd cheshire-prototype
 ### 3. Build Project
 
 **Linux/macOS:**
+
 ```bash
 ./mvnw clean install
 ```
 
 **Windows:**
+
 ```cmd
 mvnw.cmd clean install
 ```
@@ -189,6 +191,7 @@ java -jar my-app.jar --mcp-stdio
 ### Multi-Protocol
 
 Same application, multiple protocols:
+
 - REST API: `http://localhost:8080/api/v1`
 - MCP HTTP: `http://localhost:8080/mcp/v1`
 - MCP stdio: via stdin/stdout

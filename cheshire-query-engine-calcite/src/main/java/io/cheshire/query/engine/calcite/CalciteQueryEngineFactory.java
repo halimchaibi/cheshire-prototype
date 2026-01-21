@@ -11,7 +11,7 @@
 package io.cheshire.query.engine.calcite;
 
 import io.cheshire.core.config.CheshireConfig;
-import io.cheshire.spi.query.engine.ConfigAdapter;
+import io.cheshire.spi.query.engine.QueryEngineConfigAdapter;
 import io.cheshire.spi.query.engine.QueryEngineFactory;
 import io.cheshire.spi.query.exception.QueryEngineException;
 
@@ -32,7 +32,7 @@ public class CalciteQueryEngineFactory
     }
 
     @Override
-    public ConfigAdapter<CheshireConfig.QueryEngine> adapter() {
+    public QueryEngineConfigAdapter<CheshireConfig.QueryEngine> adapter() {
         return (name, queryDef) -> CalciteQueryEngineConfig.from(name, queryDef);
     }
 

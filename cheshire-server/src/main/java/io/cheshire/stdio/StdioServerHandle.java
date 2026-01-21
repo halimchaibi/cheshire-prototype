@@ -20,48 +20,43 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public final class StdioServerHandle implements CheshireServer {
 
-    private final Capability capability;
-    private final CheshireDispatcher dispatcher;
-    private final CheshireTransport container;
+  private final Capability capability;
+  private final CheshireDispatcher dispatcher;
+  private final CheshireTransport container;
 
-    public StdioServerHandle(Capability capability, CheshireTransport container, CheshireDispatcher dispatcher) {
-        this.capability = capability;
-        this.container = container;
-        this.dispatcher = dispatcher;
-    }
+  public StdioServerHandle(
+      Capability capability, CheshireTransport container, CheshireDispatcher dispatcher) {
+    this.capability = capability;
+    this.container = container;
+    this.dispatcher = dispatcher;
+  }
 
-    /**
-     * Prepares the module configuration (no ports opened yet).
-     */
-    @Override
-    public void init() throws Exception {
+  /** Prepares the module configuration (no ports opened yet). */
+  @Override
+  public void init() throws Exception {}
 
-    }
+  @Override
+  public void start() throws Exception {
+    log.info("Starting STDIO server handle for capability {}", capability.name());
+    McpAsyncServer server = new StdioMcpModule(capability, dispatcher).createServer();
+    container.register(server);
+    container.start();
+  }
 
-    @Override
-    public void start() throws Exception {
-        log.info("Starting STDIO server handle for capability {}", capability.name());
-        McpAsyncServer server = new StdioMcpModule(capability, dispatcher).createServer();
-        container.register(server);
-        container.start();
-    }
+  @Override
+  public void stop() throws Exception {
+    log.info("Stopping STDIO server handle for capability {}", capability.name());
+    container.stop();
+  }
 
-    @Override
-    public void stop() throws Exception {
-        log.info("Stopping STDIO server handle for capability {}", capability.name());
-        container.stop();
-    }
+  /** Returns the exposure type (e.g., "REST-API", "STREAMABLE-MCP"). */
+  @Override
+  public String type() {
+    return "MCP-STDIO";
+  }
 
-    /**
-     * Returns the exposure type (e.g., "REST-API", "STREAMABLE-MCP").
-     */
-    @Override
-    public String type() {
-        return "MCP-STDIO";
-    }
-
-    @Override
-    public boolean isRunning() {
-        return container.isRunning();
-    }
+  @Override
+  public boolean isRunning() {
+    return container.isRunning();
+  }
 }

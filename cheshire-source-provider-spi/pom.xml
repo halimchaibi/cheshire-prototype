@@ -17,5 +17,5 @@
   <properties>
     <spotbugs.exclude>../.spotbugs-exclude.xml</spotbugs.exclude>
   </properties>
-  
+
 </project>

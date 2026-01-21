@@ -1,1 +1,1 @@
-io.cheshire.source.jdbc.JdbcDataSourceProviderFactory
+io.cheshire.source.jdbc.JdbcSourceProviderFactory

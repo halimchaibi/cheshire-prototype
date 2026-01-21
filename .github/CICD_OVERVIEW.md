@@ -6,13 +6,13 @@ This directory contains all GitHub-specific configurations for the Cheshire Fram
 
 ### Workflows (`.github/workflows/`)
 
-| Workflow | Trigger | Purpose |
-|----------|---------|---------|
-| `ci.yml` | Push to main/develop, PRs | Main CI pipeline with build, test, quality checks |
-| `release.yml` | Git tags `v*.*.*` | Release automation and artifact publishing |
-| `pr-validation.yml` | Pull requests | PR validation with security and quality checks |
-| `dependency-update.yml` | Weekly (Monday) | Automated dependency updates |
-| `codeql.yml` | Push, PR, Weekly | Security code scanning |
+| Workflow                | Trigger                   | Purpose                                           |
+|-------------------------|---------------------------|---------------------------------------------------|
+| `ci.yml`                | Push to main/develop, PRs | Main CI pipeline with build, test, quality checks |
+| `release.yml`           | Git tags `v*.*.*`         | Release automation and artifact publishing        |
+| `pr-validation.yml`     | Pull requests             | PR validation with security and quality checks    |
+| `dependency-update.yml` | Weekly (Monday)           | Automated dependency updates                      |
+| `codeql.yml`            | Push, PR, Weekly          | Security code scanning                            |
 
 ### Configuration Files
 
@@ -64,6 +64,7 @@ act -j test
 ## Workflow Features
 
 ### ✅ Continuous Integration
+
 - Build on multiple platforms (Linux, Windows, macOS)
 - Java 21 with preview features
 - Maven dependency caching
@@ -71,24 +72,28 @@ act -j test
 - Code coverage tracking
 
 ### ✅ Code Quality
+
 - Checkstyle enforcement
 - SpotBugs analysis
 - JaCoCo code coverage
 - Test result reporting
 
 ### ✅ Security
+
 - OWASP dependency scanning
 - Trivy vulnerability scanning
 - CodeQL static analysis
 - License compliance checking
 
 ### ✅ Release Management
+
 - Semantic versioning
 - Automated GitHub releases
 - Maven Central publishing
 - Docker image publishing (multi-arch)
 
 ### ✅ Pull Request Automation
+
 - Conventional commit validation
 - Code coverage reporting
 - Security scanning
@@ -96,6 +101,7 @@ act -j test
 - PR summary generation
 
 ### ✅ Dependency Management
+
 - Weekly automated updates
 - Dependabot integration
 - Auto-merge safe updates
@@ -154,6 +160,7 @@ Update notification steps in workflows to use your preferred platform (Slack, Di
 ## Support
 
 For issues or questions about the CI/CD pipeline:
+
 1. Check [PIPELINE_DOCUMENTATION.md](PIPELINE_DOCUMENTATION.md)
 2. Review workflow run logs
 3. Create an issue with the `ci` label

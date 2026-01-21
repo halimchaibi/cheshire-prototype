@@ -10,50 +10,45 @@
 
 package io.cheshire.spi.query.exception;
 
-/**
- * Exception thrown when query execution fails.
- *
- * <p>
- * This exception indicates that a query could not be executed successfully. Common causes include:
- * <ul>
- * <li>SQL syntax errors</li>
- * <li>Schema validation failures</li>
- * <li>Connection failures</li>
- * <li>Query timeout</li>
- * <li>Resource exhaustion</li>
- * <li>Data type mismatches</li>
- * </ul>
- * </p>
- *
- * <p>
- * This exception is distinct from {@link io.cheshire.spi.query.engine.QueryEngineException}, which indicates
- * engine-level failures (initialization, configuration, etc.).
- * </p>
- *
- * @author Cheshire Framework
- * @since 1.0.0
- */
-public class QueryExecutionException extends Exception {
+import io.cheshire.spi.query.request.LogicalQuery;
+import io.cheshire.spi.query.result.QueryEngineResult;
+import java.util.Optional;
 
-    /**
-     * Constructs a new QueryExecutionException with the specified detail message.
-     *
-     * @param message
-     *            the detail message explaining the execution failure
-     */
-    public QueryExecutionException(String message) {
-        super(message);
-    }
+public sealed class QueryExecutionException extends QueryEngineException
+    permits QueryTimeoutException {
 
-    /**
-     * Constructs a new QueryExecutionException with the specified detail message and cause.
-     *
-     * @param message
-     *            the detail message explaining the execution failure
-     * @param cause
-     *            the underlying cause of this exception
-     */
-    public QueryExecutionException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  private final LogicalQuery failedQuery;
+  private final QueryEngineResult partialResult;
+
+  public QueryExecutionException(String message) {
+    super(message);
+    this.failedQuery = null;
+    this.partialResult = null;
+  }
+
+  public QueryExecutionException(String message, Throwable cause) {
+    super(message, cause);
+    this.failedQuery = null;
+    this.partialResult = null;
+  }
+
+  public QueryExecutionException(
+      String message, LogicalQuery failedQuery, QueryEngineResult partialResult, Throwable cause) {
+    super(message, cause);
+    this.failedQuery = failedQuery;
+    this.partialResult = partialResult;
+  }
+
+  public LogicalQuery getFailedQuery() {
+    return failedQuery;
+  }
+
+  public Optional<QueryEngineResult> getPartialResult() {
+    return Optional.ofNullable(partialResult);
+  }
+
+  @Override
+  public String getErrorCode() {
+    return "EXECUTION_FAILED";
+  }
 }

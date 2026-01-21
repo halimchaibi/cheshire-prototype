@@ -18,7 +18,6 @@
 
 This framework is currently in **prototype stage**. While it compiles and demonstrates core ideas, **features may be incomplete or non-functional**. Use for experimentation, research, and development purposes only.
 
-
 Cheshire is a framework that enables developers to expose various resources—databases, APIs, and services—as unified **capabilities** accessible through multiple protocols including REST, MCP (Model Context Protocol), and more.
 
 The framework features a powerful **three-stage pipeline architecture**, **DSL-based query templates**, and **federated query processing** capabilities, making it ideal for building modern data-driven applications and LLM-powered agents.
@@ -193,11 +192,11 @@ See the complete [blog-app example](https://github.com/halimchaibi/cheshire-blog
 ### Exploration Topics
 
 - **[TODOs](docs/TODOs/)** - Research topics and architectural patterns under investigation
-  - Performance optimizations (Bloom filters, off-heap streaming, probabilistic data structures)
-  - Security patterns (RBAC/ABAC with Cedar Policy)
-  - Query federation (Apache Calcite integration)
-  - Reactive patterns (Project Reactor, context propagation)
-  - Extensibility (SPI extensions, runtime compilation)
+    - Performance optimizations (Bloom filters, off-heap streaming, probabilistic data structures)
+    - Security patterns (RBAC/ABAC with Cedar Policy)
+    - Query federation (Apache Calcite integration)
+    - Reactive patterns (Project Reactor, context propagation)
+    - Extensibility (SPI extensions, runtime compilation)
 
 ### Architecture
 
@@ -224,9 +223,11 @@ The framework consists of seven distinct layers, each with well-defined responsi
 ### Data Flow
 
 **Request Flow (Top → Bottom, Red):**
+
 - External Request → RequestEnvelope → SessionTask → MaterializedInput → SqlQuery → SQL/API Calls
 
 **Response Flow (Bottom → Top, Green):**
+
 - Data Rows → MapQueryResult → MaterializedOutput → TaskResult → ResponseEntity → Responses
 
 ### Key Concepts
@@ -465,6 +466,7 @@ mvn clean install
 ### Maven Wrapper Details
 
 The project includes Maven Wrapper (mvnw) which:
+
 - ✅ Downloads correct Maven version (3.9.6) automatically
 - ✅ Ensures consistent builds across environments
 - ✅ No need to install Maven manually
@@ -477,6 +479,7 @@ The project includes Maven Wrapper (mvnw) which:
 The blog application is a complete reference implementation demonstrating all Cheshire features:
 
 **Features:**
+
 - ✅ Full CRUD operations (Authors, Articles, Comments)
 - ✅ Three protocol exposures (REST, MCP stdio, MCP HTTP)
 - ✅ 15+ operations with comprehensive validation
@@ -615,6 +618,7 @@ mvn clean test jacoco:report
 ```
 
 ## 📋 Roadmap
+
 Current progress, upcoming features, and bug fixes: [GitHub Project Board](https://github.com/users/halimchaibi/projects/2).
 
 ### ✅ Completed (v1.0)
@@ -651,7 +655,9 @@ See [cheshire-blog-app/README.md](https://github.com/halimchaibi/cheshire-blog-a
 - **Documentation**: [docs/](docs/)
 
 ---
+
 ## 🛠 Development Methodology
+
 **This project was built using a Human-in-the-Loop AI workflow, leveraging LLMs as a force-multiplier for development velocity**
 
 ---

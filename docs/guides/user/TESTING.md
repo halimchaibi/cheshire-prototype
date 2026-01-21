@@ -61,6 +61,7 @@ curl -v -N -X POST http://192.168.109.36:9001/mcp/v1/chinook/ \
 # StdIO
 
 Inialization Request:
+
 ```json
 {"jsonrpc":"2.0","id":"1","method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test-client","version":"1.0.0"}}}
 ```
@@ -68,36 +69,42 @@ Inialization Request:
 ---
 
 Complete handshake response:
+
 ```json
 {"jsonrpc":"2.0","method":"notifications/initialized","params":{}}
 ```
 
 ---
 List tools request:
+
 ```json
 {"jsonrpc":"2.0","id":"2","method":"tools/list","params":{}}
 ```
 
 ---
 List resources:
+
 ```json
 {"jsonrpc":"2.0","id":"3","method":"resources/list","params":{}}
 ```
 
 ---
 List prompts:
+
 ```json
 {"jsonrpc":"2.0","id":"4","method":"prompts/list","params":{}}
 ```
 
 ---
 list artists:
+
 ```json
 {"jsonrpc":"2.0","id":"5","method":"resources/read","params":{"uri":"list_artists","arguments":{}}}
 ```
 
 ---
 Subscribe to notifications (optional)
+
 ```json
 {"jsonrpc":"2.0","id":"8","method":"resources/subscribe","params":{"uri":"chinook://schemas/artist.json"}}
 ```
@@ -105,12 +112,14 @@ Subscribe to notifications (optional)
 ---
 
 # Testing wit Inspector
+
 ```shell
 DANGEROUSLY_OMIT_AUTH=true npx @modelcontextprotocol/inspector java -jar /home/hchaibi/workspace/idea-projects/cheshire-framework/cheshire-blog-app/target/blog-app-1.0-SNAPSHOT.jar
 npx @modelcontextprotocol/inspector java -jar cheshire-blog-app/target/blog-app-1.0-SNAPSHOT.jar blog-mcp-stdio.yaml
 ```
 
 --- To initialize an MCP session, use the following request in MCP Inspector:
+
 # Testing with Claude
 
 logs %USERPROFILE%\AppData\Roaming\Claude\logs\

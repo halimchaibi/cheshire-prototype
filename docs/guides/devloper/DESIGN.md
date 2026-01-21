@@ -934,7 +934,8 @@ Entity
 + Aggregation (group, metric)
 ```
 
-TODO: 
+TODO:
+
 - Nested queries.
 - To be reconsidered if Apache Calcite will the only supported engine.
 

@@ -1,1 +1,0 @@
-JOOQ for OPen Source Project

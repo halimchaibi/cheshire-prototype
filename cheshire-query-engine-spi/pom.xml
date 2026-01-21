@@ -16,5 +16,17 @@
   <description>Query Engine SPI</description>
   <packaging>jar</packaging>
 
-</project>
+  <dependencies>
+    <!-- Source Provider SPI for SourceProvider in QueryContext -->
+    <dependency>
+      <groupId>io.cheshire</groupId>
+      <artifactId>cheshire-source-provider-spi</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jetbrains</groupId>
+      <artifactId>annotations</artifactId>
+    </dependency>
+  </dependencies>
 
+</project>

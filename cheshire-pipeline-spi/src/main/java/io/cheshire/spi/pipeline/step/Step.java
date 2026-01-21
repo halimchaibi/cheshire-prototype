@@ -15,5 +15,5 @@ import io.cheshire.spi.pipeline.exception.PipelineException;
 
 public sealed interface Step<I, O> permits PostProcessor, PreProcessor, Executor {
 
-    O apply(I input, Context ctx) throws PipelineException;
+  O apply(I input, Context ctx) throws PipelineException;
 }

@@ -10,13 +10,13 @@
 
 /**
  * Command-line interface components for runtime control.
- * <p>
- * <strong>Package Overview:</strong>
- * <p>
- * This package provides CLI utilities for interacting with the Cheshire runtime, including argument parsing, command
- * execution, and interactive shells.
- * <p>
- * <strong>Typical Usage:</strong>
+ *
+ * <p><strong>Package Overview:</strong>
+ *
+ * <p>This package provides CLI utilities for interacting with the Cheshire runtime, including
+ * argument parsing, command execution, and interactive shells.
+ *
+ * <p><strong>Typical Usage:</strong>
  *
  * <pre>{@code
  * // Command-line application
@@ -25,15 +25,16 @@
  * java -jar app.jar --mcp-http              // Start with MCP HTTP
  * java -jar app.jar --config /path/to/config.yaml
  * }</pre>
- * <p>
- * <strong>Supported Commands:</strong>
+ *
+ * <p><strong>Supported Commands:</strong>
+ *
  * <ul>
- * <li><strong>--rest</strong> - Start with REST API exposure</li>
- * <li><strong>--mcp-stdio</strong> - Start with MCP stdio exposure</li>
- * <li><strong>--mcp-http</strong> - Start with MCP HTTP exposure</li>
- * <li><strong>--config</strong> - Specify configuration file</li>
- * <li><strong>--help</strong> - Display help message</li>
- * <li><strong>--version</strong> - Display version information</li>
+ *   <li><strong>--rest</strong> - Start with REST API exposure
+ *   <li><strong>--mcp-stdio</strong> - Start with MCP stdio exposure
+ *   <li><strong>--mcp-http</strong> - Start with MCP HTTP exposure
+ *   <li><strong>--config</strong> - Specify configuration file
+ *   <li><strong>--help</strong> - Display help message
+ *   <li><strong>--version</strong> - Display version information
  * </ul>
  *
  * @see io.cheshire.runtime.CheshireRuntime

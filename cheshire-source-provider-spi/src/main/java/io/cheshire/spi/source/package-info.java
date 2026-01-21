@@ -10,19 +10,20 @@
 
 /**
  * Service Provider Interface (SPI) for data source provider implementations.
- * <p>
- * <strong>Package Overview:</strong>
- * <p>
- * This package defines the SPI for pluggable data source providers:
+ *
+ * <p><strong>Package Overview:</strong>
+ *
+ * <p>This package defines the SPI for pluggable data source providers:
+ *
  * <ul>
- * <li><strong>SourceProvider</strong> - Main data source interface</li>
- * <li><strong>SourceProviderFactory</strong> - SPI factory for provider creation</li>
- * <li><strong>SourceConfig</strong> - Source configuration interface</li>
- * <li><strong>Query</strong> - Abstract query interface</li>
- * <li><strong>QueryResult</strong> - Abstract result interface</li>
+ *   <li><strong>SourceProvider</strong> - Main data source interface
+ *   <li><strong>SourceProviderFactory</strong> - SPI factory for provider creation
+ *   <li><strong>SourceConfig</strong> - Source configuration interface
+ *   <li><strong>Query</strong> - Abstract query interface
+ *   <li><strong>QueryResult</strong> - Abstract result interface
  * </ul>
- * <p>
- * <strong>Source Provider Implementations:</strong>
+ *
+ * <p><strong>Source Provider Implementations:</strong>
  *
  * <pre>
  * SourceProvider (SPI)
@@ -31,20 +32,20 @@
  *   ├─ RestApiProvider - REST API integration
  *   └─ SparkProvider - Apache Spark clusters
  * </pre>
- * <p>
- * <strong>SPI Discovery:</strong>
- * <p>
- * Source providers are discovered via Java's ServiceLoader:
- * <ol>
- * <li>Implement {@link io.cheshire.spi.source.SourceProviderFactory}</li>
- * <li>Register in {@code META-INF/services/io.cheshire.spi.source.SourceProviderFactory}</li>
- * <li>Framework automatically discovers and loads</li>
- * </ol>
- * <p>
- * <strong>Example Implementation:</strong>
  *
- * <pre>
- * {@code
+ * <p><strong>SPI Discovery:</strong>
+ *
+ * <p>Source providers are discovered via Java's ServiceLoader:
+ *
+ * <ol>
+ *   <li>Implement {@link io.cheshire.spi.source.SourceProviderFactory}
+ *   <li>Register in {@code META-INF/services/io.cheshire.spi.source.SourceProviderFactory}
+ *   <li>Framework automatically discovers and loads
+ * </ol>
+ *
+ * <p><strong>Example Implementation:</strong>
+ *
+ * <pre>{@code
  * // 1. Implement SourceProvider
  * public class JdbcDataSourceProvider implements SourceProvider<SqlQuery, SqlQueryResult> {
  *     private final DataSource dataSource;
@@ -77,10 +78,9 @@
  *
  * // 3. Register in META-INF/services/io.cheshire.spi.source.SourceProviderFactory
  * io.cheshire.source.jdbc.JdbcDataSourceProviderFactory
- * }
- * </pre>
- * <p>
- * <strong>Configuration:</strong>
+ * }</pre>
+ *
+ * <p><strong>Configuration:</strong>
  *
  * <pre>{@code
  * sources:
@@ -98,8 +98,8 @@
  *         maxSize: 20
  *         minIdle: 5
  * }</pre>
- * <p>
- * <strong>Query Execution Flow:</strong>
+ *
+ * <p><strong>Query Execution Flow:</strong>
  *
  * <pre>
  * QueryEngine
@@ -112,8 +112,8 @@
  *      ↓
  * QueryResult
  * </pre>
- * <p>
- * <strong>Connection Management:</strong>
+ *
+ * <p><strong>Connection Management:</strong>
  *
  * <pre>{@code
  * public interface SourceProvider<Q extends Query, R extends QueryResult> {
@@ -130,10 +130,10 @@
  *     boolean isHealthy();
  * }
  * }</pre>
- * <p>
- * <strong>Parameter Binding:</strong>
- * <p>
- * Source providers handle parameter binding for security:
+ *
+ * <p><strong>Parameter Binding:</strong>
+ *
+ * <p>Source providers handle parameter binding for security:
  *
  * <pre>{@code
  * // Named parameters in query
@@ -145,10 +145,10 @@
  * stmt.setInt(1, 123);
  * stmt.setString(2, "active");
  * }</pre>
- * <p>
- * <strong>Result Conversion:</strong>
- * <p>
- * Providers convert native results to standard format:
+ *
+ * <p><strong>Result Conversion:</strong>
+ *
+ * <p>Providers convert native results to standard format:
  *
  * <pre>{@code
  * // JDBC ResultSet → List<Map<String, Object>>
@@ -162,19 +162,20 @@
  *     rows.add(row);
  * }
  * }</pre>
- * <p>
- * <strong>Design Patterns:</strong>
+ *
+ * <p><strong>Design Patterns:</strong>
+ *
  * <ul>
- * <li><strong>Adapter:</strong> Adapt various data sources to common interface</li>
- * <li><strong>Factory Method:</strong> Provider creation via SPI</li>
- * <li><strong>Template Method:</strong> Consistent lifecycle management</li>
- * <li><strong>Resource Acquisition:</strong> Try-with-resources for cleanup</li>
+ *   <li><strong>Adapter:</strong> Adapt various data sources to common interface
+ *   <li><strong>Factory Method:</strong> Provider creation via SPI
+ *   <li><strong>Template Method:</strong> Consistent lifecycle management
+ *   <li><strong>Resource Acquisition:</strong> Try-with-resources for cleanup
  * </ul>
  *
  * @see io.cheshire.spi.source.SourceProvider
  * @see io.cheshire.spi.source.SourceProviderFactory
- * @see io.cheshire.spi.source.Query
- * @see io.cheshire.spi.source.QueryResult
+ * @see io.cheshire.spi.source.SourceProviderQuery
+ * @see io.cheshire.spi.source.SourceProviderQueryResult
  * @since 1.0.0
  */
 package io.cheshire.spi.source;

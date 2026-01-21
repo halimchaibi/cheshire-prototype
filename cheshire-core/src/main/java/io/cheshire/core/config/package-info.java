@@ -10,17 +10,18 @@
 
 /**
  * Configuration data structures representing the entire Cheshire framework configuration.
- * <p>
- * <strong>Package Overview:</strong>
- * <p>
- * This package contains immutable records that map to YAML configuration structure:
+ *
+ * <p><strong>Package Overview:</strong>
+ *
+ * <p>This package contains immutable records that map to YAML configuration structure:
+ *
  * <ul>
- * <li><strong>CheshireConfig</strong> - Root configuration with nested structures</li>
- * <li><strong>ActionsConfig</strong> - MCP tools/actions specification</li>
- * <li><strong>PipelineConfig</strong> - Three-stage pipeline definitions</li>
+ *   <li><strong>CheshireConfig</strong> - Root configuration with nested structures
+ *   <li><strong>ActionsConfig</strong> - MCP tools/actions specification
+ *   <li><strong>PipelineConfig</strong> - Three-stage pipeline definitions
  * </ul>
- * <p>
- * <strong>Configuration Hierarchy:</strong>
+ *
+ * <p><strong>Configuration Hierarchy:</strong>
  *
  * <pre>
  * CheshireConfig (root)
@@ -35,8 +36,8 @@
  *   ├─ List&lt;Exposure&gt; - Global exposure configs
  *   └─ List&lt;Transport&gt; - Global transport configs
  * </pre>
- * <p>
- * <strong>YAML Mapping Example:</strong>
+ *
+ * <p><strong>YAML Mapping Example:</strong>
  *
  * <pre>{@code
  * application:
@@ -68,20 +69,21 @@
  *     actions-specification-file: actions.yaml
  *     pipelines-definition-file: pipelines.yaml
  * }</pre>
- * <p>
- * <strong>Immutability:</strong>
- * <p>
- * All configuration classes are implemented as Java 21 records, ensuring:
+ *
+ * <p><strong>Immutability:</strong>
+ *
+ * <p>All configuration classes are implemented as Java 21 records, ensuring:
+ *
  * <ul>
- * <li>Thread-safe access without synchronization</li>
- * <li>Automatic equals/hashCode/toString</li>
- * <li>Pattern matching support</li>
- * <li>Compact constructor for validation</li>
+ *   <li>Thread-safe access without synchronization
+ *   <li>Automatic equals/hashCode/toString
+ *   <li>Pattern matching support
+ *   <li>Compact constructor for validation
  * </ul>
- * <p>
- * <strong>Validation:</strong>
- * <p>
- * Configuration records use compact constructors for validation:
+ *
+ * <p><strong>Validation:</strong>
+ *
+ * <p>Configuration records use compact constructors for validation:
  *
  * <pre>{@code
  * public record CheshireConfig.Source(String name, String factory, ...) {
@@ -94,19 +96,19 @@
  *     }
  * }
  * }</pre>
- * <p>
- * <strong>Loading Process:</strong>
+ *
+ * <p><strong>Loading Process:</strong>
+ *
  * <ol>
- * <li>Load main config (cheshire.yaml)</li>
- * <li>Parse into CheshireConfig record</li>
- * <li>For each capability, load referenced files:
- * <ul>
- * <li>actions-specification-file → ActionsConfig</li>
- * <li>pipelines-definition-file → PipelineConfig</li>
- * </ul>
- * </li>
- * <li>Validate configuration consistency</li>
- * <li>Resolve cross-references</li>
+ *   <li>Load main config (cheshire.yaml)
+ *   <li>Parse into CheshireConfig record
+ *   <li>For each capability, load referenced files:
+ *       <ul>
+ *         <li>actions-specification-file → ActionsConfig
+ *         <li>pipelines-definition-file → PipelineConfig
+ *       </ul>
+ *   <li>Validate configuration consistency
+ *   <li>Resolve cross-references
  * </ol>
  *
  * @see io.cheshire.core.config.CheshireConfig

@@ -21,26 +21,28 @@ import io.cheshire.stdio.StdioServerHandle;
 
 /**
  * Default implementation of {@link CheshireServerFactory} for creating server handles.
- * <p>
- * <strong>Server Creation Strategy:</strong>
+ *
+ * <p><strong>Server Creation Strategy:</strong>
+ *
  * <ol>
- * <li>Determines transport container via {@link ServerRegistry}</li>
- * <li>Routes to appropriate server handle based on binding type</li>
- * <li>Creates Jetty-based handles for HTTP/MCP-HTTP bindings</li>
- * <li>Creates stdio handles for MCP-STDIO bindings</li>
+ *   <li>Determines transport container via {@link ServerRegistry}
+ *   <li>Routes to appropriate server handle based on binding type
+ *   <li>Creates Jetty-based handles for HTTP/MCP-HTTP bindings
+ *   <li>Creates stdio handles for MCP-STDIO bindings
  * </ol>
- * <p>
- * <strong>Binding Types:</strong>
+ *
+ * <p><strong>Binding Types:</strong>
+ *
  * <ul>
- * <li><strong>HTTP_JSON:</strong> REST API over HTTP → {@link JettyServerHandle}</li>
- * <li><strong>MCP_JSON_RPC:</strong> MCP over HTTP → {@link JettyServerHandle}</li>
- * <li><strong>MCP_STDIO:</strong> MCP over stdio → {@link StdioServerHandle}</li>
+ *   <li><strong>HTTP_JSON:</strong> REST API over HTTP → {@link JettyServerHandle}
+ *   <li><strong>MCP_JSON_RPC:</strong> MCP over HTTP → {@link JettyServerHandle}
+ *   <li><strong>MCP_STDIO:</strong> MCP over stdio → {@link StdioServerHandle}
  * </ul>
- * <p>
- * <strong>Transport Sharing:</strong>
- * <p>
- * Multiple server handles may share a single {@link CheshireTransport} container (e.g., multiple REST endpoints on same
- * Jetty server).
+ *
+ * <p><strong>Transport Sharing:</strong>
+ *
+ * <p>Multiple server handles may share a single {@link CheshireTransport} container (e.g., multiple
+ * REST endpoints on same Jetty server).
  *
  * @see CheshireServerFactory
  * @see JettyServerHandle
@@ -49,14 +51,15 @@ import io.cheshire.stdio.StdioServerHandle;
  * @since 1.0.0
  */
 public class ServerFactory implements CheshireServerFactory {
-    @Override
-    public CheshireServer create(Capability capability, String binding, CheshireDispatcher dispatcher) {
-        CheshireTransport container = ServerRegistry.getOrCreate(capability);
+  @Override
+  public CheshireServer create(
+      Capability capability, String binding, CheshireDispatcher dispatcher) {
+    CheshireTransport container = ServerRegistry.getOrCreate(capability);
 
-        return switch (CheshireTransport.Binding.from(binding)) {
-        case HTTP_JSON, MCP_JSON_RPC -> new JettyServerHandle(capability, container, dispatcher);
-        case MCP_STDIO -> new StdioServerHandle(capability, container, dispatcher);
-        case null -> throw new IllegalArgumentException("Dispatcher cannot be null");
-        };
-    }
+    return switch (CheshireTransport.Binding.from(binding)) {
+      case HTTP_JSON, MCP_JSON_RPC -> new JettyServerHandle(capability, container, dispatcher);
+      case MCP_STDIO -> new StdioServerHandle(capability, container, dispatcher);
+      case null -> throw new IllegalArgumentException("Dispatcher cannot be null");
+    };
+  }
 }

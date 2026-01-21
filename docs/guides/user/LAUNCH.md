@@ -31,7 +31,7 @@ your-project/
 
 ---
 
-## 2. Using CheshireBootstrap in ChinookApp 
+## 2. Using CheshireBootstrap in ChinookApp
 
 ### Load Configuration
 

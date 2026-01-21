@@ -12,8 +12,8 @@ package io.cheshire.common.exception;
 
 /**
  * Base runtime exception for all Cheshire framework errors.
- * <p>
- * <strong>Exception Hierarchy:</strong>
+ *
+ * <p><strong>Exception Hierarchy:</strong>
  *
  * <pre>
  * CheshireException (base)
@@ -24,13 +24,13 @@ package io.cheshire.common.exception;
  *   ├─ SourceProviderException - Data source errors
  *   └─ CheshireRuntimeError - Fatal runtime errors
  * </pre>
- * <p>
- * <strong>Design Philosophy:</strong>
- * <p>
- * Extends {@link RuntimeException} to avoid checked exception proliferation. Framework uses this as base for all
- * domain-specific exceptions, providing a consistent error handling approach.
- * <p>
- * <strong>Usage Pattern:</strong>
+ *
+ * <p><strong>Design Philosophy:</strong>
+ *
+ * <p>Extends {@link RuntimeException} to avoid checked exception proliferation. Framework uses this
+ * as base for all domain-specific exceptions, providing a consistent error handling approach.
+ *
+ * <p><strong>Usage Pattern:</strong>
  *
  * <pre>{@code
  * try {
@@ -47,25 +47,22 @@ package io.cheshire.common.exception;
  * @since 1.0.0
  */
 public class CheshireException extends RuntimeException {
-    /**
-     * Instantiates a new Cheshire exception.
-     *
-     * @param message
-     *            the message
-     */
-    public CheshireException(String message) {
-        super(message);
-    }
+  /**
+   * Instantiates a new Cheshire exception.
+   *
+   * @param message the message
+   */
+  public CheshireException(String message) {
+    super(message);
+  }
 
-    /**
-     * Instantiates a new Cheshire exception.
-     *
-     * @param message
-     *            the message
-     * @param cause
-     *            the cause
-     */
-    public CheshireException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  /**
+   * Instantiates a new Cheshire exception.
+   *
+   * @param message the message
+   * @param cause the cause
+   */
+  public CheshireException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }
