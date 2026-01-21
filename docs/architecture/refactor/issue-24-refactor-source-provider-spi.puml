@@ -1,0 +1,233 @@
+@startuml
+
+' --- Neutral Architectural Palette ---
+!define PRIMARY_COLOR      #2E3440
+!define SECONDARY_COLOR    #4C566A
+!define INTERFACE_COLOR    #FFFFFF
+!define ABSTRACT_COLOR     #F0F0F0
+!define CONCRETE_COLOR     #A8A499
+!define EXCEPTION_COLOR    #F5F5F5
+!define EXTERNAL_COLOR     #D4D4D4
+!define DATA_COLOR         #E8F4F8
+
+' --- Skinparam Configurations ---
+skinparam {
+    BackgroundColor #FFFFFF
+    DefaultFontColor #262626
+    ArrowColor #525252
+    BorderColor #404040
+}
+
+skinparam interface {
+    BackgroundColor INTERFACE_COLOR
+    BorderColor #404040
+    FontStyle bold
+    StereotypeFontColor PRIMARY_COLOR
+}
+
+skinparam class {
+    BackgroundColor #FFFFFF
+    BorderColor #404040
+    HeaderBackgroundColor #FAFAFA
+}
+
+skinparam class<<abstract>> {
+    BackgroundColor ABSTRACT_COLOR
+    FontStyle italic
+    BorderColor #666666
+}
+
+skinparam class<<concrete>> {
+    BackgroundColor CONCRETE_COLOR
+    BorderColor #404040
+}
+
+skinparam class<<exception>> {
+    BackgroundColor EXCEPTION_COLOR
+    BorderColor #CC0000
+    FontColor #990000
+}
+
+skinparam class<<data>> {
+    BackgroundColor DATA_COLOR
+    BorderColor #2E86AB
+    FontColor #1B4F72
+}
+
+skinparam class<<external>> {
+    BackgroundColor EXTERNAL_COLOR
+    BorderColor #737373
+    FontColor #555555
+    FontStyle plain
+}
+
+skinparam class<<enumeration>> {
+    BackgroundColor #F8F0FB
+    BorderColor #8A2BE2
+}
+
+' --- Core Interfaces ---
+interface SourceProvider<Q extends SourceProviderQuery> <<interface>> {
+  + name(): String
+  + open(): void
+  + isOpen(): boolean
+  + config(): SourceProviderConfig
+  + execute(Q): SourceProviderQueryResult
+  + close(): void
+}
+
+interface SourceProviderConfig <<interface>> {
+  + get(String): String
+  + asMap(): Map<String, Object>
+  + require(String): String
+  + type(): String
+}
+
+interface SourceProviderConfigAdapter<C extends SourceProviderConfig> <<interface>> {
+  + adapt(Map<String, Object>): C
+}
+
+interface SourceProviderFactory<C extends SourceProviderConfig> <<interface>> {
+  + configType(): Class<C>
+  + validate(C): void
+  + adapter(): SourceProviderConfigAdapter<C>
+  + create(C): SourceProvider<?>
+}
+
+interface SourceProviderQuery <<interface>> {
+  + parameters(): Map<String, Object>
+  + query(): Object
+  + hasParameters(): boolean
+}
+
+interface SourceProviderQueryResult <<interface>> {
+  + rows(): List<Map<String, Object>>
+  + rowCount(): int
+  + isEmpty(): boolean
+  + iterator(): Iterator<Map<String, Object>>
+  + stream(): Stream<Map<String, Object>>
+  + close(): void
+}
+
+' --- External Dependencies (Java Standard Library) ---
+interface AutoCloseable <<external>> {
+  + close(): void
+}
+
+class "Map<String, Object>" <<external>> {
+  + get(Object): Object
+  + containsKey(Object): boolean
+}
+
+class "List<Map<String, Object>>" <<external>> {
+  + size(): int
+  + iterator(): Iterator<Map<String, Object>>
+}
+
+class "Iterator<Map<String, Object>>" <<external>> {
+  + hasNext(): boolean
+  + next(): Map<String, Object>
+}
+
+class "Stream<Map<String, Object>>" <<external>> {
+  + close(): void
+}
+
+class "Class<C>" <<external>> {
+  + getName(): String
+}
+
+' --- Exception Hierarchy ---
+abstract class SourceProviderException <<abstract, exception>> {
+  {field} - message: String
+  {field} - cause: Throwable
+  + getMessage(): String
+  + getCause(): Throwable
+}
+
+class SourceProviderConfigException <<exception>> {
+  + SourceProviderConfigException(String)
+  + SourceProviderConfigException(String, Throwable)
+}
+
+class SourceProviderConnectionException <<exception>> {
+  + SourceProviderConnectionException(String)
+  + SourceProviderConnectionException(String, Throwable)
+}
+
+class SourceProviderExecutionException <<exception>> {
+  {field} - query: SourceProviderQuery
+  {field} - partialResult: SourceProviderQueryResult
+  + getQuery(): SourceProviderQuery
+  + getPartialResult(): SourceProviderQueryResult
+}
+
+class SourceProviderInitializationException <<exception>> {
+  + SourceProviderInitializationException(String)
+  + SourceProviderInitializationException(String, Throwable)
+}
+
+class SourceProviderTimeoutException <<exception>> {
+  {field} - timeout: Duration
+  + getTimeout(): Duration
+}
+
+' --- Example Concrete Implementation (Optional) ---
+class JdbcSourceProvider <<concrete>> {
+  {field} - config: JdbcSourceProviderConfig
+  {field} - connection: Connection
+  + execute(JdbcQuery): JdbcQueryResult
+  + close(): void
+}
+
+class JdbcSourceProviderConfig <<data>> {
+  {field} - config: Map<String, Object>
+  {field} - pool: Map<String, Object>
+  {field} - connection: Map<String, Object>
+  + type(): String
+  + getPool(): Map<String, Object>
+  + getConnection(): Map<String, Object>
+}
+
+' --- Relationships ---
+SourceProvider -[#595959,dashed]-> SourceProviderConfig : uses
+SourceProvider -[#595959,dashed]-> SourceProviderConnectionException : throws
+SourceProvider -[#595959,dashed]-> SourceProviderException : throws
+SourceProvider -[#595959,dashed]-> SourceProviderQuery : consumes
+SourceProvider -[#595959,dashed]-> SourceProviderQueryResult : produces
+
+SourceProviderConfig -[#595959,dashed]-> SourceProviderConfigException : throws
+SourceProviderConfig -[#595959,dashed]-> SourceProviderException : throws
+
+SourceProviderConfigAdapter -[#595959,dashed]-> SourceProviderConfig : parametrized
+SourceProviderConfigAdapter -[#595959,dashed]-> SourceProviderException : throws
+
+SourceProviderFactory -[#595959,dashed]-> SourceProvider : creates
+SourceProviderFactory -[#595959,dashed]-> SourceProviderConfig : consumes
+SourceProviderFactory -[#595959,dashed]-> SourceProviderConfigAdapter : uses
+SourceProviderFactory -[#595959,dashed]-> SourceProviderException : throws
+
+SourceProviderQueryResult -[#595959,dashed]-> SourceProviderException : throws
+
+SourceProviderExecutionException -[#595959,dashed]-> SourceProviderQuery : consumes
+SourceProviderExecutionException -[#595959,dashed]-> SourceProviderQueryResult : produces
+
+' --- Inheritance Relationships ---
+SourceProvider -[#000082,plain]-^ AutoCloseable
+SourceProviderQueryResult -[#000082,plain]-^ AutoCloseable
+
+SourceProviderTimeoutException -[#000082,plain]-^ SourceProviderExecutionException
+SourceProviderConfigException -[#000082,plain]-^ SourceProviderException
+SourceProviderConnectionException -[#000082,plain]-^ SourceProviderException
+SourceProviderExecutionException -[#000082,plain]-^ SourceProviderException
+SourceProviderInitializationException -[#000082,plain]-^ SourceProviderException
+
+' --- Composition/Aggregation ---
+SourceProviderConfigException "1" *-[#595959,plain]-> "invalidConfig\n1" SourceProviderConfig : "references"
+JdbcSourceProvider "1" *-[#595959,plain]-> "config\n1" JdbcSourceProviderConfig : "uses"
+
+' --- Implementation Example (Optional) ---
+JdbcSourceProvider -[#000082,plain]-^ SourceProvider : implements
+JdbcSourceProviderConfig -[#000082,plain]-^ SourceProviderConfig : implements
+
+@enduml

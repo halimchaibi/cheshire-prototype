@@ -160,4 +160,5 @@ MCP Tool Name   → Action
 
 Capability boundary = MCP server instance
 ```
+
 ---

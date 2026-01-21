@@ -3,22 +3,21 @@ sequenceDiagram
     participant B as SQL Builder
     participant E as Query Engine
     participant P as Source Provider
-    
+
     rect rgb(230, 245, 230)
         Note over Exec, P: Data Access Flow
-        Exec->>+B: buildQuery(template, params)
-        B->>B: Parse JSON DSL
-        B->>B: Build SQL with params
-        B-->>-Exec: SqlQueryRequest
-        
-        Exec->>+E: execute(request, provider)
-        E->>+P: execute(SqlQuery)
-        P->>P: getConnection()
-        P->>P: prepareStatement()
-        P->>P: bindParameters()
-        P->>P: executeSQL()
-        P->>P: extractResults()
-        P-->>-E: SqlQueryResult
-        E->>E: Convert to MapQueryResult
-        E-->>-Exec: MapQueryResult
+        Exec ->>+ B: buildQuery(template, params)
+        B ->> B: Parse JSON DSL
+        B ->> B: Build SQL with params
+        B -->>- Exec: SqlQueryRequest
+        Exec ->>+ E: execute(request, provider)
+        E ->>+ P: execute(SqlQuery)
+        P ->> P: getConnection()
+        P ->> P: prepareStatement()
+        P ->> P: bindParameters()
+        P ->> P: executeSQL()
+        P ->> P: extractResults()
+        P -->>- E: SqlQueryResult
+        E ->> E: Convert to MapQueryResult
+        E -->>- Exec: MapQueryResult
     end

@@ -23,7 +23,8 @@
     <module>cheshire-source-provider-spi</module>
     <module>cheshire-source-provider-jdbc</module>
     <module>cheshire-query-engine-jdbc</module>
-    <module>cheshire-query-engine-calcite</module>
+    <!--    Disable, as the spis had been refactored-->
+    <!--    <module>cheshire-query-engine-calcite</module>-->
     <module>cheshire-runtime</module>
     <module>cheshire-test-common</module>
   </modules>
@@ -50,6 +51,9 @@
     <maven-jar-plugin.version>3.5.0</maven-jar-plugin.version>
     <maven-failsafe-plugin.version>3.5.0</maven-failsafe-plugin.version>
     <license-maven-plugin.version>2.7.1</license-maven-plugin.version>
+    <spotless-maven-plugin.version>3.1.0</spotless-maven-plugin.version>
+    <skip.spotless>false</skip.spotless>
+    <java.google.format.version>1.33.0</java.google.format.version>
   </properties>
 
   <dependencyManagement>
@@ -135,6 +139,7 @@
           <artifactId>maven-jar-plugin</artifactId>
           <version>${maven-jar-plugin.version}</version>
         </plugin>
+
         <!-- Compiler -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -147,6 +152,12 @@
               <arg>--enable-preview</arg>
               <arg>-Xlint:all</arg>
             </compilerArgs>
+            <annotationProcessorPaths>
+              <path>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+              </path>
+            </annotationProcessorPaths>
           </configuration>
         </plugin>
 
@@ -231,46 +242,42 @@
         </plugin>
 
         <!-- Formatter -->
+<!--        <plugin>-->
+<!--          <groupId>net.revelc.code.formatter</groupId>-->
+<!--          <artifactId>formatter-maven-plugin</artifactId>-->
+<!--          <version>${formatter-maven-plugin.version}</version>-->
+<!--          <configuration>-->
+<!--            <configFile>${maven.multiModuleProjectDirectory}/.formatter.xml</configFile>-->
+<!--            <encoding>UTF-8</encoding>-->
+<!--            <lineEnding>LF</lineEnding>-->
+<!--            <compilerCompliance>${java.version}</compilerCompliance>-->
+<!--            <compilerSource>${java.version}</compilerSource>-->
+<!--            <compilerTargetPlatform>${java.version}</compilerTargetPlatform>-->
+<!--            <includes>-->
+<!--              <include>**/*.java</include>-->
+<!--            </includes>-->
+<!--          </configuration>-->
+<!--        </plugin>-->
         <plugin>
-          <groupId>net.revelc.code.formatter</groupId>
-          <artifactId>formatter-maven-plugin</artifactId>
-          <version>${formatter-maven-plugin.version}</version>
+          <groupId>com.diffplug.spotless</groupId>
+          <artifactId>spotless-maven-plugin</artifactId>
+          <version>${spotless-maven-plugin.version}</version>
           <configuration>
-            <configFile>${maven.multiModuleProjectDirectory}/.formatter.xml</configFile>
-            <encoding>UTF-8</encoding>
-            <lineEnding>LF</lineEnding>
-            <compilerCompliance>${java.version}</compilerCompliance>
-            <compilerSource>${java.version}</compilerSource>
-            <compilerTargetPlatform>${java.version}</compilerTargetPlatform>
-            <includes>
-              <include>**/*.java</include>
-            </includes>
+            <java>
+              <googleJavaFormat>
+                <version>${java.google.format.version}</version>
+              </googleJavaFormat>
+              <removeUnusedImports/>
+              <trimTrailingWhitespace/>
+              <endWithNewline/>
+            </java>
           </configuration>
         </plugin>
-
         <!-- Enforcer -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-enforcer-plugin</artifactId>
           <version>${maven-enforcer-plugin.version}</version>
-          <configuration>
-            <rules>
-              <requireMavenVersion>
-                <version>[3.6.0,)</version>
-              </requireMavenVersion>
-              <requireJavaVersion>
-                <version>[21,)</version>
-              </requireJavaVersion>
-              <requirePluginVersions/>
-              <bannedDependencies>
-                <excludes>
-                  <exclude>org.apache.logging.log4j:log4j-core:(,2.17.0)</exclude>
-                  <exclude>io.cheshire:cheshire-testing</exclude>
-                </excludes>
-                <searchTransitive>true</searchTransitive>
-              </bannedDependencies>
-            </rules>
-          </configuration>
         </plugin>
 
         <!-- Clean Plugin -->
@@ -342,20 +349,35 @@
       </plugin>
 
       <!-- Formatter validate -->
+<!--      <plugin>-->
+<!--        <groupId>net.revelc.code.formatter</groupId>-->
+<!--        <artifactId>formatter-maven-plugin</artifactId>-->
+<!--        <executions>-->
+<!--          <execution>-->
+<!--            <id>format</id>-->
+<!--            <goals>-->
+<!--              <goal>format</goal>-->
+<!--            </goals>-->
+<!--            <phase>validate</phase>-->
+<!--          </execution>-->
+<!--        </executions>-->
+<!--      </plugin>-->
+
       <plugin>
-        <groupId>net.revelc.code.formatter</groupId>
-        <artifactId>formatter-maven-plugin</artifactId>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>format</id>
+            <phase>compile</phase>
             <goals>
-              <goal>format</goal>
+              <goal>apply</goal>
             </goals>
-            <phase>validate</phase>
           </execution>
         </executions>
+        <configuration>
+          <skip>${skip.spotless}</skip>
+        </configuration>
       </plugin>
-
       <!-- SpotBugs verify -->
       <plugin>
         <groupId>com.github.spotbugs</groupId>
@@ -397,17 +419,13 @@
         <configuration>
           <licenseName>cheshire_polyform</licenseName>
           <licenseResolver>file:///${maven.multiModuleProjectDirectory}/src/license</licenseResolver>
-
           <organizationName>Halim Chaibi</organizationName>
           <inceptionYear>2026</inceptionYear>
-
           <failOnMissingHeader>false</failOnMissingHeader>
           <failOnNotUptodateHeader>false</failOnNotUptodateHeader>
-
           <includes>
             <include>**/*.java</include>
           </includes>
-
           <addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
           <canUpdateCopyright>true</canUpdateCopyright>
           <canUpdateDescription>false</canUpdateDescription>
@@ -422,7 +440,6 @@
             <goals>
               <goal>update-file-header</goal>
             </goals>
-
             <phase>process-sources</phase>
           </execution>
         </executions>
@@ -442,7 +459,7 @@
       - CI/CD: mvn clean install -Pgithub
     -->
     <profile>
-      <id>fast</id>
+      <id>dev</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
@@ -451,43 +468,12 @@
         <maven.test.skip>true</maven.test.skip>
         <enforcer.skip>true</enforcer.skip>
         <checkstyle.skip>true</checkstyle.skip>
-        <formatter.skip>true</formatter.skip>
         <spotbugs.skip>true</spotbugs.skip>
         <dependency-check.skip>true</dependency-check.skip>
-        <license.skip>true</license.skip>
+        <license.skip>false</license.skip>
+        <formatter.skip>true</formatter.skip>
+        <skip.spotless>false</skip.spotless>
       </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <version>${maven-compiler-plugin.version}</version>
-            <configuration>
-              <release>${java.version}</release>
-              <parameters>true</parameters>
-              <compilerArgs>
-                <arg>--enable-preview</arg>
-                <arg>-Xlint:all</arg>
-              </compilerArgs>
-              <annotationProcessorPaths>
-                <path>
-                  <groupId>org.projectlombok</groupId>
-                  <artifactId>lombok</artifactId>
-                </path>
-              </annotationProcessorPaths>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <version>${maven-surefire-plugin.version}</version>
-            <configuration>
-              <argLine>--enable-preview</argLine>
-              <useModulePath>false</useModulePath>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
     <profile>
       <id>github</id>
@@ -500,45 +486,8 @@
         <spotbugs.skip>false</spotbugs.skip>
         <dependency-check.skip>false</dependency-check.skip>
         <license.skip>false</license.skip>
+        <skip.spotless>false</skip.spotless>
       </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <version>${maven-compiler-plugin.version}</version>
-            <configuration>
-              <release>${java.version}</release>
-              <parameters>true</parameters>
-              <compilerArgs>
-                <arg>--enable-preview</arg>
-                <arg>-Xlint:all</arg>
-              </compilerArgs>
-              <annotationProcessorPaths>
-                <path>
-                  <groupId>org.projectlombok</groupId>
-                  <artifactId>lombok</artifactId>
-                </path>
-              </annotationProcessorPaths>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <version>${maven-surefire-plugin.version}</version>
-            <configuration>
-              <argLine>--enable-preview</argLine>
-              <useModulePath>false</useModulePath>
-              <annotationProcessorPaths>
-                <path>
-                  <groupId>org.projectlombok</groupId>
-                  <artifactId>lombok</artifactId>
-                </path>
-              </annotationProcessorPaths>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
   </profiles>
 </project>

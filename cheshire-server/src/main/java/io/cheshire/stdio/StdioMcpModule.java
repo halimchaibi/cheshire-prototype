@@ -27,29 +27,36 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public final class StdioMcpModule {
 
-    private final Capability capability;
-    private final CheshireDispatcher dispatcher;
+  private final Capability capability;
+  private final CheshireDispatcher dispatcher;
 
-    public StdioMcpModule(Capability capability, CheshireDispatcher dispatcher) {
-        this.capability = capability;
-        this.dispatcher = dispatcher;
-    }
+  public StdioMcpModule(Capability capability, CheshireDispatcher dispatcher) {
+    this.capability = capability;
+    this.dispatcher = dispatcher;
+  }
 
-    public McpAsyncServer createServer() {
+  public McpAsyncServer createServer() {
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        JacksonMcpJsonMapper jsonMapper = new JacksonMcpJsonMapper(objectMapper);
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule());
+    objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    JacksonMcpJsonMapper jsonMapper = new JacksonMcpJsonMapper(objectMapper);
 
-        StdioServerTransportProvider transportProvider = new StdioServerTransportProvider(jsonMapper);
+    StdioServerTransportProvider transportProvider = new StdioServerTransportProvider(jsonMapper);
 
-        McpAsyncServer mcpServer = McpServer.async(transportProvider).serverInfo("cheshire-mcp-jetty", "1.0.0")
-                .capabilities(McpSchema.ServerCapabilities.builder().tools(true).resources(true, true).prompts(true)
-                        .logging().build())
-                .build();
-        McpManifestRegistrar.of(capability, dispatcher, mcpServer, new McpProtocolAdapter()).register();
-        log.info("Stdio MCP Module initialized for capability: {}", capability.name());
-        return mcpServer;
-    }
+    McpAsyncServer mcpServer =
+        McpServer.async(transportProvider)
+            .serverInfo("cheshire-mcp-jetty", "1.0.0")
+            .capabilities(
+                McpSchema.ServerCapabilities.builder()
+                    .tools(true)
+                    .resources(true, true)
+                    .prompts(true)
+                    .logging()
+                    .build())
+            .build();
+    McpManifestRegistrar.of(capability, dispatcher, mcpServer, new McpProtocolAdapter()).register();
+    log.info("Stdio MCP Module initialized for capability: {}", capability.name());
+    return mcpServer;
+  }
 }

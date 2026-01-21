@@ -12,7 +12,7 @@ package io.cheshire.query.engine.calcite.schema;
 
 import io.cheshire.core.manager.SourceProviderManager;
 import io.cheshire.spi.source.SourceProvider;
-import io.cheshire.spi.source.SourceProviderException;
+import io.cheshire.spi.source.exception.SourceProviderException;
 
 import java.util.Map;
 import java.util.Set;

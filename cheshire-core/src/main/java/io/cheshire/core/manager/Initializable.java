@@ -11,7 +11,7 @@
 package io.cheshire.core.manager;
 
 public interface Initializable {
-    void initialize();
+  void initialize();
 
-    void shutdown();
+  void shutdown();
 }

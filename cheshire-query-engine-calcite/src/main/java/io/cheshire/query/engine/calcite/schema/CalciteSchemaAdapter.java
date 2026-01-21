@@ -10,9 +10,9 @@
 
 package io.cheshire.query.engine.calcite.schema;
 
-import io.cheshire.source.jdbc.JdbcDataSourceConfig;
+import io.cheshire.source.jdbc.JdbcSourceProviderConfig;
 import io.cheshire.spi.source.SourceProvider;
-import io.cheshire.spi.source.SourceProviderException;
+import io.cheshire.spi.source.exception.SourceProviderException;
 import org.apache.calcite.adapter.jdbc.JdbcSchema;
 import org.apache.calcite.schema.Schema;
 import org.apache.calcite.schema.SchemaPlus;
@@ -67,7 +67,7 @@ public class CalciteSchemaAdapter {
             }
 
             // Get the JDBC config
-            if (!(sourceProvider.config() instanceof JdbcDataSourceConfig jdbcConfig)) {
+            if (!(sourceProvider.config() instanceof JdbcSourceProviderConfig jdbcConfig)) {
                 throw new SourceProviderException(
                         "Source provider config is not a JdbcDataSourceConfig: " + sourceProvider.config().getClass());
             }

@@ -10,5 +10,4 @@
 
 package io.cheshire.core.pipeline;
 
-public record OffHeapOutput() {
-}
+public record OffHeapOutput() {}

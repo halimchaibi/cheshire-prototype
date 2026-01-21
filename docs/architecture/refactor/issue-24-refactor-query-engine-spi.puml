@@ -1,0 +1,309 @@
+@startuml
+
+' --- Neutral Architectural Palette ---
+!define PRIMARY_COLOR      #2E3440
+!define SECONDARY_COLOR    #4C566A
+!define INTERFACE_COLOR    #FFFFFF
+!define ABSTRACT_COLOR     #F0F0F0
+!define CONCRETE_COLOR     #A8A499
+!define EXCEPTION_COLOR    #F5F5F5
+!define EXTERNAL_COLOR     #D4D4D4
+!define DATA_COLOR         #E8F4F8
+
+' --- Skinparam Configurations ---
+skinparam {
+    BackgroundColor #FFFFFF
+    DefaultFontColor #262626
+    ArrowColor #525252
+    BorderColor #404040
+}
+
+skinparam interface {
+    BackgroundColor INTERFACE_COLOR
+    BorderColor #404040
+    FontStyle bold
+    StereotypeFontColor PRIMARY_COLOR
+}
+
+skinparam class {
+    BackgroundColor #FFFFFF
+    BorderColor #404040
+    HeaderBackgroundColor #FAFAFA
+}
+
+skinparam class<<abstract>> {
+    BackgroundColor ABSTRACT_COLOR
+    FontStyle italic
+    BorderColor #666666
+}
+
+skinparam class<<concrete>> {
+    BackgroundColor CONCRETE_COLOR
+    BorderColor #404040
+}
+
+skinparam class<<exception>> {
+    BackgroundColor EXCEPTION_COLOR
+    BorderColor #CC0000
+    FontColor #990000
+}
+
+skinparam class<<data>> {
+    BackgroundColor DATA_COLOR
+    BorderColor #2E86AB
+    FontColor #1B4F72
+}
+
+skinparam class<<external>> {
+    BackgroundColor EXTERNAL_COLOR
+    BorderColor #737373
+    FontColor #555555
+    FontStyle plain
+}
+
+skinparam class<<enumeration>> {
+    BackgroundColor #F8F0FB
+    BorderColor #8A2BE2
+}
+
+' --- Core Interfaces ---
+interface QueryEngine<Q extends LogicalQuery> <<interface>> {
+  + name(): String
+  + open(): void
+  + execute(Q, QueryEngineContext): QueryEngineResult
+  + explain(Q): String
+  + validate(Q): boolean
+  + supportsStreaming(): boolean
+  + isOpen(): boolean
+  + close(): void
+}
+
+interface QueryEngineConfig <<interface>> {
+  + name(): String
+  + asMap(): Map<String, Object>
+  + validate(): boolean
+}
+
+interface QueryEngineConfigAdapter<C extends QueryEngineConfig> <<interface>> {
+  + adapt(Map<String, Object>): C
+}
+
+interface QueryEngineFactory<C extends QueryEngineConfig> <<interface>> {
+  + configType(): Class<C>
+  + create(C): QueryEngine<?>
+  + adapter(): QueryEngineConfigAdapter<C>
+  + validate(C): void
+}
+
+interface LogicalQuery <<interface>> {
+  + parameters(): Map<String, Object>
+  + query(): Object
+  + hasParameters(): boolean
+}
+
+' --- Data Classes (Records) ---
+class QueryEngineContext <<data>> {
+  {field} - sessionId: String
+  {field} - userId: String
+  {field} - traceId: String
+  {field} - securityContext: Map<String, Object>
+  {field} - sources: List<SourceProvider<?>>
+  {field} - attributes: ConcurrentMap<String, Object>
+  {field} - arrivalTime: Instant
+  {field} - deadline: Instant
+  + QueryEngineContext(String, String, String, Map, List, ConcurrentMap, Instant, Instant)
+  {static} + empty(): QueryEngineContext
+  + putIfAbsent(String, Object): Object
+  + sessionId(): String
+  + userId(): String
+  + traceId(): String
+  + securityContext(): Map<String, Object>
+  + sources(): List<SourceProvider<?>>
+  + attributes(): ConcurrentMap<String, Object>
+  + arrivalTime(): Instant
+  + deadline(): Instant
+}
+
+class QueryEngineResult <<data>> {
+  {field} - columns: List<Column>
+  {field} - rows: List<Map<String, Object>>
+  + QueryEngineResult(List<Column>, List<Map<String, Object>>)
+  + columns(): List<Column>
+  + row(int): Map<String, Object>
+  + rows(): List<Map<String, Object>>
+  + rowCount(): int
+  + iterator(): Iterator<Map<String, Object>>
+  + stream(): Stream<Map<String, Object>>
+  + isEmpty(): boolean
+  + close(): void
+}
+
+class Column <<data>> {
+  {field} - name: String
+  {field} - type: String
+  {field} - nullable: boolean
+  + Column(String, String, boolean)
+  + name(): String
+  + type(): String
+  + nullable(): boolean
+}
+
+class ValidationError <<data>> {
+  {field} - field: String
+  {field} - message: String
+  {field} - code: String
+  + ValidationError(String, String, String)
+  + field(): String
+  + message(): String
+  + code(): String
+}
+
+' --- External Dependencies (Java Standard Library) ---
+interface AutoCloseable <<external>> {
+  + close(): void
+}
+
+class "Map<String, Object>" <<external>> {
+  + get(Object): Object
+  + containsKey(Object): boolean
+}
+
+class "List<Map<String, Object>>" <<external>> {
+  + size(): int
+  + iterator(): Iterator<Map<String, Object>>
+}
+
+class "Iterator<Map<String, Object>>" <<external>> {
+  + hasNext(): boolean
+  + next(): Map<String, Object>
+}
+
+class "Stream<Map<String, Object>>" <<external>> {
+  + close(): void
+}
+
+class "Class<C>" <<external>> {
+  + getName(): String
+}
+
+class Instant <<external>> {
+  {static} + now(): Instant
+}
+
+class Duration <<external>> {
+  {static} + ofMillis(long): Duration
+}
+
+class "ConcurrentMap<String, Object>" <<external>> {
+  + putIfAbsent(String, Object): Object
+}
+
+' --- Exception Hierarchy ---
+abstract class QueryEngineException <<abstract, exception>> {
+  {field} - message: String
+  {field} - cause: Throwable
+  + QueryEngineException(String)
+  + QueryEngineException(String, Throwable)
+  + getMessage(): String
+  + getCause(): Throwable
+  + getErrorCode(): String
+  + isRetryable(): boolean
+}
+
+class QueryEngineConfigurationException <<exception>> {
+  {field} - invalidConfig: QueryEngineConfig
+  + QueryEngineConfigurationException(String)
+  + QueryEngineConfigurationException(String, Throwable)
+  + QueryEngineConfigurationException(String, QueryEngineConfig)
+  + QueryEngineConfigurationException(String, QueryEngineConfig, Throwable)
+  + getInvalidConfig(): QueryEngineConfig
+  + getErrorCode(): String
+}
+
+class QueryEngineInitializationException <<exception>> {
+  + QueryEngineInitializationException(String)
+  + QueryEngineInitializationException(String, Throwable)
+  + QueryEngineInitializationException(String, String, Throwable)
+}
+
+class QueryExecutionException <<exception>> {
+  {field} - failedQuery: LogicalQuery
+  {field} - partialResult: QueryEngineResult
+  + QueryExecutionException(String)
+  + QueryExecutionException(String, Throwable)
+  + QueryExecutionException(String, LogicalQuery, QueryEngineResult, Throwable)
+  + getFailedQuery(): LogicalQuery
+  + getPartialResult(): Optional<QueryEngineResult>
+  + getErrorCode(): String
+}
+
+class QueryValidationException <<exception>> {
+  {field} - validationErrors: List<ValidationError>
+  + QueryValidationException(String)
+  + QueryValidationException(String, List<ValidationError>)
+  + getValidationErrors(): List<ValidationError>
+  + getErrorCode(): String
+}
+
+class QueryTimeoutException <<exception>> {
+  {field} - elapsedTime: Duration
+  {field} - deadline: Instant
+  + QueryTimeoutException(String, Duration, Instant)
+  + QueryTimeoutException(String, Duration, Instant, Throwable)
+  + getElapsedTime(): Duration
+  + getDeadline(): Instant
+  + getErrorCode(): String
+  + isRetryable(): boolean
+}
+
+' --- Relationships ---
+QueryEngine -[#595959,dashed]-> QueryEngineConfig : uses
+QueryEngine -[#595959,dashed]-> QueryEngineException : throws
+QueryEngine -[#595959,dashed]-> LogicalQuery : consumes
+QueryEngine -[#595959,dashed]-> QueryEngineContext : requires
+QueryEngine -[#595959,dashed]-> QueryEngineResult : produces
+
+QueryEngineConfig -[#595959,dashed]-> QueryEngineException : throws
+
+QueryEngineConfigAdapter -[#595959,dashed]-> QueryEngineConfig : parametrized
+QueryEngineConfigAdapter -[#595959,dashed]-> QueryEngineException : throws
+
+QueryEngineFactory -[#595959,dashed]-> QueryEngine : creates
+QueryEngineFactory -[#595959,dashed]-> QueryEngineConfig : consumes
+QueryEngineFactory -[#595959,dashed]-> QueryEngineConfigAdapter : uses
+QueryEngineFactory -[#595959,dashed]-> QueryEngineException : throws
+
+QueryEngineContext -[#595959,dashed]-> "Map<String, Object>" : uses
+QueryEngineContext -[#595959,dashed]-> "ConcurrentMap<String, Object>" : uses
+QueryEngineContext -[#595959,dashed]-> Instant : uses
+
+QueryEngineResult -[#595959,dashed]-> Column : contains
+QueryEngineResult -[#595959,dashed]-> "List<Map<String, Object>>" : uses
+
+QueryExecutionException -[#595959,dashed]-> LogicalQuery : references
+QueryExecutionException -[#595959,dashed]-> QueryEngineResult : references
+
+QueryValidationException -[#595959,dashed]-> ValidationError : contains
+
+QueryTimeoutException -[#595959,dashed]-> Duration : uses
+QueryTimeoutException -[#595959,dashed]-> Instant : uses
+
+QueryEngineConfigurationException -[#595959,dashed]-> QueryEngineConfig : references
+
+' --- Inheritance Relationships ---
+QueryEngine -[#000082,plain]-^ AutoCloseable
+QueryEngineResult -[#000082,plain]-^ AutoCloseable
+
+QueryEngineConfigurationException -[#000082,plain]-^ QueryEngineException
+QueryEngineInitializationException -[#000082,plain]-^ QueryEngineException
+QueryExecutionException -[#000082,plain]-^ QueryEngineException
+QueryValidationException -[#000082,plain]-^ QueryEngineException
+
+QueryTimeoutException -[#000082,plain]-^ QueryExecutionException
+
+' --- Composition/Aggregation ---
+QueryEngineResult "1" *-[#595959,plain]-> "columns\n*" Column : "contains"
+QueryEngineConfigurationException "1" *-[#595959,plain]-> "invalidConfig\n0..1" QueryEngineConfig : "references"
+QueryValidationException "1" *-[#595959,plain]-> "errors\n*" ValidationError : "contains"
+
+@enduml

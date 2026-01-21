@@ -10,18 +10,20 @@
 
 /**
  * Runtime monitoring components for health tracking and performance metrics.
- * <p>
- * <strong>Package Overview:</strong>
- * <p>
- * This package provides production-ready monitoring infrastructure:
+ *
+ * <p><strong>Package Overview:</strong>
+ *
+ * <p>This package provides production-ready monitoring infrastructure:
+ *
  * <ul>
- * <li><strong>RuntimeHealth</strong> - State machine-based health tracking</li>
- * <li><strong>RuntimeMetrics</strong> - Lock-free performance metrics</li>
+ *   <li><strong>RuntimeHealth</strong> - State machine-based health tracking
+ *   <li><strong>RuntimeMetrics</strong> - Lock-free performance metrics
  * </ul>
- * <p>
- * <strong>Health Monitoring:</strong>
- * <p>
- * The {@link io.cheshire.runtime.monitoring.RuntimeHealth} class tracks runtime state with validation:
+ *
+ * <p><strong>Health Monitoring:</strong>
+ *
+ * <p>The {@link io.cheshire.runtime.monitoring.RuntimeHealth} class tracks runtime state with
+ * validation:
  *
  * <pre>
  * State Machine:
@@ -35,8 +37,8 @@
  *
  * Invalid transitions throw IllegalStateException
  * </pre>
- * <p>
- * <strong>Example Usage:</strong>
+ *
+ * <p><strong>Example Usage:</strong>
  *
  * <pre>{@code
  * RuntimeHealth health = new RuntimeHealth();
@@ -56,22 +58,24 @@
  * // Get health report
  * Map<String, Object> report = health.healthReport();
  * }</pre>
- * <p>
- * <strong>Performance Metrics:</strong>
- * <p>
- * The {@link io.cheshire.runtime.monitoring.RuntimeMetrics} class provides lock-free metrics optimized for Virtual
- * Threads:
+ *
+ * <p><strong>Performance Metrics:</strong>
+ *
+ * <p>The {@link io.cheshire.runtime.monitoring.RuntimeMetrics} class provides lock-free metrics
+ * optimized for Virtual Threads:
+ *
  * <ul>
- * <li>Request counts (total, success, failure)</li>
- * <li>Timing (start time, uptime)</li>
- * <li>Memory usage (heap, non-heap)</li>
- * <li>Component-specific metrics</li>
+ *   <li>Request counts (total, success, failure)
+ *   <li>Timing (start time, uptime)
+ *   <li>Memory usage (heap, non-heap)
+ *   <li>Component-specific metrics
  * </ul>
- * <p>
- * <strong>Lock-Free Design:</strong>
- * <p>
- * Uses {@link java.util.concurrent.atomic.LongAdder} and {@link java.util.concurrent.atomic.LongAccumulator} for
- * zero-contention updates in Virtual Thread environments:
+ *
+ * <p><strong>Lock-Free Design:</strong>
+ *
+ * <p>Uses {@link java.util.concurrent.atomic.LongAdder} and {@link
+ * java.util.concurrent.atomic.LongAccumulator} for zero-contention updates in Virtual Thread
+ * environments:
  *
  * <pre>{@code
  * RuntimeMetrics metrics = new RuntimeMetrics();
@@ -88,10 +92,10 @@
  * // Get snapshot (linearizable reads)
  * Map<String, Object> snapshot = metrics.snapshot();
  * }</pre>
- * <p>
- * <strong>Integration with Monitoring Systems:</strong>
- * <p>
- * Metrics can be exported to external monitoring systems:
+ *
+ * <p><strong>Integration with Monitoring Systems:</strong>
+ *
+ * <p>Metrics can be exported to external monitoring systems:
  *
  * <pre>{@code
  * // Prometheus-style metrics
@@ -100,10 +104,10 @@
  * cheshire_uptime_seconds 3600
  * cheshire_memory_used_bytes{type="heap"} 104857600
  * }</pre>
- * <p>
- * <strong>Health Check Endpoints:</strong>
- * <p>
- * Health and metrics can be exposed via HTTP endpoints:
+ *
+ * <p><strong>Health Check Endpoints:</strong>
+ *
+ * <p>Health and metrics can be exposed via HTTP endpoints:
  *
  * <pre>{@code
  * GET /health
@@ -124,21 +128,23 @@
  *   "memory": {"heap": 104857600, "nonHeap": 52428800}
  * }
  * }</pre>
- * <p>
- * <strong>Design Patterns:</strong>
+ *
+ * <p><strong>Design Patterns:</strong>
+ *
  * <ul>
- * <li><strong>State Pattern:</strong> Health state machine with validation</li>
- * <li><strong>Observer:</strong> Event recording and notification</li>
- * <li><strong>Strategy:</strong> Pluggable metric collectors</li>
- * <li><strong>Snapshot:</strong> Consistent metrics snapshots</li>
+ *   <li><strong>State Pattern:</strong> Health state machine with validation
+ *   <li><strong>Observer:</strong> Event recording and notification
+ *   <li><strong>Strategy:</strong> Pluggable metric collectors
+ *   <li><strong>Snapshot:</strong> Consistent metrics snapshots
  * </ul>
- * <p>
- * <strong>Performance Considerations:</strong>
+ *
+ * <p><strong>Performance Considerations:</strong>
+ *
  * <ul>
- * <li>Lock-free operations for Virtual Thread scalability</li>
- * <li>Minimal allocation (reuse collections)</li>
- * <li>Fast-path optimizations for common operations</li>
- * <li>Linearizable reads despite concurrent writes</li>
+ *   <li>Lock-free operations for Virtual Thread scalability
+ *   <li>Minimal allocation (reuse collections)
+ *   <li>Fast-path optimizations for common operations
+ *   <li>Linearizable reads despite concurrent writes
  * </ul>
  *
  * @see io.cheshire.runtime.monitoring.RuntimeHealth

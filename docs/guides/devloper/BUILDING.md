@@ -5,6 +5,7 @@ This guide covers building, testing, and packaging the Cheshire Framework.
 ## Prerequisites
 
 ### Required
+
 - **Java 21+** with preview features enabled
   ```bash
   java --version
@@ -12,6 +13,7 @@ This guide covers building, testing, and packaging the Cheshire Framework.
   ```
 
 ### Optional
+
 - **Maven 3.8+** (not required - project includes Maven wrapper)
 - **Git** for version control
 
@@ -27,16 +29,19 @@ cd cheshire-prototype
 ### 2. Build with Maven Wrapper
 
 **Linux/macOS:**
+
 ```bash
 ./mvnw clean install
 ```
 
 **Windows:**
+
 ```cmd
 mvnw.cmd clean install
 ```
 
 The Maven wrapper will automatically:
+
 - Download Maven 3.9.6 if not already cached
 - Build all modules
 - Run all tests
@@ -110,6 +115,7 @@ rm -rf */target/
 ### What is Maven Wrapper?
 
 Maven Wrapper (mvnw) is a script that:
+
 - Downloads the correct Maven version automatically
 - Ensures consistent builds across all environments
 - Eliminates "works on my machine" issues
@@ -144,6 +150,7 @@ mvn clean install
 ### Default Profile
 
 Builds all modules with standard settings:
+
 ```bash
 ./mvnw clean install
 ```

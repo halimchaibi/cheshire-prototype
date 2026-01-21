@@ -2,7 +2,7 @@ name: Pull Request Validation
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+    types: [ opened, synchronize, reopened, ready_for_review ]
     branches:
       - main
       - develop
@@ -177,7 +177,7 @@ jobs:
         run: |
           echo "Changed files:"
           echo "${{ steps.changed-files.outputs.all_changed_files }}"
-          
+
           # Count lines changed
           git diff --numstat origin/${{ github.base_ref }}...HEAD | \
             awk '{added+=$1; deleted+=$2} END {print "Lines added:", added, "Lines deleted:", deleted}'
@@ -277,7 +277,7 @@ jobs:
   pr-summary:
     name: PR Summary
     runs-on: ubuntu-latest
-    needs: [build-and-test, code-validation, security-scan]
+    needs: [ build-and-test, code-validation, security-scan ]
     if: always()
     permissions:
       pull-requests: write
@@ -293,18 +293,18 @@ jobs:
               'Build and Test': '${{ needs.build-and-test.result }}',
               'Security Scan': '${{ needs.security-scan.result }}'
             };
-            
+
             let summary = '## 🔍 Pull Request Validation Summary\n\n';
-            
+
             for (const [job, result] of Object.entries(jobs)) {
               const icon = result === 'success' ? '✅' : result === 'failure' ? '❌' : '⚠️';
               summary += `${icon} **${job}**: ${result}\n`;
             }
-            
+
             summary += '\n';
             summary += `**Commit**: ${context.sha.substring(0, 7)}\n`;
             summary += `**Author**: @${context.payload.pull_request.user.login}\n`;
-            
+
             github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,

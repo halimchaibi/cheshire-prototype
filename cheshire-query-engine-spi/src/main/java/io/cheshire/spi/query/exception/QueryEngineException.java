@@ -10,14 +10,25 @@
 
 package io.cheshire.spi.query.exception;
 
-public class QueryEngineException extends Exception {
+public abstract sealed class QueryEngineException extends Exception
+    permits QueryEngineConfigurationException,
+        QueryEngineInitializationException,
+        QueryExecutionException,
+        QueryValidationException {
 
-    public QueryEngineException(String message) {
-        super(message);
-    }
+  public QueryEngineException(String message) {
+    super(message);
+  }
 
-    public QueryEngineException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public QueryEngineException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
+  public String getErrorCode() {
+    return "UNKNOWN";
+  }
+
+  public boolean isRetryable() {
+    return false;
+  }
 }

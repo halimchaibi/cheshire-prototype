@@ -10,49 +10,50 @@
 
 /**
  * Service Provider Interface (SPI) for query engine implementations.
- * <p>
- * <strong>Package Overview:</strong>
- * <p>
- * This package defines the SPI for pluggable query engines:
+ *
+ * <p><strong>Package Overview:</strong>
+ *
+ * <p>This package defines the SPI for pluggable query engines:
+ *
  * <ul>
- * <li><strong>QueryEngine</strong> - Main query execution interface</li>
- * <li><strong>QueryEngineFactory</strong> - SPI factory for engine creation</li>
- * <li><strong>QueryEngineConfig</strong> - Engine configuration interface</li>
+ *   <li><strong>QueryEngine</strong> - Main query execution interface
+ *   <li><strong>QueryEngineFactory</strong> - SPI factory for engine creation
+ *   <li><strong>QueryEngineConfig</strong> - Engine configuration interface
  * </ul>
- * <p>
- * <strong>Query Engine Implementations:</strong>
+ *
+ * <p><strong>Query Engine Implementations:</strong>
  *
  * <pre>
  * QueryEngine (SPI)
  *   ├─ JdbcQueryEngine - Direct SQL execution
  *   └─ CalciteQueryEngine - Federated query processing
  * </pre>
- * <p>
- * <strong>SPI Discovery:</strong>
- * <p>
- * Query engines are discovered via Java's ServiceLoader mechanism:
+ *
+ * <p><strong>SPI Discovery:</strong>
+ *
+ * <p>Query engines are discovered via Java's ServiceLoader mechanism:
+ *
  * <ol>
- * <li>Implement {@link io.cheshire.spi.query.engine.QueryEngineFactory}</li>
- * <li>Register in {@code META-INF/services/io.cheshire.spi.query.engine.QueryEngineFactory}</li>
- * <li>Framework automatically discovers and loads</li>
+ *   <li>Implement {@link io.cheshire.spi.query.engine.QueryEngineFactory}
+ *   <li>Register in {@code META-INF/services/io.cheshire.spi.query.engine.QueryEngineFactory}
+ *   <li>Framework automatically discovers and loads
  * </ol>
- * <p>
- * <strong>Example Implementation:</strong>
  *
- * <pre>
- * {@code
+ * <p><strong>Example Implementation:</strong>
+ *
+ * <pre>{@code
  * // 1. Implement QueryEngine
- * public class JdbcQueryEngine implements QueryEngine<SqlQueryRequest, JdbcDataSourceProvider> {
+ * public class JdbcQueryEngine implements QueryEngine {
  *     &#64;Override
- *     public MapQueryResult execute(SqlQueryRequest request, JdbcDataSourceProvider provider) {
- *         // Convert request to SQL query
- *         SqlQuery query = request.toSqlQuery();
+ *     public QueryResult execute(LogicalQuery query, QueryContext context) {
+ *         // Convert logical query to SQL
+ *         String sql = (String) query.query();
  *
- *         // Execute via provider
- *         SqlQueryResult result = provider.execute(query);
+ *         // Get source provider from context
+ *         SourceProvider provider = context.sources().get(0);
  *
- *         // Convert to standard format
- *         return QueryResultConverter.fromRows(result.rows());
+ *         // Execute via provider and return result
+ *         return provider.execute(new SqlQuery(sql, query.parameters()));
  *     }
  * }
  *
@@ -71,10 +72,9 @@
  *
  * // 3. Register in META-INF/services/io.cheshire.spi.query.engine.QueryEngineFactory
  * io.cheshire.query.engine.jdbc.JdbcQueryEngineFactory
- * }
- * </pre>
- * <p>
- * <strong>Configuration:</strong>
+ * }</pre>
+ *
+ * <p><strong>Configuration:</strong>
  *
  * <pre>{@code
  * query-engines:
@@ -89,54 +89,57 @@
  *       optimizer: true
  *       parallelism: 4
  * }</pre>
- * <p>
- * <strong>Query Request Types:</strong>
- * <p>
- * Different engines support different request types:
+ *
+ * <p><strong>Query Request Types:</strong>
+ *
+ * <p>Different engines support different request types:
+ *
  * <ul>
- * <li><strong>SqlQueryRequest:</strong> SQL query with parameters</li>
- * <li><strong>CalciteQueryRequest:</strong> Relational algebra expression</li>
- * <li><strong>GraphQLQueryRequest:</strong> GraphQL query string</li>
+ *   <li><strong>SqlQueryRequest:</strong> SQL query with parameters
+ *   <li><strong>CalciteQueryRequest:</strong> Relational algebra expression
+ *   <li><strong>GraphQLQueryRequest:</strong> GraphQL query string
  * </ul>
- * <p>
- * <strong>Query Result Format:</strong>
- * <p>
- * All engines return {@code MapQueryResult} for consistency:
+ *
+ * <p><strong>Query Result Format:</strong>
+ *
+ * <p>All engines return {@code QueryResult} for consistency:
  *
  * <pre>{@code
- * public record MapQueryResult(
- *         List<Column> columns,
- *         List<Map<String, Object>> rows) {
- *     public record Column(
- *             String name,
- *             String type,
- *             boolean nullable) {
- *     }
+ * public class QueryResult {
+ *     public QueryResult(List<Column> columns, List<Map<String, Object>> rows) {...}
+ *     public List<Column> columns() {...}
+ *     public List<Map<String, Object>> rows() {...}
+ *     public int rowCount() {...}
+ *     public boolean isEmpty() {...}
+ *
+ *     public record Column(String name, String type, boolean nullable) {}
  * }
  * }</pre>
- * <p>
- * <strong>Lifecycle:</strong>
+ *
+ * <p><strong>Lifecycle:</strong>
+ *
  * <ol>
- * <li><strong>Discovery:</strong> ServiceLoader finds all QueryEngineFactory implementations</li>
- * <li><strong>Configuration:</strong> Factory.adapter() converts YAML to typed config</li>
- * <li><strong>Creation:</strong> Factory.create() instantiates engine</li>
- * <li><strong>Initialization:</strong> Engine.open() prepares for execution</li>
- * <li><strong>Execution:</strong> Engine.execute() processes queries</li>
- * <li><strong>Shutdown:</strong> Engine.close() releases resources</li>
+ *   <li><strong>Discovery:</strong> ServiceLoader finds all QueryEngineFactory implementations
+ *   <li><strong>Configuration:</strong> Factory.adapter() converts YAML to typed config
+ *   <li><strong>Creation:</strong> Factory.create() instantiates engine
+ *   <li><strong>Initialization:</strong> Engine.open() prepares for execution
+ *   <li><strong>Execution:</strong> Engine.execute() processes queries
+ *   <li><strong>Shutdown:</strong> Engine.close() releases resources
  * </ol>
- * <p>
- * <strong>Design Patterns:</strong>
+ *
+ * <p><strong>Design Patterns:</strong>
+ *
  * <ul>
- * <li><strong>Strategy:</strong> Pluggable query engines</li>
- * <li><strong>Factory Method:</strong> Engine creation via SPI</li>
- * <li><strong>Adapter:</strong> Protocol-specific request/response conversion</li>
- * <li><strong>Template Method:</strong> Consistent lifecycle management</li>
+ *   <li><strong>Strategy:</strong> Pluggable query engines
+ *   <li><strong>Factory Method:</strong> Engine creation via SPI
+ *   <li><strong>Adapter:</strong> Protocol-specific request/response conversion
+ *   <li><strong>Template Method:</strong> Consistent lifecycle management
  * </ul>
  *
  * @see io.cheshire.spi.query.engine.QueryEngine
  * @see io.cheshire.spi.query.engine.QueryEngineFactory
  * @see io.cheshire.spi.query.request.QueryRequest
- * @see io.cheshire.spi.query.result.QueryResult
+ * @see io.cheshire.spi.query.result.QueryEngineResult
  * @since 1.0.0
  */
 package io.cheshire.spi.query.engine;

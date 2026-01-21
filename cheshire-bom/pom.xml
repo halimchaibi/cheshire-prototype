@@ -42,10 +42,68 @@
     <!-- enforced transitive dependencies version -->
     <json-smart.version>2.5.2</json-smart.version>
     <commons-lang3.version>3.20.0</commons-lang3.version>
+
+    <!-- Skip Spotless formatting in BOM -->
+    <skip.spotless>true</skip.spotless>
   </properties>
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-common</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-pipeline-spi</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-query-engine-spi</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-source-provider-spi</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-source-provider-jdbc</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-query-engine-jdbc</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-query-engine-calcite</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-runtime</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-server</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-test-common</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <dependency>
         <groupId>io.modelcontextprotocol.sdk</groupId>
         <artifactId>mcp-bom</artifactId>
@@ -164,13 +222,15 @@
         <groupId>org.jetbrains</groupId>
         <artifactId>annotations</artifactId>
         <version>${jetbrains.annotations.version}</version>
+        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
         <version>${lombok.version}</version>
+        <scope>provided</scope>
       </dependency>
-    
+
       <!-- Swagger / OpenAPI -->
       <dependency>
         <groupId>io.swagger.core.v3</groupId>

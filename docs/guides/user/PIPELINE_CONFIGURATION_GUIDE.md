@@ -140,28 +140,28 @@ pipeline_name:
 
 ### Field Reference
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `pipeline_name` | String | ✅ Yes | Unique identifier for this pipeline |
-| `uri` | String | ✅ Yes | URI pattern (e.g., `blog://authors/create`) |
-| `description` | String | ✅ Yes | Human-readable description |
-| `input` | String | ✅ Yes | Fully qualified class name of input type |
-| `pipeline.preprocess` | List | ❌ No | List of preprocessing steps (executed in order) |
-| `pipeline.process` | Object | ✅ Yes | Single executor step |
-| `pipeline.postprocess` | List | ❌ No | List of postprocessing steps (executed in order) |
-| `output` | String | ✅ Yes | Fully qualified class name of output type |
+| Field                  | Type   | Required | Description                                      |
+|------------------------|--------|----------|--------------------------------------------------|
+| `pipeline_name`        | String | ✅ Yes    | Unique identifier for this pipeline              |
+| `uri`                  | String | ✅ Yes    | URI pattern (e.g., `blog://authors/create`)      |
+| `description`          | String | ✅ Yes    | Human-readable description                       |
+| `input`                | String | ✅ Yes    | Fully qualified class name of input type         |
+| `pipeline.preprocess`  | List   | ❌ No     | List of preprocessing steps (executed in order)  |
+| `pipeline.process`     | Object | ✅ Yes    | Single executor step                             |
+| `pipeline.postprocess` | List   | ❌ No     | List of postprocessing steps (executed in order) |
+| `output`               | String | ✅ Yes    | Fully qualified class name of output type        |
 
 ### Step Configuration
 
 Each step (PreProcessor, Executor, PostProcessor) has:
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | String | ✅ Yes | Unique name for this step |
-| `type` | String | ✅ Yes | Step type: `transformer` or `executor` |
-| `template` | String | ✅ Yes | DSL configuration (JSON/YAML) |
-| `implementation` | String | ✅ Yes | Fully qualified class name of implementation |
-| `description` | String | ❌ No | Human-readable description of the step |
+| Field            | Type   | Required | Description                                  |
+|------------------|--------|----------|----------------------------------------------|
+| `name`           | String | ✅ Yes    | Unique name for this step                    |
+| `type`           | String | ✅ Yes    | Step type: `transformer` or `executor`       |
+| `template`       | String | ✅ Yes    | DSL configuration (JSON/YAML)                |
+| `implementation` | String | ✅ Yes    | Fully qualified class name of implementation |
+| `description`    | String | ❌ No     | Human-readable description of the step       |
 
 ---
 
@@ -184,6 +184,7 @@ create_author:
 ```
 
 **Best Practices**:
+
 - Use descriptive names in `snake_case`
 - URI should follow pattern: `domain://resource/action`
 - Description should explain what, why, and what is returned
@@ -523,12 +524,12 @@ PostProcessors format and enrich the output:
 
 #### Operation Types
 
-| Operation | Description | Returns |
-|-----------|-------------|---------|
-| `SELECT` | Query data | Result set |
-| `INSERT` | Create new record | Inserted record (with `returning`) |
-| `UPDATE` | Modify existing record | Updated record (with `returning`) |
-| `DELETE` | Remove record | Deleted record ID (with `returning`) |
+| Operation | Description            | Returns                              |
+|-----------|------------------------|--------------------------------------|
+| `SELECT`  | Query data             | Result set                           |
+| `INSERT`  | Create new record      | Inserted record (with `returning`)   |
+| `UPDATE`  | Modify existing record | Updated record (with `returning`)    |
+| `DELETE`  | Remove record          | Deleted record ID (with `returning`) |
 
 ---
 
@@ -681,20 +682,20 @@ PostProcessors format and enrich the output:
 
 #### Filter Operators
 
-| Operator | Description | Example |
-|----------|-------------|---------|
-| `=` | Equals | `status = 'active'` |
-| `!=` | Not equals | `status != 'deleted'` |
-| `>` | Greater than | `age > 18` |
-| `<` | Less than | `price < 100` |
-| `>=` | Greater or equal | `score >= 50` |
-| `<=` | Less or equal | `quantity <= 10` |
-| `LIKE` | Pattern match (case-sensitive) | `name LIKE '%John%'` |
-| `ILIKE` | Pattern match (case-insensitive) | `email ILIKE '%@example.com'` |
-| `IN` | In list | `category IN ('A', 'B', 'C')` |
-| `NOT IN` | Not in list | `status NOT IN ('draft', 'deleted')` |
-| `IS NULL` | Is null check | `deleted_at IS NULL` |
-| `IS NOT NULL` | Not null check | `published_at IS NOT NULL` |
+| Operator      | Description                      | Example                              |
+|---------------|----------------------------------|--------------------------------------|
+| `=`           | Equals                           | `status = 'active'`                  |
+| `!=`          | Not equals                       | `status != 'deleted'`                |
+| `>`           | Greater than                     | `age > 18`                           |
+| `<`           | Less than                        | `price < 100`                        |
+| `>=`          | Greater or equal                 | `score >= 50`                        |
+| `<=`          | Less or equal                    | `quantity <= 10`                     |
+| `LIKE`        | Pattern match (case-sensitive)   | `name LIKE '%John%'`                 |
+| `ILIKE`       | Pattern match (case-insensitive) | `email ILIKE '%@example.com'`        |
+| `IN`          | In list                          | `category IN ('A', 'B', 'C')`        |
+| `NOT IN`      | Not in list                      | `status NOT IN ('draft', 'deleted')` |
+| `IS NULL`     | Is null check                    | `deleted_at IS NULL`                 |
+| `IS NOT NULL` | Not null check                   | `published_at IS NOT NULL`           |
 
 #### GroupBy and Having
 
@@ -1291,12 +1292,14 @@ search_articles:
 ### 1. Naming Conventions
 
 ✅ **DO**:
+
 - Use `snake_case` for pipeline names
 - Use descriptive, action-oriented names: `create_author`, `list_articles`, `update_comment`
 - Follow pattern: `action_resource` (e.g., `get_author`, `delete_article`)
 - Use consistent prefixes for related operations
 
 ❌ **DON'T**:
+
 - Use camelCase or PascalCase
 - Use generic names: `process`, `handle`, `do_something`
 - Mix naming patterns
@@ -1304,12 +1307,14 @@ search_articles:
 ### 2. URI Design
 
 ✅ **DO**:
+
 - Follow pattern: `domain://resource/action`
 - Use plural for collections: `blog://articles/list`
 - Use singular for single items: `blog://article/get`
 - Be consistent across your domain
 
 ❌ **DON'T**:
+
 - Mix singular and plural inconsistently
 - Use verbs in resource names
 - Include implementation details in URIs
@@ -1317,6 +1322,7 @@ search_articles:
 ### 3. Validation
 
 ✅ **DO**:
+
 - Validate all required fields
 - Use appropriate data types
 - Set reasonable min/max limits
@@ -1324,6 +1330,7 @@ search_articles:
 - Sanitize user input (trim, lowercase, escape)
 
 ❌ **DON'T**:
+
 - Skip validation for "trusted" sources
 - Allow unbounded string lengths
 - Accept unvalidated email addresses or URLs
@@ -1331,6 +1338,7 @@ search_articles:
 ### 4. Database Queries
 
 ✅ **DO**:
+
 - Use table aliases consistently
 - Specify field aliases for clarity
 - Use optional filters for flexible queries
@@ -1339,6 +1347,7 @@ search_articles:
 - Group by all non-aggregated columns
 
 ❌ **DON'T**:
+
 - Use `SELECT *` in production
 - Create N+1 query problems
 - Forget to add pagination
@@ -1347,12 +1356,14 @@ search_articles:
 ### 5. Error Handling
 
 ✅ **DO**:
+
 - Return meaningful error messages
 - Include error codes for programmatic handling
 - Log errors with context
 - Handle constraint violations gracefully
 
 ❌ **DON'T**:
+
 - Expose database error messages to clients
 - Return stack traces in production
 - Use generic error messages
@@ -1360,6 +1371,7 @@ search_articles:
 ### 6. Performance
 
 ✅ **DO**:
+
 - Set reasonable default limits (e.g., 50)
 - Enforce maximum limits (e.g., 100)
 - Use indexes on filter columns
@@ -1367,6 +1379,7 @@ search_articles:
 - Consider denormalization for read-heavy operations
 
 ❌ **DON'T**:
+
 - Allow unlimited result sets
 - Perform expensive operations in loops
 - Fetch more data than needed
@@ -1374,12 +1387,14 @@ search_articles:
 ### 7. Documentation
 
 ✅ **DO**:
+
 - Write clear, descriptive summaries
 - Document all parameters
 - Explain business logic
 - Include examples in comments
 
 ❌ **DON'T**:
+
 - Leave descriptions empty
 - Assume parameters are self-explanatory
 
@@ -1396,6 +1411,7 @@ search_articles:
 **Cause**: PreProcessor not properly implementing validation logic
 
 **Solution**:
+
 1. Verify `inputProcessor` implementation class exists
 2. Check that validation template is valid JSON
 3. Ensure required fields are listed correctly

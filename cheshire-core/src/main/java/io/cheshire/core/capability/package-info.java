@@ -10,30 +10,32 @@
 
 /**
  * Capability abstractions representing business-aligned, self-contained domains.
- * <p>
- * <strong>Package Overview:</strong>
- * <p>
- * Contains the core {@link io.cheshire.core.capability.Capability} record that encapsulates:
+ *
+ * <p><strong>Package Overview:</strong>
+ *
+ * <p>Contains the core {@link io.cheshire.core.capability.Capability} record that encapsulates:
+ *
  * <ul>
- * <li>Capability metadata (name, description, domain)</li>
- * <li>Exposure configuration (REST, MCP stdio, MCP HTTP)</li>
- * <li>Transport configuration (port, host, threading)</li>
- * <li>Data sources and query engine references</li>
- * <li>Pipeline definitions for each action</li>
- * <li>Action specifications (MCP tools)</li>
+ *   <li>Capability metadata (name, description, domain)
+ *   <li>Exposure configuration (REST, MCP stdio, MCP HTTP)
+ *   <li>Transport configuration (port, host, threading)
+ *   <li>Data sources and query engine references
+ *   <li>Pipeline definitions for each action
+ *   <li>Action specifications (MCP tools)
  * </ul>
- * <p>
- * <strong>What is a Capability?</strong>
- * <p>
- * A capability is a business-aligned grouping of:
+ *
+ * <p><strong>What is a Capability?</strong>
+ *
+ * <p>A capability is a business-aligned grouping of:
+ *
  * <ul>
- * <li><strong>Actions:</strong> Invocable operations (exposed as MCP tools or REST endpoints)</li>
- * <li><strong>Pipelines:</strong> Three-stage processing flow for each action</li>
- * <li><strong>Data Access:</strong> Associated data sources and query engines</li>
- * <li><strong>Protocol:</strong> How the capability is exposed (REST, MCP, etc.)</li>
+ *   <li><strong>Actions:</strong> Invocable operations (exposed as MCP tools or REST endpoints)
+ *   <li><strong>Pipelines:</strong> Three-stage processing flow for each action
+ *   <li><strong>Data Access:</strong> Associated data sources and query engines
+ *   <li><strong>Protocol:</strong> How the capability is exposed (REST, MCP, etc.)
  * </ul>
- * <p>
- * <strong>Example Capability:</strong>
+ *
+ * <p><strong>Example Capability:</strong>
  *
  * <pre>{@code
  * Capability blogCapability = new Capability("blog-capability", "Blog management capability", "blogging", exposure, // REST
@@ -46,21 +48,22 @@
  *         actions // List of available actions
  * );
  * }</pre>
- * <p>
- * <strong>Capability Lifecycle:</strong>
+ *
+ * <p><strong>Capability Lifecycle:</strong>
+ *
  * <ol>
- * <li>Load capability configuration from YAML</li>
- * <li>Resolve data source and query engine references</li>
- * <li>Load actions specification from external file</li>
- * <li>Load pipeline definitions from external file</li>
- * <li>Register capability in CapabilityManager</li>
- * <li>Create server handle for capability</li>
- * <li>Start server and expose actions</li>
+ *   <li>Load capability configuration from YAML
+ *   <li>Resolve data source and query engine references
+ *   <li>Load actions specification from external file
+ *   <li>Load pipeline definitions from external file
+ *   <li>Register capability in CapabilityManager
+ *   <li>Create server handle for capability
+ *   <li>Start server and expose actions
  * </ol>
- * <p>
- * <strong>Multi-Protocol Support:</strong>
- * <p>
- * The same capability can be exposed through multiple protocols simultaneously:
+ *
+ * <p><strong>Multi-Protocol Support:</strong>
+ *
+ * <p>The same capability can be exposed through multiple protocols simultaneously:
  *
  * <pre>{@code
  * // REST API
@@ -74,13 +77,14 @@
  * // MCP stdio
  * echo '{"tool": "list_articles"}' | java -jar app.jar --mcp-stdio
  * }</pre>
- * <p>
- * <strong>Design Principles:</strong>
+ *
+ * <p><strong>Design Principles:</strong>
+ *
  * <ul>
- * <li>Domain-Driven Design: Capabilities align with business domains</li>
- * <li>Self-Contained: Each capability is independently deployable</li>
- * <li>Protocol-Agnostic: Same logic, multiple protocols</li>
- * <li>Composable: Capabilities can reference shared data sources</li>
+ *   <li>Domain-Driven Design: Capabilities align with business domains
+ *   <li>Self-Contained: Each capability is independently deployable
+ *   <li>Protocol-Agnostic: Same logic, multiple protocols
+ *   <li>Composable: Capabilities can reference shared data sources
  * </ul>
  *
  * @see io.cheshire.core.capability.Capability

@@ -10,20 +10,21 @@
 
 /**
  * Service Provider Interface (SPI) for three-stage pipeline processing.
- * <p>
- * <strong>Package Overview:</strong>
- * <p>
- * This package defines the core SPI for Cheshire's three-stage pipeline pattern:
+ *
+ * <p><strong>Package Overview:</strong>
+ *
+ * <p>This package defines the core SPI for Cheshire's three-stage pipeline pattern:
+ *
  * <ul>
- * <li><strong>PipelineProcessor</strong> - Orchestrator for the three-stage flow</li>
- * <li><strong>PreProcessor</strong> - Input validation and transformation (stage 1)</li>
- * <li><strong>Executor</strong> - Business logic execution (stage 2)</li>
- * <li><strong>PostProcessor</strong> - Output formatting and enrichment (stage 3)</li>
- * <li><strong>MaterializedInput</strong> - Immutable input data carrier</li>
- * <li><strong>MaterializedOutput</strong> - Immutable output data carrier</li>
+ *   <li><strong>PipelineProcessor</strong> - Orchestrator for the three-stage flow
+ *   <li><strong>PreProcessor</strong> - Input validation and transformation (stage 1)
+ *   <li><strong>Executor</strong> - Business logic execution (stage 2)
+ *   <li><strong>PostProcessor</strong> - Output formatting and enrichment (stage 3)
+ *   <li><strong>MaterializedInput</strong> - Immutable input data carrier
+ *   <li><strong>MaterializedOutput</strong> - Immutable output data carrier
  * </ul>
- * <p>
- * <strong>Three-Stage Pipeline Pattern:</strong>
+ *
+ * <p><strong>Three-Stage Pipeline Pattern:</strong>
  *
  * <pre>
  * Input (Map)
@@ -40,8 +41,8 @@
  *      ↓
  * Output (Map)
  * </pre>
- * <p>
- * <strong>Implementation Example:</strong>
+ *
+ * <p><strong>Implementation Example:</strong>
  *
  * <pre>
  * {
@@ -91,10 +92,10 @@
  *     }
  * }
  * </pre>
- * <p>
- * <strong>Pipeline Composition:</strong>
- * <p>
- * Pipelines are composed via stream-based reduction:
+ *
+ * <p><strong>Pipeline Composition:</strong>
+ *
+ * <p>Pipelines are composed via stream-based reduction:
  *
  * <pre>{@code
  * MaterializedOutput result = Stream.of(input)
@@ -104,10 +105,10 @@
  *     .findFirst()
  *     .orElseThrow();
  * }</pre>
- * <p>
- * <strong>Immutability:</strong>
- * <p>
- * MaterializedInput and MaterializedOutput are immutable records:
+ *
+ * <p><strong>Immutability:</strong>
+ *
+ * <p>MaterializedInput and MaterializedOutput are immutable records:
  *
  * <pre>{@code
  * public record MaterializedInput(Map<String, Object> data) {
@@ -120,10 +121,10 @@
  * }
  * }
  * }</pre>
- * <p>
- * <strong>Configuration:</strong>
- * <p>
- * Pipelines are configured in YAML:
+ *
+ * <p><strong>Configuration:</strong>
+ *
+ * <p>Pipelines are configured in YAML:
  *
  * <pre>{@code
  * pipelines:
@@ -145,22 +146,24 @@
  *     postprocess:
  *       - class: io.blog.pipeline.BlogOutputProcessor
  * }</pre>
- * <p>
- * <strong>Design Patterns:</strong>
+ *
+ * <p><strong>Design Patterns:</strong>
+ *
  * <ul>
- * <li><strong>Chain of Responsibility:</strong> Sequential processing stages</li>
- * <li><strong>Template Method:</strong> Fixed pipeline structure, extensible steps</li>
- * <li><strong>Strategy:</strong> Pluggable processor implementations</li>
- * <li><strong>Immutable Object:</strong> MaterializedInput/Output</li>
+ *   <li><strong>Chain of Responsibility:</strong> Sequential processing stages
+ *   <li><strong>Template Method:</strong> Fixed pipeline structure, extensible steps
+ *   <li><strong>Strategy:</strong> Pluggable processor implementations
+ *   <li><strong>Immutable Object:</strong> MaterializedInput/Output
  * </ul>
- * <p>
- * <strong>Extensibility:</strong>
- * <p>
- * Applications can implement custom processors:
+ *
+ * <p><strong>Extensibility:</strong>
+ *
+ * <p>Applications can implement custom processors:
+ *
  * <ol>
- * <li>Implement PreProcessor/Executor/PostProcessor interfaces</li>
- * <li>Add to pipeline configuration YAML</li>
- * <li>Framework automatically instantiates and chains them</li>
+ *   <li>Implement PreProcessor/Executor/PostProcessor interfaces
+ *   <li>Add to pipeline configuration YAML
+ *   <li>Framework automatically instantiates and chains them
  * </ol>
  *
  * @see io.cheshire.spi.pipeline.step.PreProcessor

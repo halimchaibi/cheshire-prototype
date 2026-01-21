@@ -1,4 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 2800" width="1000" height="1400" style="background-color: #ffffff;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 2800" width="1000" height="1400"
+     style="background-color: #ffffff;">
     <defs>
         <marker id="arrowDown" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
             <path d="M0,0 L6,3 L0,6 Z" fill="#c0392b"/>
@@ -8,90 +9,164 @@
         </marker>
     </defs>
 
-    <text x="1000" y="80" font-family="Arial, sans-serif" font-size="48" font-weight="bold" text-anchor="middle" fill="#2c3e50">Cheshire Framework Architecture</text>
+    <text x="1000" y="80" font-family="Arial, sans-serif" font-size="48" font-weight="bold" text-anchor="middle"
+          fill="#2c3e50">Cheshire Framework Architecture
+    </text>
 
-    <rect x="100" y="140" width="1800" height="140" rx="20" fill="#f5f6f8" stroke="#3b4a5a" stroke-width="4" stroke-dasharray="10,10"/>
-    <text x="1000" y="184" font-family="Arial, sans-serif" font-size="26" font-weight="bold" text-anchor="middle" fill="#7b8b9a">TRANSPORT LAYER (Network I/O)</text>
-    <text x="500" y="240" font-family="Arial, sans-serif" font-size="28" text-anchor="middle" fill="#2f4050">Jetty (HTTP/WS)</text>
-    <text x="1000" y="240" font-family="Arial, sans-serif" font-size="28" text-anchor="middle" fill="#2f4050">Stdio / Pipes</text>
-    <text x="1500" y="240" font-family="Arial, sans-serif" font-size="28" text-anchor="middle" fill="#2f4050">RPC (TCP)</text>
+    <rect x="100" y="140" width="1800" height="140" rx="20" fill="#f5f6f8" stroke="#3b4a5a" stroke-width="4"
+          stroke-dasharray="10,10"/>
+    <text x="1000" y="184" font-family="Arial, sans-serif" font-size="26" font-weight="bold" text-anchor="middle"
+          fill="#7b8b9a">TRANSPORT LAYER (Network I/O)
+    </text>
+    <text x="500" y="240" font-family="Arial, sans-serif" font-size="28" text-anchor="middle" fill="#2f4050">Jetty
+        (HTTP/WS)
+    </text>
+    <text x="1000" y="240" font-family="Arial, sans-serif" font-size="28" text-anchor="middle" fill="#2f4050">Stdio /
+        Pipes
+    </text>
+    <text x="1500" y="240" font-family="Arial, sans-serif" font-size="28" text-anchor="middle" fill="#2f4050">RPC
+        (TCP)
+    </text>
 
     <line x1="960" y1="300" x2="960" y2="370" stroke="#c0392b" stroke-width="5" marker-end="url(#arrowDown)"/>
     <line x1="1040" y1="370" x2="1040" y2="300" stroke="#1e8449" stroke-width="5" marker-end="url(#arrowUp)"/>
-    <text x="940" y="340" font-family="Arial, sans-serif" font-size="20" text-anchor="end" fill="#546e7a">Client Request</text>
-    <text x="1060" y="340" font-family="Arial, sans-serif" font-size="20" text-anchor="start" fill="#546e7a">Client Response</text>
+    <text x="940" y="340" font-family="Arial, sans-serif" font-size="20" text-anchor="end" fill="#546e7a">Client
+        Request
+    </text>
+    <text x="1060" y="340" font-family="Arial, sans-serif" font-size="20" text-anchor="start" fill="#546e7a">Client
+        Response
+    </text>
 
     <rect x="100" y="390" width="1800" height="320" rx="20" fill="#f4f5f7" stroke="#3b4a5a" stroke-width="4"/>
-    <text x="1000" y="440" font-family="Arial, sans-serif" font-size="32" font-weight="bold" text-anchor="middle" fill="#2c3e50">PROTOCOL LAYER (Exposures)</text>
+    <text x="1000" y="440" font-family="Arial, sans-serif" font-size="32" font-weight="bold" text-anchor="middle"
+          fill="#2c3e50">PROTOCOL LAYER (Exposures)
+    </text>
     <rect x="160" y="480" width="360" height="190" rx="10" fill="#dde1e5" stroke="#2f4f6b" stroke-width="3"/>
-    <text x="340" y="530" font-family="Arial, sans-serif" font-size="28" font-weight="bold" text-anchor="middle" fill="#2f4050">realtime-ws</text>
+    <text x="340" y="530" font-family="Arial, sans-serif" font-size="28" font-weight="bold" text-anchor="middle"
+          fill="#2f4050">realtime-ws
+    </text>
     <rect x="560" y="480" width="360" height="190" rx="10" fill="#dde1e5" stroke="#2f4f6b" stroke-width="3"/>
-    <text x="740" y="530" font-family="Arial, sans-serif" font-size="28" font-weight="bold" text-anchor="middle" fill="#2f4050">MCP Protocol</text>
+    <text x="740" y="530" font-family="Arial, sans-serif" font-size="28" font-weight="bold" text-anchor="middle"
+          fill="#2f4050">MCP Protocol
+    </text>
     <rect x="960" y="480" width="360" height="190" rx="10" fill="#dde1e5" stroke="#2f4f6b" stroke-width="3"/>
-    <text x="1140" y="530" font-family="Arial, sans-serif" font-size="28" font-weight="bold" text-anchor="middle" fill="#2f4050">REST API</text>
+    <text x="1140" y="530" font-family="Arial, sans-serif" font-size="28" font-weight="bold" text-anchor="middle"
+          fill="#2f4050">REST API
+    </text>
     <rect x="1360" y="480" width="360" height="190" rx="10" fill="#dde1e5" stroke="#2f4f6b" stroke-width="3"/>
-    <text x="1540" y="530" font-family="Arial, sans-serif" font-size="28" font-weight="bold" text-anchor="middle" fill="#2f4050">GraphQL</text>
+    <text x="1540" y="530" font-family="Arial, sans-serif" font-size="28" font-weight="bold" text-anchor="middle"
+          fill="#2f4050">GraphQL
+    </text>
 
     <line x1="960" y1="730" x2="960" y2="810" stroke="#c0392b" stroke-width="5" marker-end="url(#arrowDown)"/>
     <line x1="1040" y1="810" x2="1040" y2="730" stroke="#1e8449" stroke-width="5" marker-end="url(#arrowUp)"/>
-    <text x="940" y="775" font-family="Arial, sans-serif" font-size="20" text-anchor="end" fill="#546e7a">RequestEnvelope (protocol-Agnostic)</text>
-    <text x="1060" y="775" font-family="Arial, sans-serif" font-size="20" text-anchor="start" fill="#546e7a">ResponseEntity (protocol-agnostic)</text>
+    <text x="940" y="775" font-family="Arial, sans-serif" font-size="20" text-anchor="end" fill="#546e7a">
+        RequestEnvelope (protocol-Agnostic)
+    </text>
+    <text x="1060" y="775" font-family="Arial, sans-serif" font-size="20" text-anchor="start" fill="#546e7a">
+        ResponseEntity (protocol-agnostic)
+    </text>
 
     <rect x="100" y="830" width="1800" height="260" rx="20" fill="#f4f5f7" stroke="#3b4a5a" stroke-width="4"/>
-    <text x="1000" y="880" font-family="Arial, sans-serif" font-size="32" font-weight="bold" text-anchor="middle" fill="#2c3e50">DISPATCHERS</text>
+    <text x="1000" y="880" font-family="Arial, sans-serif" font-size="32" font-weight="bold" text-anchor="middle"
+          fill="#2c3e50">DISPATCHERS
+    </text>
     <rect x="200" y="910" width="1600" height="150" rx="10" fill="#dde1e5" stroke="#9aa3aa" stroke-width="2"/>
-    <text x="1000" y="956" font-family="Arial, sans-serif" font-size="26" font-weight="bold" text-anchor="middle" fill="#2f4050">Protocol Adapters | Dispatchers | Server Handles</text>
+    <text x="1000" y="956" font-family="Arial, sans-serif" font-size="26" font-weight="bold" text-anchor="middle"
+          fill="#2f4050">Protocol Adapters | Dispatchers | Server Handles
+    </text>
 
     <line x1="960" y1="1110" x2="960" y2="1190" stroke="#c0392b" stroke-width="5" marker-end="url(#arrowDown)"/>
     <line x1="1040" y1="1190" x2="1040" y2="1110" stroke="#1e8449" stroke-width="5" marker-end="url(#arrowUp)"/>
-    <text x="940" y="1155" font-family="Arial, sans-serif" font-size="20" text-anchor="end" fill="#546e7a">SessionTask</text>
-    <text x="1060" y="1155" font-family="Arial, sans-serif" font-size="20" text-anchor="start" fill="#546e7a">TaskResult</text>
+    <text x="940" y="1155" font-family="Arial, sans-serif" font-size="20" text-anchor="end" fill="#546e7a">SessionTask
+    </text>
+    <text x="1060" y="1155" font-family="Arial, sans-serif" font-size="20" text-anchor="start" fill="#546e7a">
+        TaskResult
+    </text>
 
     <rect x="100" y="1210" width="1800" height="220" rx="20" fill="#f4f5f7" stroke="#3b4a5a" stroke-width="4"/>
-    <text x="1000" y="1260" font-family="Arial, sans-serif" font-size="32" font-weight="bold" text-anchor="middle" fill="#2f4050">CHESHIRE CORE (Session &amp; Orchestration)</text>
+    <text x="1000" y="1260" font-family="Arial, sans-serif" font-size="32" font-weight="bold" text-anchor="middle"
+          fill="#2f4050">CHESHIRE CORE (Session &amp; Orchestration)
+    </text>
     <rect x="200" y="1290" width="1600" height="110" rx="10" fill="#dde1e5" stroke="#35495e" stroke-width="2"/>
-    <text x="1000" y="1336" font-family="Arial, sans-serif" font-size="26" text-anchor="middle" fill="#2f4050">CheshireSession | Capability Registry | Managers</text>
+    <text x="1000" y="1336" font-family="Arial, sans-serif" font-size="26" text-anchor="middle" fill="#2f4050">
+        CheshireSession | Capability Registry | Managers
+    </text>
 
     <line x1="960" y1="1450" x2="960" y2="1530" stroke="#c0392b" stroke-width="5" marker-end="url(#arrowDown)"/>
     <line x1="1040" y1="1530" x2="1040" y2="1450" stroke="#1e8449" stroke-width="5" marker-end="url(#arrowUp)"/>
-    <text x="940" y="1495" font-family="Arial, sans-serif" font-size="20" text-anchor="end" fill="#546e7a">Canonical Input</text>
-    <text x="1060" y="1495" font-family="Arial, sans-serif" font-size="20" text-anchor="start" fill="#546e7a">Canonical Output</text>
+    <text x="940" y="1495" font-family="Arial, sans-serif" font-size="20" text-anchor="end" fill="#546e7a">Canonical
+        Input
+    </text>
+    <text x="1060" y="1495" font-family="Arial, sans-serif" font-size="20" text-anchor="start" fill="#546e7a">Canonical
+        Output
+    </text>
 
     <rect x="100" y="1550" width="1800" height="200" rx="20" fill="#f4f5f7" stroke="#3b4a5a" stroke-width="4"/>
-    <text x="1000" y="1600" font-family="Arial, sans-serif" font-size="32" font-weight="bold" text-anchor="middle" fill="#2f4050">THREE-STAGE PIPELINE</text>
-    <text x="1000" y="1720" font-family="Arial, sans-serif" font-size="22" font-style="italic" text-anchor="middle" fill="#7b8b9a">Validate/Transform → Execute → Format/Enrich</text>
+    <text x="1000" y="1600" font-family="Arial, sans-serif" font-size="32" font-weight="bold" text-anchor="middle"
+          fill="#2f4050">THREE-STAGE PIPELINE
+    </text>
+    <text x="1000" y="1720" font-family="Arial, sans-serif" font-size="22" font-style="italic" text-anchor="middle"
+          fill="#7b8b9a">Validate/Transform → Execute → Format/Enrich
+    </text>
 
     <line x1="960" y1="1770" x2="960" y2="1850" stroke="#c0392b" stroke-width="5" marker-end="url(#arrowDown)"/>
     <line x1="1040" y1="1850" x2="1040" y2="1770" stroke="#1e8449" stroke-width="5" marker-end="url(#arrowUp)"/>
-    <text x="940" y="1815" font-family="Arial, sans-serif" font-size="20" text-anchor="end" fill="#546e7a">Logical Query (datasource-agnostic)</text>
-    <text x="1060" y="1815" font-family="Arial, sans-serif" font-size="20" text-anchor="start" fill="#546e7a">Raw Results (datasource-agnostic)</text>
+    <text x="940" y="1815" font-family="Arial, sans-serif" font-size="20" text-anchor="end" fill="#546e7a">Logical Query
+        (datasource-agnostic)
+    </text>
+    <text x="1060" y="1815" font-family="Arial, sans-serif" font-size="20" text-anchor="start" fill="#546e7a">Raw
+        Results (datasource-agnostic)
+    </text>
 
     <rect x="100" y="1870" width="1800" height="240" rx="20" fill="#f4f5f7" stroke="#3b4a5a" stroke-width="4"/>
-    <text x="1000" y="1920" font-family="Arial, sans-serif" font-size="32" font-weight="bold" text-anchor="middle" fill="#2f4050">QUERY ENGINES (SPI)</text>
+    <text x="1000" y="1920" font-family="Arial, sans-serif" font-size="32" font-weight="bold" text-anchor="middle"
+          fill="#2f4050">QUERY ENGINES (SPI)
+    </text>
     <g transform="translate(300, 1960)">
         <rect x="0" y="0" width="500" height="110" rx="10" fill="#dde1e5" stroke="#35495e" stroke-width="3"/>
-        <text x="250" y="46" font-family="Arial, sans-serif" font-size="26" font-weight="bold" text-anchor="middle" fill="#2f4050">JDBC Query Engine</text>
+        <text x="250" y="46" font-family="Arial, sans-serif" font-size="26" font-weight="bold" text-anchor="middle"
+              fill="#2f4050">JDBC Query Engine
+        </text>
     </g>
     <g transform="translate(1200, 1960)">
         <rect x="0" y="0" width="500" height="110" rx="10" fill="#dde1e5" stroke="#35495e" stroke-width="3"/>
-        <text x="250" y="46" font-family="Arial, sans-serif" font-size="26" font-weight="bold" text-anchor="middle" fill="#2f4050">Calcite Engine</text>
+        <text x="250" y="46" font-family="Arial, sans-serif" font-size="26" font-weight="bold" text-anchor="middle"
+              fill="#2f4050">Calcite Engine
+        </text>
     </g>
 
     <line x1="960" y1="2130" x2="960" y2="2210" stroke="#c0392b" stroke-width="5" marker-end="url(#arrowDown)"/>
     <line x1="1040" y1="2210" x2="1040" y2="2130" stroke="#1e8449" stroke-width="5" marker-end="url(#arrowUp)"/>
-    <text x="940" y="2175" font-family="Arial, sans-serif" font-size="20" text-anchor="end" fill="#546e7a">Physical SQL</text>
-    <text x="1060" y="2175" font-family="Arial, sans-serif" font-size="20" text-anchor="start" fill="#546e7a">Result Set</text>
+    <text x="940" y="2175" font-family="Arial, sans-serif" font-size="20" text-anchor="end" fill="#546e7a">Physical
+        SQL
+    </text>
+    <text x="1060" y="2175" font-family="Arial, sans-serif" font-size="20" text-anchor="start" fill="#546e7a">Result
+        Set
+    </text>
 
     <rect x="100" y="2230" width="1800" height="220" rx="20" fill="#f4f5f7" stroke="#35495e" stroke-width="4"/>
-    <text x="1000" y="2280" font-family="Arial, sans-serif" font-size="32" font-weight="bold" text-anchor="middle" fill="#2f4050">SOURCE PROVIDERS (SPI)</text>
-    <text x="1000" y="2360" font-family="Arial, sans-serif" font-size="26" text-anchor="middle" fill="#2f4050">JDBC | Vector | API | Spark</text>
+    <text x="1000" y="2280" font-family="Arial, sans-serif" font-size="32" font-weight="bold" text-anchor="middle"
+          fill="#2f4050">SOURCE PROVIDERS (SPI)
+    </text>
+    <text x="1000" y="2360" font-family="Arial, sans-serif" font-size="26" text-anchor="middle" fill="#2f4050">JDBC |
+        Vector | API | Spark
+    </text>
 
     <line x1="960" y1="2470" x2="960" y2="2550" stroke="#c0392b" stroke-width="5" marker-end="url(#arrowDown)"/>
     <line x1="1040" y1="2550" x2="1040" y2="2470" stroke="#1e8449" stroke-width="5" marker-end="url(#arrowUp)"/>
-    <text x="940" y="2515" font-family="Arial, sans-serif" font-size="20" text-anchor="end" fill="#546e7a">Execute Driver</text>
-    <text x="1060" y="2515" font-family="Arial, sans-serif" font-size="20" text-anchor="start" fill="#546e7a">Data Stream</text>
+    <text x="940" y="2515" font-family="Arial, sans-serif" font-size="20" text-anchor="end" fill="#546e7a">Execute
+        Driver
+    </text>
+    <text x="1060" y="2515" font-family="Arial, sans-serif" font-size="20" text-anchor="start" fill="#546e7a">Data
+        Stream
+    </text>
 
     <rect x="100" y="2570" width="1800" height="160" rx="20" fill="#9aa3aa" stroke="#7b8b9a" stroke-width="4"/>
-    <text x="1000" y="2634" font-family="Arial, sans-serif" font-size="32" font-weight="bold" text-anchor="middle" fill="#2f4050">EXTERNAL RESOURCES</text>
-    <text x="1000" y="2684" font-family="Arial, sans-serif" font-size="22" text-anchor="middle" fill="#2f4050">Databases | Cloud Warehouses | Vector Stores | External APIs</text>
+    <text x="1000" y="2634" font-family="Arial, sans-serif" font-size="32" font-weight="bold" text-anchor="middle"
+          fill="#2f4050">EXTERNAL RESOURCES
+    </text>
+    <text x="1000" y="2684" font-family="Arial, sans-serif" font-size="22" text-anchor="middle" fill="#2f4050">Databases
+        | Cloud Warehouses | Vector Stores | External APIs
+    </text>
 </svg>

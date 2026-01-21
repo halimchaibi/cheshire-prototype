@@ -5,10 +5,12 @@ import json
 # Configuration: Point this to your running Java/Spring server
 HTTP_SERVER_URL = "http://localhost:9000/mcp/v1/chinook/"
 
+
 def log(message):
     """Logs to stderr so it doesn't interfere with the MCP protocol on stdout."""
     sys.stderr.write(f"BRIDGE-LOG: {message}\n")
     sys.stderr.flush()
+
 
 def main():
     log("Starting MCP Stdio-to-HTTP Bridge...")
@@ -28,7 +30,7 @@ def main():
                     HTTP_SERVER_URL,
                     data=payload,
                     headers={'Content-Type': 'application/json'},
-                    timeout=30 # Allow time for DB queries
+                    timeout=30  # Allow time for DB queries
                 )
 
                 if response.status_code == 200:
@@ -43,6 +45,7 @@ def main():
 
     except KeyboardInterrupt:
         log("Bridge shutting down.")
+
 
 if __name__ == "__main__":
     main()
