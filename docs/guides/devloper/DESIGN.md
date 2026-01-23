@@ -223,12 +223,6 @@ The ***RuntimeSession*** invokes the ***PipelineExecutor** for exeution
 
 #### g. The ***PipelineExecutor***
 
-Here’s a **detailed expansion of section g. “PipelineExecutor”** with **subsections** matching your sequence diagram and flow, formatted for your existing documentation:
-
----
-
-#### g. The ***PipelineExecutor***
-
 The ***PipelineExecutor*** orchestrates the main execution steps for a task. It is responsible for transforming the canonical input into a canonical output, invoking the query engine, and applying any post-processing logic. The executor is **protocol-agnostic** and does not depend on the transport layer.
 
 ```java
@@ -341,14 +335,6 @@ CanonicalOutput apply(CanonicalOutput output, ExecutionContext ctx) {
 ```
 
 * PostProcessors are executed **after the QueryEngine finishes**, ensuring the raw data is converted into the **final canonical output**.
-
----
-
-If you want, I can **also draft a `g.5` subsection specifically for streaming large datasets**, showing **row-by-row streaming through the pipeline**, which you can integrate with MCP or chunked HTTP.
-
-Do you want me to do that next?
-
-Return a ***CanonicalOutput*** to the ***RuntimeSession***
 
 ---
 
