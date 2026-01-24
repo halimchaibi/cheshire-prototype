@@ -412,7 +412,7 @@ public class CustomExecutor implements Executor {
 
 ### Prerequisites
 
-- **Java 21+** (with preview features enabled)
+- **Java 25** (with preview features enabled)
 - **No Maven installation required!** - Project includes Maven wrapper
 
 ### Clone and Build
@@ -564,7 +564,14 @@ curl "http://localhost:9000/api/v1/blog/stats_overview"
 See [cheshire-blog-app/TESTING.md](https://github.com/halimchaibi/cheshire-blog-app/blob/main/TESTING.md) for comprehensive testing guide.
 
 ## 🧑‍💻 Development
+### Development Conventions 
+For guidance on **issue types, commit message conventions, branch naming, and spike/task templates**, please refer to our [Development Taxonomy](https://github.com/halimchaibi/cheshire-framework/blob/main/.github/DEV_TAXONOMY.md).
 
+This includes:  
+- GitHub issue prefixes (`TASK:`, `BUG:`, `SPIKE:` etc.)  
+- Conventional commit prefixes (`feat:`, `fix:`, `docs:`, `refactor:` etc.)  
+- Branch naming conventions  
+- Guidance on optional vs automatic issue linking in commits
 ### Project Structure
 
 ```
