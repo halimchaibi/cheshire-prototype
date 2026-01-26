@@ -10,6 +10,9 @@
 
 package io.cheshire.core.manager;
 
+import io.cheshire.common.utils.MapUtils;
+import io.cheshire.common.utils.ObjectUtils;
+import io.cheshire.common.utils.ServiceUtils;
 import io.cheshire.core.config.CheshireConfig;
 import io.cheshire.core.registry.Registry;
 import io.cheshire.core.registry.RegistryException;
@@ -18,10 +21,7 @@ import io.cheshire.spi.query.engine.QueryEngineConfig;
 import io.cheshire.spi.query.engine.QueryEngineConfigAdapter;
 import io.cheshire.spi.query.engine.QueryEngineFactory;
 import io.cheshire.spi.query.exception.QueryEngineException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ServiceLoader;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -191,30 +191,35 @@ public final class QueryEngineManager implements Initializable {
    */
   @Override
   public void initialize() {
-    var engines = buildFlattenedConfig(config);
 
-    ServiceLoader<QueryEngineFactory> loader =
-        ServiceLoader.load(QueryEngineFactory.class, QueryEngineFactory.class.getClassLoader());
-
-    var factories =
-        loader.stream()
-            .map(ServiceLoader.Provider::get)
-            .peek(f -> log.info("Found QueryEngineFactory: {}", f.getClass().getName()))
-            .collect(Collectors.toMap(f -> f.getClass().getName(), f -> f));
+    var engines = resolveSources(config);
+    var factories = ServiceUtils.loadAll(QueryEngineFactory.class);
 
     engines.forEach(
-        (name, _) -> {
-          String factoryClass = engines.get("factory").toString();
-
-          QueryEngineFactory<?> factory = factories.get(factoryClass);
-
-          if (factory == null) {
-            throw new IllegalStateException("No QueryEngineFactory found for: " + factoryClass);
-          }
-
+        (name, engineDef) -> {
           try {
-            QueryEngine<?> engine = createAndValidate(factory, engines);
+            String factoryClass =
+                MapUtils.someValueFromMapAs(engines, "factory", String.class)
+                    .orElseThrow(
+                        () ->
+                            new IllegalStateException(
+                                "No factory setting specified for engine: " + name));
+
+            QueryEngineFactory<?> factory =
+                Optional.ofNullable(factories.get(factoryClass))
+                    .orElseThrow(
+                        () ->
+                            new IllegalStateException(
+                                "No QueryEngineFactory found for: " + factoryClass));
+
+            @SuppressWarnings("unchecked")
+            Map<String, Object> engineConfig =
+                ObjectUtils.someObjectAs(engineDef, Map.class)
+                    .orElseThrow(() -> new IllegalStateException("Engine config must be a map"));
+
+            QueryEngine<?> engine = createAndValidate(factory, engineConfig);
             register(engine.name(), engine);
+
           } catch (Exception e) {
             throw new IllegalStateException("Failed to initialize QueryEngine: " + name, e);
           }
@@ -222,11 +227,11 @@ public final class QueryEngineManager implements Initializable {
   }
 
   private <C extends QueryEngineConfig> QueryEngine<?> createAndValidate(
-      QueryEngineFactory<C> factory, Map<String, Object> engines) throws QueryEngineException {
+      QueryEngineFactory<C> factory, Map<String, Object> engine) throws QueryEngineException {
 
     QueryEngineConfigAdapter<C> adapter = factory.adapter();
 
-    C config = adapter.adapt(engines);
+    C config = adapter.adapt(engine);
 
     if (!factory.configType().isInstance(config)) {
       throw new IllegalStateException(
@@ -240,7 +245,7 @@ public final class QueryEngineManager implements Initializable {
     return factory.create(config);
   }
 
-  private Map<String, Object> buildFlattenedConfig(CheshireConfig config) {
+  private Map<String, Object> resolveSources(CheshireConfig config) {
     var engines = config.getQueryEngines();
     var sources = config.getSources();
     Map<String, Object> result = new HashMap<>();
@@ -251,6 +256,7 @@ public final class QueryEngineManager implements Initializable {
 
           engineMap.put("name", engine.getName());
           engineMap.put("factory", engine.getFactory());
+          engineMap.put("description", engine.getFactory());
 
           Map<String, Object> resolvedSources =
               engine.getSources().stream()
@@ -261,6 +267,7 @@ public final class QueryEngineManager implements Initializable {
                           sourceName -> sources.get(sourceName).getConfig()));
 
           engineMap.put("sources", resolvedSources);
+          engineMap.put("config", engine.getConfig());
 
           result.put(engineName, engineMap);
         });

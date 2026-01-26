@@ -22,7 +22,7 @@ public interface SourceAdapter {
 
   default void validate(Map<String, Object> config) throws QueryEngineConfigurationException {
     String type =
-        MapUtils.mayBeValueFromMapAs(config, "type", String.class)
+        MapUtils.someValueFromMapAs(config, "type", String.class)
             .orElseThrow(
                 () ->
                     new QueryEngineConfigurationException(

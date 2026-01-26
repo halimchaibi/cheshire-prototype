@@ -25,7 +25,7 @@ public class ObjectUtils {
     return clazz.cast(o);
   }
 
-  public static <T> Optional<T> mayBeObjectAs(Object obj, Class<T> clazz) {
+  public static <T> Optional<T> someObjectAs(Object obj, Class<T> clazz) {
     if (clazz == null) {
       throw new IllegalArgumentException("Class parameter cannot be null");
     }

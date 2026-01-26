@@ -22,15 +22,25 @@ public class CalciteQueryEngineConfigAdapter
     implements QueryEngineConfigAdapter<CalciteQueryEngineConfig> {
 
   @Override
-  public CalciteQueryEngineConfig adapt(Map<String, Object> config) throws QueryEngineException {
+  public CalciteQueryEngineConfig adapt(Map<String, Object> engineConfig)
+      throws QueryEngineException {
 
     String name =
-        MapUtils.mayBeValueFromMapAs(config, "name", String.class)
+        MapUtils.someValueFromMapAs(engineConfig, "name", String.class)
             .orElseThrow(
                 () -> new QueryEngineConfigurationException("Engine name cannot be null or blank"));
 
-    //noinspection unchecked
-    Map<String, Object> sources = MapUtils.valueFromMapAs(config, "sources", Map.class, Map.of());
+    @SuppressWarnings("unchecked")
+    Map<String, Object> sources =
+        MapUtils.someValueFromMapAs(engineConfig, "sources", Map.class)
+            .orElseThrow(
+                () -> new QueryEngineConfigurationException("Sources cannot be null or blank"));
+
+    @SuppressWarnings("unchecked")
+    Map<String, Object> config =
+        MapUtils.someValueFromMapAs(engineConfig, "config", Map.class)
+            .orElseThrow(
+                () -> new QueryEngineConfigurationException("Sources cannot be null or blank"));
 
     return new CalciteQueryEngineConfig(name, sources, config);
   }

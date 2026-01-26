@@ -75,7 +75,7 @@ public class SchemaManager {
 
       @SuppressWarnings("unchecked")
       Map<String, Object> config =
-          ObjectUtils.mayBeObjectAs(source, Map.class)
+          ObjectUtils.someObjectAs(source, Map.class)
               .orElseThrow(
                   () ->
                       new IllegalArgumentException(

@@ -29,7 +29,7 @@ public class CalciteSchemaAdapter {
       throws QueryEngineInitializationException {
 
     String type =
-        MapUtils.mayBeValueFromMapAs(config, "type", String.class)
+        MapUtils.someValueFromMapAs(config, "type", String.class)
             .orElseThrow(
                 () ->
                     new QueryEngineInitializationException(

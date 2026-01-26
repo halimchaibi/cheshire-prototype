@@ -14,18 +14,18 @@ import io.cheshire.spi.query.engine.QueryEngineConfig;
 import java.util.Map;
 
 public record CalciteQueryEngineConfig(
-    String name, Map<String, Object> config, Map<String, Object> sources)
+    String name, Map<String, Object> sources, Map<String, Object> config)
     implements QueryEngineConfig {
+
+  @Override
+  public Map<String, Object> asMap() {
+    // TODO: As of now rebuild the original map ...
+    return Map.of("name", name, "sources", sources, "config", config);
+  }
 
   @Override
   public boolean validate() {
     // TODO: Validation logic placeholder
-    return name != null && !name.isBlank() && config != null;
-  }
-
-  @Override
-  public Map<String, Object> asMap() {
-    // TODO: convert to typed map for serialization
-    return config;
+    return name != null && !name.isBlank();
   }
 }

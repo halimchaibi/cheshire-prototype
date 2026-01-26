@@ -27,7 +27,7 @@ public class JdbcAdapter implements SourceAdapter {
     try {
       @SuppressWarnings("unchecked")
       Map<String, Object> jdbcConfig =
-          MapUtils.mayBeValueFromMapAs(config, "config", Map.class)
+          MapUtils.someValueFromMapAs(config, "config", Map.class)
               .orElseThrow(
                   () ->
                       new QueryEngineConfigurationException(
@@ -38,7 +38,7 @@ public class JdbcAdapter implements SourceAdapter {
       return createJdbcSchema(jdbcConfig, schema);
 
     } catch (Exception e) {
-      String name = MapUtils.mayBeValueFromMapAs(config, "name", String.class).orElse("unknown");
+      String name = MapUtils.someValueFromMapAs(config, "name", String.class).orElse("unknown");
       throw new QueryEngineInitializationException(
           "Failed to create JDBC schema for source: " + name, e);
     }
@@ -48,7 +48,7 @@ public class JdbcAdapter implements SourceAdapter {
       throws QueryEngineConfigurationException {
 
     String schemaName =
-        MapUtils.mayBeValueFromMapAs(config, "schema", String.class)
+        MapUtils.someValueFromMapAs(config, "schema", String.class)
             .orElseThrow(
                 () ->
                     new QueryEngineConfigurationException(
@@ -70,30 +70,30 @@ public class JdbcAdapter implements SourceAdapter {
 
     @SuppressWarnings("unchecked")
     Map<String, Object> connection =
-        MapUtils.mayBeValueFromMapAs(config, "connection", Map.class)
+        MapUtils.someValueFromMapAs(config, "connection", Map.class)
             .orElseThrow(
                 () ->
                     new QueryEngineConfigurationException(
                         "Source config missing required 'connection' config"));
 
     String jdbcUrl =
-        MapUtils.mayBeValueFromMapAs(connection, "url", String.class)
+        MapUtils.someValueFromMapAs(connection, "url", String.class)
             .orElseThrow(
                 () ->
                     new QueryEngineConfigurationException(
                         "Source config missing required 'url' field"));
 
     String jdbcDriver =
-        MapUtils.mayBeValueFromMapAs(connection, "driver", String.class)
+        MapUtils.someValueFromMapAs(connection, "driver", String.class)
             .orElseThrow(
                 () ->
                     new QueryEngineConfigurationException(
                         "Source config missing required 'driver' field"));
 
     String username =
-        MapUtils.mayBeValueFromMapAs(connection, "username", String.class).orElse(null);
+        MapUtils.someValueFromMapAs(connection, "username", String.class).orElse(null);
     String password =
-        MapUtils.mayBeValueFromMapAs(connection, "password", String.class).orElse(null);
+        MapUtils.someValueFromMapAs(connection, "password", String.class).orElse(null);
 
     operand.put("jdbcUrl", jdbcUrl);
     operand.put("jdbcDriver", jdbcDriver);

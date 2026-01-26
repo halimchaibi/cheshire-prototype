@@ -63,14 +63,14 @@ public class MapUtils {
   }
 
   /** Convenience method: fetch from map and cast safely to class. */
-  public static <T> Optional<T> mayBeValueFromMapAs(
+  public static <T> Optional<T> someValueFromMapAs(
       Map<String, Object> map, String key, Class<T> clazz) {
     if (map == null || key == null) {
       return Optional.empty();
     }
 
     Object value = map.get(key);
-    return ObjectUtils.mayBeObjectAs(value, clazz);
+    return ObjectUtils.someObjectAs(value, clazz);
   }
 
   /**
