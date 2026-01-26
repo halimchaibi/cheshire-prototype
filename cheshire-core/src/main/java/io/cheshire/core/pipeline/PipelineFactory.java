@@ -11,7 +11,9 @@
 package io.cheshire.core.pipeline;
 
 import io.cheshire.core.config.PipelineConfig;
-import io.cheshire.spi.pipeline.*;
+import io.cheshire.spi.pipeline.CanonicalInput;
+import io.cheshire.spi.pipeline.CanonicalOutput;
+import io.cheshire.spi.pipeline.PipelineProcessor;
 import io.cheshire.spi.pipeline.step.Executor;
 import io.cheshire.spi.pipeline.step.PostProcessor;
 import io.cheshire.spi.pipeline.step.PreProcessor;

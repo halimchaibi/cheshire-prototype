@@ -18,6 +18,8 @@ import io.cheshire.spi.query.engine.QueryEngineConfig;
 import io.cheshire.spi.query.engine.QueryEngineConfigAdapter;
 import io.cheshire.spi.query.engine.QueryEngineFactory;
 import io.cheshire.spi.query.exception.QueryEngineException;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.concurrent.atomic.AtomicReference;
@@ -189,7 +191,7 @@ public final class QueryEngineManager implements Initializable {
    */
   @Override
   public void initialize() {
-    var engines = config.getQueryEngines();
+    var engines = buildFlattenedConfig(config);
 
     ServiceLoader<QueryEngineFactory> loader =
         ServiceLoader.load(QueryEngineFactory.class, QueryEngineFactory.class.getClassLoader());
@@ -201,8 +203,8 @@ public final class QueryEngineManager implements Initializable {
             .collect(Collectors.toMap(f -> f.getClass().getName(), f -> f));
 
     engines.forEach(
-        (engineName, engineDef) -> {
-          String factoryClass = engines.get(engineName).getFactory();
+        (name, _) -> {
+          String factoryClass = engines.get("factory").toString();
 
           QueryEngineFactory<?> factory = factories.get(factoryClass);
 
@@ -211,21 +213,20 @@ public final class QueryEngineManager implements Initializable {
           }
 
           try {
-            QueryEngine<?> engine = createAndValidate(factory, engineDef);
-            register(engineName, engine);
+            QueryEngine<?> engine = createAndValidate(factory, engines);
+            register(engine.name(), engine);
           } catch (Exception e) {
-            throw new IllegalStateException("Failed to initialize QueryEngine: " + engineName, e);
+            throw new IllegalStateException("Failed to initialize QueryEngine: " + name, e);
           }
         });
   }
 
   private <C extends QueryEngineConfig> QueryEngine<?> createAndValidate(
-      QueryEngineFactory<C> factory, CheshireConfig.QueryEngine engineDef)
-      throws QueryEngineException {
+      QueryEngineFactory<C> factory, Map<String, Object> engines) throws QueryEngineException {
 
     QueryEngineConfigAdapter<C> adapter = factory.adapter();
 
-    C config = adapter.adapt(engineDef.getConfig());
+    C config = adapter.adapt(engines);
 
     if (!factory.configType().isInstance(config)) {
       throw new IllegalStateException(
@@ -237,6 +238,34 @@ public final class QueryEngineManager implements Initializable {
 
     factory.validate(config);
     return factory.create(config);
+  }
+
+  private Map<String, Object> buildFlattenedConfig(CheshireConfig config) {
+    var engines = config.getQueryEngines();
+    var sources = config.getSources();
+    Map<String, Object> result = new HashMap<>();
+
+    engines.forEach(
+        (engineName, engine) -> {
+          Map<String, Object> engineMap = new HashMap<>(engine.getConfig());
+
+          engineMap.put("name", engine.getName());
+          engineMap.put("factory", engine.getFactory());
+
+          Map<String, Object> resolvedSources =
+              engine.getSources().stream()
+                  .filter(sources::containsKey)
+                  .collect(
+                      Collectors.toMap(
+                          sourceName -> sourceName,
+                          sourceName -> sources.get(sourceName).getConfig()));
+
+          engineMap.put("sources", resolvedSources);
+
+          result.put(engineName, engineMap);
+        });
+
+    return Collections.unmodifiableMap(result);
   }
 
   /**

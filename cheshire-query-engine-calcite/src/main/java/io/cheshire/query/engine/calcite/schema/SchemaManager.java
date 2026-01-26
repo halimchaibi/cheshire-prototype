@@ -10,74 +10,117 @@
 
 package io.cheshire.query.engine.calcite.schema;
 
-import io.cheshire.core.manager.SourceProviderManager;
-import io.cheshire.spi.source.SourceProvider;
-import io.cheshire.spi.source.exception.SourceProviderException;
-
+import io.cheshire.common.utils.ObjectUtils;
+import io.cheshire.spi.query.exception.QueryEngineInitializationException;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
+import org.apache.calcite.schema.Schema;
+import org.apache.calcite.schema.SchemaPlus;
+import org.apache.calcite.tools.Frameworks;
 
-/**
- * Manages multiple schemas and source providers for the Calcite query engine.
- * <p>
- * This class serves as the context type for CalciteQueryEngine, providing access to source providers by name and
- * managing schema registration.
- */
 public class SchemaManager {
 
-    private final Map<String, SourceProvider<?, ?>> sourceProviders;
+  private final CalciteSchemaAdapter schemaAdapter;
+  private SchemaPlus rootSchema;
+  private Map<String, Object> sources = new HashMap<>();
 
-    public SchemaManager(SourceProviderManager registrar) throws SourceProviderException {
-        this.sourceProviders = registrar.all();
+  public SchemaManager() {
+    this.schemaAdapter = new CalciteSchemaAdapter();
+  }
+
+  /** Entry point for the Fluent API */
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public static class Builder {
+    private final SchemaManager instance = new SchemaManager();
+
+    public Builder withRootSchema(SchemaPlus rootSchema) {
+      instance.rootSchema = rootSchema;
+      return this;
     }
 
-    public SchemaManager(SourceProvider<?, ?> source) throws SourceProviderException {
-        this.sourceProviders = Map.of(source.config().name(), source);
+    public Builder addSource(String key, Object config) {
+      instance.sources.put(key, config);
+      return this;
     }
 
-    /**
-     * Gets a source provider by name.
-     *
-     * @param name
-     *            the source name
-     * @return the source provider
-     * @throws SourceProviderException
-     *             if not found
-     */
-    public SourceProvider<?, ?> getSourceProvider(String name) throws SourceProviderException {
-        SourceProvider<?, ?> provider = sourceProviders.get(name);
-        if (provider == null) {
-            throw new SourceProviderException("Source provider not found: " + name);
-        }
-        return provider;
+    public Builder addSources(Map<String, Object> sources) {
+      instance.sources.putAll(sources);
+      return this;
     }
 
-    /**
-     * Returns all registered source provider names.
-     *
-     * @return list of source names
-     */
-    public Set<String> getSourceNames() {
-        return sourceProviders.keySet();
-    }
+    /** The "Build" step: Validates state and initializes the schemas. */
+    public SchemaManager build() throws QueryEngineInitializationException {
+      if (instance.rootSchema == null) {
+        throw new QueryEngineInitializationException("RootSchema must be set before building.");
+      }
 
-    /**
-     * Returns all source providers.
-     *
-     * @return map of source name to provider
-     */
-    public Map<String, SourceProvider<?, ?>> getAllSourceProviders() {
-        return Map.copyOf(sourceProviders);
+      if (!instance.sources.isEmpty()) {
+        instance.registerSchemas(instance.sources);
+      } else {
+        throw new QueryEngineInitializationException("At least one source must be provided.");
+      }
+      return instance;
     }
+  }
 
-    /**
-     * Checks if a source provider is registered.
-     *
-     * @param name
-     *            the source name
-     * @return true if registered, false otherwise
-     */
-    public boolean hasSourceProvider(String name) {
-        return sourceProviders.containsKey(name);
+  private void registerSchemas(Map<String, Object> sources)
+      throws QueryEngineInitializationException {
+
+    for (Map.Entry<String, Object> entry : sources.entrySet()) {
+      String key = entry.getKey();
+      Object source = entry.getValue();
+
+      @SuppressWarnings("unchecked")
+      Map<String, Object> config =
+          ObjectUtils.mayBeObjectAs(source, Map.class)
+              .orElseThrow(
+                  () ->
+                      new IllegalArgumentException(
+                          "Source config for '" + key + "' is missing required 'config' field"));
+
+      Schema schema = schemaAdapter.createSchema(key, config, rootSchema);
+      rootSchema.add(key, schema);
     }
+  }
+
+  public SchemaPlus rootSchema() {
+    return rootSchema;
+  }
+
+  /**
+   * Gets the source configuration for a given source name.
+   *
+   * @param sourceName the name of the source
+   * @return the source configuration map, or null if not found
+   */
+  public Map<String, Object> getSourceConfig(String sourceName) {
+    Object sourceConfig = sources.get(sourceName);
+    if (sourceConfig instanceof Map) {
+      @SuppressWarnings("unchecked")
+      Map<String, Object> config = (Map<String, Object>) sourceConfig;
+      return config;
+    }
+    return null;
+  }
+
+  /**
+   * Gets all registered source names.
+   *
+   * @return a set of source names
+   */
+  public java.util.Set<String> getSourceNames() {
+    return java.util.Collections.unmodifiableSet(sources.keySet());
+  }
+
+  public void close() throws QueryEngineInitializationException {
+    try {
+      sources.clear();
+      rootSchema = Frameworks.createRootSchema(true);
+    } catch (Exception e) {
+      throw new QueryEngineInitializationException("Failed to close source providers", e);
+    }
+  }
 }

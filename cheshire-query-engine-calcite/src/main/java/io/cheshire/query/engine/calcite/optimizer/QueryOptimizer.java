@@ -10,149 +10,145 @@
 
 package io.cheshire.query.engine.calcite.optimizer;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.calcite.plan.RelOptRule;
+import java.util.*;
+import org.apache.calcite.adapter.enumerable.EnumerableConvention;
+import org.apache.calcite.plan.*;
 import org.apache.calcite.plan.hep.HepPlanner;
 import org.apache.calcite.plan.hep.HepProgram;
 import org.apache.calcite.plan.hep.HepProgramBuilder;
+import org.apache.calcite.plan.volcano.VolcanoPlanner;
+import org.apache.calcite.rel.RelCollationTraitDef;
 import org.apache.calcite.rel.RelNode;
+import org.apache.calcite.tools.FrameworkConfig;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-/**
- * Query Optimizer component that optimizes logical plans for better performance.
- * <p>
- * This optimizer uses Apache Calcite's HepPlanner to apply transformation rules: - Predicate pushdown - Projection
- * pushdown - Join reordering - Constant folding - Column pruning
- */
-@Slf4j
+// TODO: requires builder all this is messy
 public class QueryOptimizer {
 
-    private final HepPlanner planner;
-    private final List<RelOptRule> defaultRules;
+  private final HepPlanner planner;
+  private final List<RelOptRule> rules;
+  private final FrameworkConfig frameworkConfig;
 
-    /**
-     * Creates a new query optimizer with default optimization rules.
-     */
-    public QueryOptimizer() {
-        this.defaultRules = createDefaultRules();
-        HepProgram program = new HepProgramBuilder().addRuleCollection(defaultRules).addMatchLimit(1000).build();
-        this.planner = new HepPlanner(program);
+  List<RelTraitDef> traitDefs =
+      List.of(
+          ConventionTraitDef.INSTANCE, RelCollationTraitDef.INSTANCE
+          // Optional:
+          // RelDistributionTraitDef.INSTANCE //TODO: Kept as reference for advanced use
+          // cases(engine that support distribution)
+          );
+
+  RelOptCostFactory costFactory = RelOptCostImpl.FACTORY;
+
+  // TODO: the addMatchLimit needs to be reviewed basically it supposed to prevent infinite loops,
+  // when rules are conflicting
+  private static final int MAX_ITERATIONS = 1000;
+
+  private QueryOptimizer() {
+    // TODO: requires builder all this is messy
+    planner = null;
+    rules = List.of();
+    frameworkConfig = null;
+  }
+
+  public QueryOptimizer(FrameworkConfig config) {
+    this.frameworkConfig = config;
+
+    this.rules = CustomRuleSet.builder().build().getRules();
+    HepProgram program =
+        new HepProgramBuilder().addRuleCollection(rules).addMatchLimit(MAX_ITERATIONS).build();
+    this.planner = new HepPlanner(program);
+  }
+
+  public QueryOptimizer(List<RelOptRule> rules) {
+    this.rules = Objects.requireNonNull(rules, "Rules cannot be null");
+    HepProgram program =
+        new HepProgramBuilder().addRuleCollection(rules).addMatchLimit(MAX_ITERATIONS).build();
+    this.planner = new HepPlanner(program);
+
+    // TODO: requires builder all this is messy
+    frameworkConfig = null;
+  }
+
+  public RelNode optimize(RelNode logicalPlan) throws OptimizationException {
+    return optimize(logicalPlan, null);
+  }
+
+  public RelNode optimizeWithVolcano(RelNode logicalRoot) {
+
+    List<RelOptRule> rules = CustomRuleSet.builder().build().getRules();
+    Context context = frameworkConfig.getContext();
+
+    // TODO This had been set in FrameworkInitializer, requires to Check what is really the purpose
+    // of the Context
+    // It might be very help full to wrap any contexts on in it and get what is required when needed
+    // by calling using
+    // ataContext dataContext = context.unwrap(DataContext.class);
+
+    //    DataContext dataContext = new CalciteDataContext(schemaManager);
+    //    PlannerContext plannerContext = new PlannerContext(dataContext);
+
+    VolcanoPlanner planner = new VolcanoPlanner(costFactory, context);
+
+    traitDefs.forEach(planner::addRelTraitDef);
+
+    rules.forEach(planner::addRule);
+
+    planner.setRoot(logicalRoot);
+
+    RelTraitSet desiredTraits = logicalRoot.getTraitSet().replace(EnumerableConvention.INSTANCE);
+
+    RelNode physicalRoot = planner.changeTraits(logicalRoot, desiredTraits);
+
+    planner.setRoot(physicalRoot);
+
+    return planner.findBestExp();
+  }
+
+  public RelNode optimize(RelNode logicalPlan, CustomRuleSet ruleSet) throws OptimizationException {
+    Objects.requireNonNull(logicalPlan, "Logical plan cannot be null");
+
+    // TODO: Use a query scoped planner
+    HepPlanner plannerToUse = planner;
+
+    if (ruleSet != null) {
+      List<RelOptRule> customRules = ruleSet.getRules();
+      HepProgram program =
+          new HepProgramBuilder().addRuleCollection(customRules).addMatchLimit(1000).build();
+      plannerToUse = new HepPlanner(program);
     }
 
-    /**
-     * Creates a new query optimizer with custom rules.
-     */
-    public QueryOptimizer(List<RelOptRule> rules) {
-        this.defaultRules = Objects.requireNonNull(rules, "Rules cannot be null");
-        HepProgram program = new HepProgramBuilder().addRuleCollection(defaultRules).addMatchLimit(1000).build();
-        this.planner = new HepPlanner(program);
+    try {
+      plannerToUse.setRoot(logicalPlan);
+      return plannerToUse.findBestExp();
+    } catch (Exception e) {
+      throw new OptimizationException("Query optimization failed: " + e.getMessage(), e);
+    } catch (StackOverflowError e) {
+      // Protect against planner rule oscillation (infinite rewrite loops).
+      throw new OptimizationException(
+          "Query optimization failed due to a StackOverflowError. "
+              + "This often happens when conflicting transformation rules (e.g. both project<->filter transpose rules) "
+              + "are enabled and keep re-writing the plan. Consider removing one of the transpose rules.",
+          e);
+    } finally {
+      plannerToUse.clear();
+    }
+  }
+
+  public String explain(RelNode logicalPlan) throws OptimizationException {
+    RelNode optimized = optimize(logicalPlan);
+    return optimized.toString();
+  }
+
+  public List<RelOptRule> getRules() {
+    return new ArrayList<>(rules);
+  }
+
+  public static class OptimizationException extends Exception {
+    public OptimizationException(String message) {
+      super(message);
     }
 
-    /**
-     * Optimizes a logical plan using the default rule set.
-     *
-     * @param logicalPlan
-     *            the logical plan to optimize
-     * @return the optimized logical plan
-     * @throws OptimizationException
-     *             if optimization fails
-     */
-    public RelNode optimize(RelNode logicalPlan) throws OptimizationException {
-        return optimize(logicalPlan, null);
+    public OptimizationException(String message, Throwable cause) {
+      super(message, cause);
     }
-
-    /**
-     * Optimizes a logical plan using a specific rule set. If ruleSet is null, uses the default rule set configured for
-     * this optimizer.
-     *
-     * @param logicalPlan
-     *            the logical plan to optimize
-     * @param ruleSet
-     *            the custom rule set to use, or null to use default
-     * @return the optimized logical plan
-     * @throws OptimizationException
-     *             if optimization fails
-     */
-    public RelNode optimize(RelNode logicalPlan, CustomRuleSet ruleSet) throws OptimizationException {
-        Objects.requireNonNull(logicalPlan, "Logical plan cannot be null");
-
-        HepPlanner plannerToUse = planner;
-
-        // If a custom rule set is provided, create a temporary planner for it
-        if (ruleSet != null) {
-            List<RelOptRule> customRules = ruleSet.getRules();
-            HepProgram program = new HepProgramBuilder().addRuleCollection(customRules).addMatchLimit(1000).build();
-            plannerToUse = new HepPlanner(program);
-        }
-
-        try {
-            plannerToUse.setRoot(logicalPlan);
-            RelNode optimizedPlan = plannerToUse.findBestExp();
-            return optimizedPlan;
-        } catch (Exception e) {
-            throw new OptimizationException("Query optimization failed: " + e.getMessage(), e);
-        } catch (StackOverflowError e) {
-            // Protect against planner rule oscillation (infinite rewrite loops).
-            throw new OptimizationException("Query optimization failed due to a StackOverflowError. "
-                    + "This often happens when conflicting transformation rules are enabled. "
-                    + "Consider removing conflicting rules.", e);
-        } finally {
-            plannerToUse.clear();
-        }
-    }
-
-    /**
-     * Gets a string representation of the optimized plan.
-     *
-     * @param logicalPlan
-     *            the logical plan to optimize
-     * @return string representation of the optimized plan
-     * @throws OptimizationException
-     *             if optimization fails
-     */
-    public String explainOptimizedPlan(RelNode logicalPlan) throws OptimizationException {
-        RelNode optimized = optimize(logicalPlan);
-        return optimized.toString();
-    }
-
-    /**
-     * Creates default optimization rules.
-     */
-    private List<RelOptRule> createDefaultRules() {
-        List<RelOptRule> defaultRules = new ArrayList<>();
-
-        // Core optimization rules
-        defaultRules.add(org.apache.calcite.rel.rules.CoreRules.FILTER_AGGREGATE_TRANSPOSE);
-        defaultRules.add(org.apache.calcite.rel.rules.CoreRules.FILTER_INTO_JOIN);
-        defaultRules.add(org.apache.calcite.rel.rules.CoreRules.PROJECT_JOIN_TRANSPOSE);
-        defaultRules.add(org.apache.calcite.rel.rules.CoreRules.AGGREGATE_PROJECT_MERGE);
-        defaultRules.add(org.apache.calcite.rel.rules.CoreRules.CALC_REDUCE_EXPRESSIONS);
-        defaultRules.add(org.apache.calcite.rel.rules.CoreRules.FILTER_REDUCE_EXPRESSIONS);
-        defaultRules.add(org.apache.calcite.rel.rules.CoreRules.PROJECT_REDUCE_EXPRESSIONS);
-
-        return defaultRules;
-    }
-
-    /**
-     * Gets the list of optimization rules being used.
-     */
-    public List<RelOptRule> getRules() {
-        return new ArrayList<>(defaultRules);
-    }
-
-    /**
-     * Exception thrown when query optimization fails.
-     */
-    public static class OptimizationException extends Exception {
-        public OptimizationException(String message) {
-            super(message);
-        }
-
-        public OptimizationException(String message, Throwable cause) {
-            super(message, cause);
-        }
-    }
+  }
 }

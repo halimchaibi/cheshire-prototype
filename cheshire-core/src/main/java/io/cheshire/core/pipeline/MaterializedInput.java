@@ -11,7 +11,9 @@
 package io.cheshire.core.pipeline;
 
 import io.cheshire.spi.pipeline.CanonicalInput;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  *
