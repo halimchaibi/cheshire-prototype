@@ -18,46 +18,28 @@ import org.apache.calcite.rel.rules.CoreRules;
 import org.apache.calcite.tools.RuleSet;
 import org.apache.calcite.tools.RuleSets;
 
-public final class CustomRuleSet {
+// TODO: Guestestimate rules. Requires testing and review and fine tuning
+public final class RuleSetManager {
 
   private final List<RelOptRule> rules;
   private final Convention convention;
-  private static final List<RelOptRule> DEFAULT_RULES;
 
-  static {
-    // ----------------------------------------------
-    // Default logical rules (applied to all queries)
-    // -----------------------------------------------
-    // TODO: Guestestimate default rules. Requires review
-    DEFAULT_RULES =
-        List.of(
-            CoreRules.FILTER_AGGREGATE_TRANSPOSE,
-            CoreRules.FILTER_INTO_JOIN,
-            CoreRules.PROJECT_JOIN_TRANSPOSE,
-            // CoreRules.JOIN_COMMUTE);
-            // CoreRules.JOIN_ASSOCIATE);
-            CoreRules.AGGREGATE_PROJECT_MERGE,
-            CoreRules.CALC_REDUCE_EXPRESSIONS,
-            CoreRules.FILTER_REDUCE_EXPRESSIONS,
-            CoreRules.PROJECT_REDUCE_EXPRESSIONS);
-  }
-
-  public CustomRuleSet() {
+  public RuleSetManager() {
     this.convention = Convention.NONE;
     this.rules = createDefaultRules();
   }
 
-  public CustomRuleSet(Convention convention) {
+  public RuleSetManager(Convention convention) {
     this.convention = convention;
     this.rules = createDefaultRules();
   }
 
-  public CustomRuleSet(List<RelOptRule> rules) {
+  public RuleSetManager(List<RelOptRule> rules) {
     this.convention = Convention.NONE;
     this.rules = new ArrayList<>(rules);
   }
 
-  public CustomRuleSet(List<RelOptRule> rules, Convention convention) {
+  public RuleSetManager(List<RelOptRule> rules, Convention convention) {
     this.convention = convention;
     this.rules = new ArrayList<>(rules);
   }
@@ -116,14 +98,14 @@ public final class CustomRuleSet {
     return ruleList;
   }
 
-  public CustomRuleSet addRule(RelOptRule rule) {
+  public RuleSetManager addRule(RelOptRule rule) {
     if (rule != null && !rules.contains(rule)) {
       rules.add(rule);
     }
     return this;
   }
 
-  public CustomRuleSet addRules(List<RelOptRule> rules) {
+  public RuleSetManager addRules(List<RelOptRule> rules) {
     if (rules != null) {
       for (RelOptRule rule : rules) {
         addRule(rule);
@@ -132,22 +114,22 @@ public final class CustomRuleSet {
     return this;
   }
 
-  public CustomRuleSet removeRule(RelOptRule rule) {
+  public RuleSetManager removeRule(RelOptRule rule) {
     rules.remove(rule);
     return this;
   }
 
-  public CustomRuleSet removeRulesByClass(Class<? extends RelOptRule> ruleClass) {
+  public RuleSetManager removeRulesByClass(Class<? extends RelOptRule> ruleClass) {
     rules.removeIf(rule -> ruleClass.isInstance(rule));
     return this;
   }
 
-  public CustomRuleSet removeRulesByPattern(String pattern) {
+  public RuleSetManager removeRulesByPattern(String pattern) {
     rules.removeIf(rule -> rule.toString().contains(pattern));
     return this;
   }
 
-  public CustomRuleSet clear() {
+  public RuleSetManager clear() {
     rules.clear();
     return this;
   }
@@ -176,24 +158,24 @@ public final class CustomRuleSet {
     return rules.contains(rule);
   }
 
-  public CustomRuleSet copy() {
-    return new CustomRuleSet(new ArrayList<>(rules), convention);
+  public RuleSetManager copy() {
+    return new RuleSetManager(new ArrayList<>(rules), convention);
   }
 
-  public CustomRuleSet merge(CustomRuleSet other) {
+  public RuleSetManager merge(RuleSetManager other) {
     List<RelOptRule> mergedRules = new ArrayList<>(this.rules);
     for (RelOptRule rule : other.rules) {
       if (!mergedRules.contains(rule)) {
         mergedRules.add(rule);
       }
     }
-    return new CustomRuleSet(mergedRules, this.convention);
+    return new RuleSetManager(mergedRules, this.convention);
   }
 
   // ========== Pre-built Rule Sets ==========
 
-  public static CustomRuleSet createFilterPushdownRuleSet() {
-    return new CustomRuleSet(
+  public static RuleSetManager createFilterPushdownRuleSet() {
+    return new RuleSetManager(
         Arrays.asList(
             CoreRules.FILTER_INTO_JOIN,
             CoreRules.FILTER_PROJECT_TRANSPOSE,
@@ -201,8 +183,8 @@ public final class CustomRuleSet {
             CoreRules.FILTER_MERGE));
   }
 
-  public static CustomRuleSet createProjectionPushdownRuleSet() {
-    return new CustomRuleSet(
+  public static RuleSetManager createProjectionPushdownRuleSet() {
+    return new RuleSetManager(
         Arrays.asList(
             CoreRules.PROJECT_MERGE,
             CoreRules.PROJECT_JOIN_TRANSPOSE,
@@ -210,8 +192,8 @@ public final class CustomRuleSet {
             CoreRules.PROJECT_REMOVE));
   }
 
-  public static CustomRuleSet createJoinOptimizationRuleSet() {
-    return new CustomRuleSet(
+  public static RuleSetManager createJoinOptimizationRuleSet() {
+    return new RuleSetManager(
         Arrays.asList(
             CoreRules.JOIN_CONDITION_PUSH,
             CoreRules.JOIN_EXTRACT_FILTER,
@@ -219,24 +201,24 @@ public final class CustomRuleSet {
             CoreRules.JOIN_COMMUTE));
   }
 
-  public static CustomRuleSet createAggregateOptimizationRuleSet() {
-    return new CustomRuleSet(
+  public static RuleSetManager createAggregateOptimizationRuleSet() {
+    return new RuleSetManager(
         Arrays.asList(
             CoreRules.AGGREGATE_PROJECT_MERGE,
             CoreRules.AGGREGATE_REMOVE,
             CoreRules.FILTER_AGGREGATE_TRANSPOSE));
   }
 
-  public static CustomRuleSet createMinimalRuleSet() {
-    return new CustomRuleSet(Arrays.asList(CoreRules.FILTER_MERGE, CoreRules.PROJECT_MERGE));
+  public static RuleSetManager createMinimalRuleSet() {
+    return new RuleSetManager(Arrays.asList(CoreRules.FILTER_MERGE, CoreRules.PROJECT_MERGE));
   }
 
-  public static CustomRuleSet createEmptyRuleSet() {
-    return new CustomRuleSet(new ArrayList<>());
+  public static RuleSetManager createEmptyRuleSet() {
+    return new RuleSetManager(new ArrayList<>());
   }
 
-  public static CustomRuleSet createFederatedQueryRuleSet() {
-    return new CustomRuleSet(
+  public static RuleSetManager createFederatedQueryRuleSet() {
+    return new RuleSetManager(
         Arrays.asList(
             // Push filters to remote sources
             CoreRules.FILTER_INTO_JOIN,
@@ -256,8 +238,8 @@ public final class CustomRuleSet {
             CoreRules.AGGREGATE_REMOVE));
   }
 
-  public static CustomRuleSet createOLAPRuleSet() {
-    return new CustomRuleSet(
+  public static RuleSetManager createOLAPRuleSet() {
+    return new RuleSetManager(
         Arrays.asList(
             CoreRules.AGGREGATE_PROJECT_MERGE,
             CoreRules.FILTER_AGGREGATE_TRANSPOSE,
@@ -266,8 +248,8 @@ public final class CustomRuleSet {
             CoreRules.SORT_REMOVE));
   }
 
-  public static CustomRuleSet createOLTPRuleSet() {
-    return new CustomRuleSet(
+  public static RuleSetManager createOLTPRuleSet() {
+    return new RuleSetManager(
         Arrays.asList(
             CoreRules.FILTER_MERGE, CoreRules.PROJECT_REMOVE, CoreRules.FILTER_PROJECT_TRANSPOSE));
   }
@@ -354,8 +336,31 @@ public final class CustomRuleSet {
           .withSortRules();
     }
 
-    public CustomRuleSet build() {
-      return new CustomRuleSet(rules, convention);
+    public Builder withSafeDefaultRules() {
+      // Use the carefully curated rules from createDefaultRules()
+      RuleSetManager defaultSet = new RuleSetManager();
+      return addRules(defaultSet.getMutableRules());
+    }
+
+    public Builder withAggressiveFilterRules() {
+      // Include potentially problematic rules for advanced users
+      return addRules(
+          CoreRules.FILTER_INTO_JOIN, // May cause loops
+          CoreRules.FILTER_MERGE,
+          CoreRules.FILTER_AGGREGATE_TRANSPOSE,
+          CoreRules.FILTER_PROJECT_TRANSPOSE);
+    }
+
+    public Builder withSafeFilterRules() {
+      // Exclude problematic rules
+      return addRules(
+          CoreRules.FILTER_MERGE,
+          CoreRules.FILTER_AGGREGATE_TRANSPOSE,
+          CoreRules.FILTER_PROJECT_TRANSPOSE);
+    }
+
+    public RuleSetManager build() {
+      return new RuleSetManager(rules, convention);
     }
   }
 
