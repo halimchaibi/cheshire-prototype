@@ -11,6 +11,8 @@
 package io.cheshire.query.engine.calcite.schema;
 
 import io.cheshire.common.utils.MapUtils;
+import io.cheshire.core.config.ConfigKeys;
+import io.cheshire.query.engine.calcite.EngineType;
 import io.cheshire.query.engine.calcite.adapter.JdbcAdapter;
 import io.cheshire.spi.query.exception.QueryEngineInitializationException;
 import java.util.Map;
@@ -29,14 +31,14 @@ public class CalciteSchemaAdapter {
       throws QueryEngineInitializationException {
 
     String type =
-        MapUtils.someValueFromMapAs(config, "type", String.class)
+        MapUtils.someValueFromMapAs(config, ConfigKeys.TYPE.key(), String.class)
             .orElseThrow(
                 () ->
                     new QueryEngineInitializationException(
                         "Source config for '" + name + "' is missing required 'type' field"));
 
-    return switch (type) {
-      case "JDBC" -> jdbcAdapter.createSchema(config, parent);
+    return switch (EngineType.fromString(type.toLowerCase())) {
+      case JDBC -> jdbcAdapter.createSchema(config, parent);
       default -> throw new UnsupportedOperationException("Unknown source type: " + type);
     };
   }

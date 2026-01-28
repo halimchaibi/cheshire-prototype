@@ -11,9 +11,13 @@
 package io.cheshire.query.engine.calcite;
 
 enum ExecutionStage {
+  EXTRACT_PARAMETERS,
   PARSE,
   VALIDATE,
+  RESOLVE_PARAMETERS,
   CONVERT,
+  BUILD_CONTEXT,
+  SELECT_RULES,
   OPTIMIZE,
   EXECUTE,
   TRANSFORM

@@ -25,7 +25,7 @@
     <module>cheshire-query-engine-jdbc</module>
     <module>cheshire-query-engine-calcite</module>
     <module>cheshire-runtime</module>
-    <module>cheshire-test-common</module>
+<!--    <module>cheshire-test-common</module>-->
   </modules>
 
   <properties>
@@ -463,8 +463,23 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <skipTests>true</skipTests>
         <maven.test.skip>true</maven.test.skip>
+        <enforcer.skip>true</enforcer.skip>
+        <checkstyle.skip>true</checkstyle.skip>
+        <spotbugs.skip>true</spotbugs.skip>
+        <dependency-check.skip>true</dependency-check.skip>
+        <license.skip>true</license.skip>
+        <formatter.skip>true</formatter.skip>
+        <spotless.skip>false</spotless.skip>
+      </properties>
+    </profile>
+    <profile>
+      <id>test</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <properties>
+        <maven.test.skip>false</maven.test.skip>
         <enforcer.skip>true</enforcer.skip>
         <checkstyle.skip>true</checkstyle.skip>
         <spotbugs.skip>true</spotbugs.skip>
@@ -477,7 +492,6 @@
     <profile>
       <id>github</id>
       <properties>
-        <skipTests>false</skipTests>
         <maven.test.skip>false</maven.test.skip>
         <enforcer.skip>false</enforcer.skip>
         <checkstyle.skip>false</checkstyle.skip>

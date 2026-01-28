@@ -12,17 +12,20 @@ package io.cheshire.query.engine.calcite.schema;
 
 import io.cheshire.common.utils.ObjectUtils;
 import io.cheshire.spi.query.exception.QueryEngineInitializationException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.calcite.schema.Schema;
 import org.apache.calcite.schema.SchemaPlus;
+import org.apache.calcite.schema.lookup.Lookup;
 import org.apache.calcite.tools.Frameworks;
+import org.apache.calcite.util.NameMap;
 
 public class SchemaManager {
 
   private final CalciteSchemaAdapter schemaAdapter;
   private SchemaPlus rootSchema;
-  private Map<String, Object> sources = new HashMap<>();
+  private final Map<String, Object> sources = new HashMap<>();
 
   public SchemaManager() {
     this.schemaAdapter = new CalciteSchemaAdapter();
@@ -70,7 +73,7 @@ public class SchemaManager {
       throws QueryEngineInitializationException {
 
     for (Map.Entry<String, Object> entry : sources.entrySet()) {
-      String key = entry.getKey();
+      String name = entry.getKey();
       Object source = entry.getValue();
 
       @SuppressWarnings("unchecked")
@@ -79,15 +82,35 @@ public class SchemaManager {
               .orElseThrow(
                   () ->
                       new IllegalArgumentException(
-                          "Source config for '" + key + "' is missing required 'config' field"));
+                          "Source config for '" + name + "' is missing required 'config' field"));
 
-      Schema schema = schemaAdapter.createSchema(key, config, rootSchema);
-      rootSchema.add(key, schema);
+      Schema schema = schemaAdapter.createSchema(name, config, rootSchema);
+      rootSchema.add(name, schema);
     }
   }
 
   public SchemaPlus rootSchema() {
     return rootSchema;
+  }
+
+  /**
+   * Retrieves an unmodifiable view of all sub-schemas registered under the root schema. *
+   *
+   * <p>This method leverages the {@link Lookup} API to discover schema names and populates a {@link
+   * NameMap} to ensure consistent name resolution. The resulting map is wrapped as unmodifiable to
+   * prevent external structural modifications. * @return A non-null, immutable {@code Map<String,
+   * Schema>} containing the mapping of sub-schema names to their respective {@link Schema}
+   * instances.
+   *
+   * @throws RuntimeException if a sub-schema cannot be initialized during the lookup process.
+   */
+  public Map<String, Schema> schemas() {
+    NameMap<Schema> nameMap = new NameMap<>();
+    Lookup<? extends Schema> lookup = rootSchema.subSchemas();
+
+    lookup.getNames(null).forEach(name -> nameMap.put(name, lookup.get(name)));
+
+    return Collections.unmodifiableMap(nameMap.map());
   }
 
   /**
