@@ -17,6 +17,19 @@ import org.apache.calcite.rel.RelNode;
 import org.apache.calcite.tools.FrameworkConfig;
 import org.apache.calcite.tools.RelRunners;
 
+// TODO (EXECUTION): QueryExecutor currently relies on Calcite's default RelRunners
+// execution path (Enumerable, local JVM).
+//
+// Limitations:
+//  - QueryRuntimeContext (timezone, locale, cancel flag) is not propagated
+//  - No execution strategy selection (local vs pushdown vs federated)
+//  - No timeout, cancellation, or observability hooks
+//
+// Target design:
+//  - Make execution context-aware (DataContext binding)
+//  - Allow multiple execution strategies
+//  - Delegate execution to adapters when full pushdown is possible
+
 /**
  * Executes optimized RelNode plans using Calcite's RelRunners.
  *

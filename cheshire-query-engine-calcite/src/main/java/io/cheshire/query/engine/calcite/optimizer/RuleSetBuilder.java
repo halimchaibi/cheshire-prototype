@@ -11,11 +11,31 @@
 package io.cheshire.query.engine.calcite.optimizer;
 
 import io.cheshire.query.engine.calcite.schema.SchemaManager;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.calcite.plan.RelOptRule;
 import org.apache.calcite.rel.rules.CoreRules;
+
+// TODO: Guestestimate rules. Requires testing and review and fine tuning
+// TODO (ARCH): Resolve responsibility split between OptimizationContext and RuleSetBuilder.
+// Currently:
+//  - OptimizationContext describes query intent (query type, characteristics, federation, hints)
+//  - RuleSetBuilder decides which Calcite rules are enabled
+// Problem:
+//  - Some optimization decisions are duplicated or implied in both places
+//  - RuleSetBuilder partially re-derives information already present in OptimizationContext
+//
+// Target design:
+//  - OptimizationContext is a pure, read-only description of query intent and environment
+//  - RuleSetBuilder is the single authority that translates intent + source capabilities
+//    into a concrete RuleSet
+//  - All rule-selection logic must live in RuleSetBuilder
+//  - No Calcite/CoreRules knowledge should leak into OptimizationContext
+//
+// Follow-up work:
+//  - Add withOptimizationContext(OptimizationContext) to RuleSetBuilder
+//  - Remove duplicated intent inference from RuleSetBuilder
+//  - Gate rule activation by (capability AND intent), not capability alone
 
 /**
  * Builder for creating query-scoped rule sets based on source capabilities.
@@ -32,6 +52,7 @@ public class RuleSetBuilder {
   private final List<String> sourceNames;
   private SchemaManager schemaManager;
   private final RuleSetManager.Builder ruleSetBuilder;
+  OptimizationContext optimizationContext;
 
   private RuleSetBuilder(List<String> sourceNames) {
     this.sourceNames = Objects.requireNonNull(sourceNames, "Source names cannot be null");
@@ -56,6 +77,11 @@ public class RuleSetBuilder {
    */
   public RuleSetBuilder withSchemaManager(SchemaManager schemaManager) {
     this.schemaManager = schemaManager;
+    return this;
+  }
+
+  public RuleSetBuilder withOptimizationContext(OptimizationContext optimizationContext) {
+    this.optimizationContext = optimizationContext;
     return this;
   }
 
@@ -87,6 +113,62 @@ public class RuleSetBuilder {
     RuleSetManager ruleSet = ruleSetBuilder.build();
     log.debug("Built rule set with {} rules", ruleSet.size());
     return ruleSet;
+  }
+
+  // TODO: imported from @RuleSetManager, analyze and delete, should rely on universal rules as
+  // default onces
+  private List<RelOptRule> addDefaultRules() {
+    List<RelOptRule> ruleList = new ArrayList<>();
+
+    // Filter rules - optimize filter operations
+    ruleList.addAll(
+        Arrays.asList(
+            CoreRules.FILTER_MERGE, // Combine multiple filters
+            CoreRules.FILTER_AGGREGATE_TRANSPOSE, // Move filters before aggregates
+            CoreRules.FILTER_PROJECT_TRANSPOSE // Move filters before projections
+            // Note: FILTER_INTO_JOIN is excluded as it can cause infinite rewrite loops
+            // when combined with JOIN_EXTRACT_FILTER and other join optimization rules
+            ));
+
+    // Projection rules - optimize projection operations
+    ruleList.addAll(
+        Arrays.asList(
+            CoreRules.PROJECT_MERGE, // Combine multiple projections
+            CoreRules.PROJECT_REMOVE // Remove unnecessary projections
+            // Note: PROJECT_JOIN_TRANSPOSE is excluded as it can cause infinite rewrite loops
+            // in complex join queries when combined with other optimization rules
+            // Note: PROJECT_FILTER_TRANSPOSE is excluded to avoid conflicts with
+            // FILTER_PROJECT_TRANSPOSE
+            // Having both can cause infinite rewrite loops (StackOverflowError)
+            ));
+
+    // Join rules - optimize join operations
+    ruleList.addAll(
+        Arrays.asList(
+            CoreRules.JOIN_CONDITION_PUSH, // Push join conditions down
+            CoreRules.JOIN_EXTRACT_FILTER // Extract filters from joins
+            // Note: JOIN_PUSH_TRANSITIVE_PREDICATES is excluded as it can cause issues
+            // in complex join queries with multiple tables
+            // Note: JOIN_COMMUTE is excluded as it can cause infinite rewrite loops
+            // when combined with other join optimization rules, especially in complex queries
+            ));
+
+    // Aggregate rules - optimize aggregation operations
+    ruleList.addAll(
+        Arrays.asList(
+            CoreRules.AGGREGATE_PROJECT_MERGE, // Merge aggregate with projection
+            CoreRules.AGGREGATE_REMOVE // Remove unnecessary aggregates
+            ));
+
+    // Sort rules - optimize sort operations
+    ruleList.addAll(
+        Arrays.asList(
+            CoreRules.SORT_REMOVE // Remove unnecessary sorts
+            // Note: SORT_PROJECT_TRANSPOSE and SORT_JOIN_TRANSPOSE are excluded
+            // as they can cause infinite rewrite loops in complex queries
+            ));
+
+    return ruleList;
   }
 
   /** Adds universal rules that are safe for all sources. */

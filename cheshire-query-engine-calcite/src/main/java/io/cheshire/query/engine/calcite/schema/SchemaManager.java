@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.calcite.schema.Schema;
 import org.apache.calcite.schema.SchemaPlus;
+import org.apache.calcite.schema.lookup.LikePattern;
 import org.apache.calcite.schema.lookup.Lookup;
 import org.apache.calcite.tools.Frameworks;
 import org.apache.calcite.util.NameMap;
@@ -26,6 +27,9 @@ public class SchemaManager {
   private final CalciteSchemaAdapter schemaAdapter;
   private SchemaPlus rootSchema;
   private final Map<String, Object> sources = new HashMap<>();
+
+  // TODO: This is seems redundant. Review to see if rootSchema can be used instead
+  private final Map<String, Schema> schemaLookup = new HashMap<>();
 
   public SchemaManager() {
     this.schemaAdapter = new CalciteSchemaAdapter();
@@ -86,6 +90,7 @@ public class SchemaManager {
 
       Schema schema = schemaAdapter.createSchema(name, config, rootSchema);
       rootSchema.add(name, schema);
+      schemaLookup.put(name, schema);
     }
   }
 
@@ -93,8 +98,12 @@ public class SchemaManager {
     return rootSchema;
   }
 
+  public Map<String, Schema> schemas() {
+    return Collections.unmodifiableMap(schemaLookup);
+  }
+
   /**
-   * Retrieves an unmodifiable view of all sub-schemas registered under the root schema. *
+   * Retrieves an unmodifiable view of any @{@link LikePattern} registered under the root schema. *
    *
    * <p>This method leverages the {@link Lookup} API to discover schema names and populates a {@link
    * NameMap} to ensure consistent name resolution. The resulting map is wrapped as unmodifiable to
@@ -104,11 +113,12 @@ public class SchemaManager {
    *
    * @throws RuntimeException if a sub-schema cannot be initialized during the lookup process.
    */
-  public Map<String, Schema> schemas() {
+  public Map<String, Schema> anySchemas() {
     NameMap<Schema> nameMap = new NameMap<>();
+
     Lookup<? extends Schema> lookup = rootSchema.subSchemas();
 
-    lookup.getNames(null).forEach(name -> nameMap.put(name, lookup.get(name)));
+    lookup.getNames(LikePattern.any()).forEach(name -> nameMap.put(name, lookup.get(name)));
 
     return Collections.unmodifiableMap(nameMap.map());
   }

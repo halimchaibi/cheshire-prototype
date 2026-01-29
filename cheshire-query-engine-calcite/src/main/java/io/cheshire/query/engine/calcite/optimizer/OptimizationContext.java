@@ -8,11 +8,12 @@
  * #L%
  */
 
-package io.cheshire.query.engine.calcite;
+package io.cheshire.query.engine.calcite.optimizer;
 
 import io.cheshire.query.engine.calcite.query.QueryCharacteristics;
 import io.cheshire.query.engine.calcite.query.QueryType;
 import java.util.*;
+import org.apache.calcite.adapter.jdbc.JdbcSchema;
 import org.apache.calcite.schema.Schema;
 
 /**
@@ -69,11 +70,21 @@ public class OptimizationContext {
   }
 
   private boolean isRemoteSchema(Schema schema) {
-    // TODO: Implement based on your schema types
-    // e.g., check if schema is instance of JdbcSchema, RestSchema, etc.
-    return schema.getClass().getSimpleName().contains("Remote")
-        || schema.getClass().getSimpleName().contains("Jdbc")
-        || schema.getClass().getSimpleName().contains("Rest");
+    // Built-in JDBC schemas
+    if (schema instanceof JdbcSchema) {
+      return true;
+    }
+
+    // Add support for  custom remote/federated schemas
+    //    if (schema instanceof RestSchema) {
+    //      return true;
+    //    }
+    //    if (schema instanceof SparkSchema) {
+    //      return true;
+    //    }
+
+    // Default: local / in-memory schema
+    return false;
   }
 
   public static Builder builder() {

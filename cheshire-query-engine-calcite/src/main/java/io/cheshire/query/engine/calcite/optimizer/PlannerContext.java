@@ -20,7 +20,6 @@ public final class PlannerContext implements Context {
 
   public PlannerContext(DataContext dataContext) {
     this.dataContext = dataContext;
-    // this.schemaManager = schemaManager;
   }
 
   @Override
@@ -30,12 +29,6 @@ public final class PlannerContext implements Context {
     if (clazz.isInstance(dataContext)) {
       return (C) dataContext;
     }
-
-    // TODO: Place holder in case, rules customization are required and requires it, or expose
-    // anything else that needs to be carried
-    //    if (clazz.isInstance(schemaManager)) {
-    //      return (C) schemaManager;
-    //    }
     return null;
   }
 }

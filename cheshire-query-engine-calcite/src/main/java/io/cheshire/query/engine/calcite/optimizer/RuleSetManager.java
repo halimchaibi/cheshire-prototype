@@ -18,7 +18,6 @@ import org.apache.calcite.rel.rules.CoreRules;
 import org.apache.calcite.tools.RuleSet;
 import org.apache.calcite.tools.RuleSets;
 
-// TODO: Guestestimate rules. Requires testing and review and fine tuning
 public final class RuleSetManager {
 
   private final List<RelOptRule> rules;
@@ -26,12 +25,7 @@ public final class RuleSetManager {
 
   public RuleSetManager() {
     this.convention = Convention.NONE;
-    this.rules = createDefaultRules();
-  }
-
-  public RuleSetManager(Convention convention) {
-    this.convention = convention;
-    this.rules = createDefaultRules();
+    this.rules = new ArrayList<>();
   }
 
   public RuleSetManager(List<RelOptRule> rules) {
@@ -42,60 +36,6 @@ public final class RuleSetManager {
   public RuleSetManager(List<RelOptRule> rules, Convention convention) {
     this.convention = convention;
     this.rules = new ArrayList<>(rules);
-  }
-
-  private List<RelOptRule> createDefaultRules() {
-    List<RelOptRule> ruleList = new ArrayList<>();
-
-    // Filter rules - optimize filter operations
-    ruleList.addAll(
-        Arrays.asList(
-            CoreRules.FILTER_MERGE, // Combine multiple filters
-            CoreRules.FILTER_AGGREGATE_TRANSPOSE, // Move filters before aggregates
-            CoreRules.FILTER_PROJECT_TRANSPOSE // Move filters before projections
-            // Note: FILTER_INTO_JOIN is excluded as it can cause infinite rewrite loops
-            // when combined with JOIN_EXTRACT_FILTER and other join optimization rules
-            ));
-
-    // Projection rules - optimize projection operations
-    ruleList.addAll(
-        Arrays.asList(
-            CoreRules.PROJECT_MERGE, // Combine multiple projections
-            CoreRules.PROJECT_REMOVE // Remove unnecessary projections
-            // Note: PROJECT_JOIN_TRANSPOSE is excluded as it can cause infinite rewrite loops
-            // in complex join queries when combined with other optimization rules
-            // Note: PROJECT_FILTER_TRANSPOSE is excluded to avoid conflicts with
-            // FILTER_PROJECT_TRANSPOSE
-            // Having both can cause infinite rewrite loops (StackOverflowError)
-            ));
-
-    // Join rules - optimize join operations
-    ruleList.addAll(
-        Arrays.asList(
-            CoreRules.JOIN_CONDITION_PUSH, // Push join conditions down
-            CoreRules.JOIN_EXTRACT_FILTER // Extract filters from joins
-            // Note: JOIN_PUSH_TRANSITIVE_PREDICATES is excluded as it can cause issues
-            // in complex join queries with multiple tables
-            // Note: JOIN_COMMUTE is excluded as it can cause infinite rewrite loops
-            // when combined with other join optimization rules, especially in complex queries
-            ));
-
-    // Aggregate rules - optimize aggregation operations
-    ruleList.addAll(
-        Arrays.asList(
-            CoreRules.AGGREGATE_PROJECT_MERGE, // Merge aggregate with projection
-            CoreRules.AGGREGATE_REMOVE // Remove unnecessary aggregates
-            ));
-
-    // Sort rules - optimize sort operations
-    ruleList.addAll(
-        Arrays.asList(
-            CoreRules.SORT_REMOVE // Remove unnecessary sorts
-            // Note: SORT_PROJECT_TRANSPOSE and SORT_JOIN_TRANSPOSE are excluded
-            // as they can cause infinite rewrite loops in complex queries
-            ));
-
-    return ruleList;
   }
 
   public RuleSetManager addRule(RelOptRule rule) {

@@ -10,123 +10,58 @@
 
 package io.cheshire.query.engine.calcite.optimizer;
 
-import io.cheshire.query.engine.calcite.schema.SchemaManager;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.calcite.DataContext;
 import org.apache.calcite.adapter.java.JavaTypeFactory;
 import org.apache.calcite.jdbc.JavaTypeFactoryImpl;
 import org.apache.calcite.linq4j.QueryProvider;
 import org.apache.calcite.rel.type.RelDataTypeSystem;
 import org.apache.calcite.schema.SchemaPlus;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
-/**
- * Production-grade DataContext implementation for a federated Calcite engine. Holds: - Named
- * sources (JDBC, Spark, Elasticsearch, etc.) - Query parameters - Execution metadata (timezone,
- * locale)
- */
-public class CalciteDataContext implements DataContext {
-  private final Map<String, Object> variables;
-  private Map<String, Object> values;
-  private SchemaManager schemaManager;
+/** Calcite adapter over QueryRuntimeContext. This is the ONLY class that implements DataContext. */
+public final class CalciteDataContext implements DataContext {
 
-  public CalciteDataContext(SchemaManager schemaManager) {
+  private final QueryRuntimeContext runtimeContext;
+  private final SchemaPlus rootSchema;
+  private final JavaTypeFactory typeFactory;
 
-    long now = System.currentTimeMillis();
-
-    variables = Map.of();
-
-    values =
-        Map.of(
-            Variable.CURRENT_TIMESTAMP.camelName,
-            now,
-            Variable.LOCAL_TIMESTAMP.camelName,
-            now,
-            Variable.UTC_TIMESTAMP.camelName,
-            now,
-            Variable.TIME_ZONE.camelName,
-            TimeZone.getDefault(),
-            Variable.LOCALE.camelName,
-            Locale.ROOT,
-            Variable.CANCEL_FLAG.camelName,
-            new AtomicBoolean(false));
-  }
-
-  /**
-   * Main constructor
-   *
-   * @param sources Named runtime objects (DataSource, Spark, etc.)
-   * @param parameters Query parameters
-   * @param timeZone Execution timezone
-   * @param locale Execution locale
-   */
-  public CalciteDataContext(
-      Map<String, Object> sources,
-      Map<String, Object> parameters,
-      TimeZone timeZone,
-      Locale locale) {
-    Map<String, Object> vars = new HashMap<>();
-
-    if (sources != null) vars.putAll(sources);
-    if (parameters != null) vars.putAll(parameters);
-
-    // Standard Calcite variables
-    vars.putIfAbsent(
-        DataContext.Variable.TIME_ZONE.camelName,
-        timeZone != null ? timeZone : TimeZone.getDefault());
-    vars.putIfAbsent(
-        DataContext.Variable.LOCALE.camelName, locale != null ? locale : Locale.getDefault());
-    vars.putIfAbsent(DataContext.Variable.CURRENT_TIMESTAMP.camelName, System.currentTimeMillis());
-    vars.putIfAbsent(DataContext.Variable.UTC_TIMESTAMP.camelName, System.currentTimeMillis());
-    vars.putIfAbsent(DataContext.Variable.LOCAL_TIMESTAMP.camelName, System.currentTimeMillis());
-    vars.putIfAbsent(DataContext.Variable.CANCEL_FLAG.camelName, new AtomicBoolean(false));
-
-    this.variables = Collections.unmodifiableMap(vars);
+  public CalciteDataContext(QueryRuntimeContext runtimeContext, SchemaPlus rootSchema) {
+    this.runtimeContext = runtimeContext;
+    this.rootSchema = rootSchema;
+    this.typeFactory = new JavaTypeFactoryImpl(RelDataTypeSystem.DEFAULT);
   }
 
   @Override
   public SchemaPlus getRootSchema() {
-    return schemaManager.rootSchema();
+    return rootSchema;
   }
 
   @Override
   public JavaTypeFactory getTypeFactory() {
-    return new JavaTypeFactoryImpl(RelDataTypeSystem.DEFAULT);
+    return typeFactory;
   }
 
   @Override
   public QueryProvider getQueryProvider() {
-    return null; // TODO:
+    return null; // not using linq4j
   }
 
-  /**
-   * Returns a context variable.
-   *
-   * <p>Supported variables include: "sparkContext", "currentTimestamp", "localTimestamp".
-   *
-   * @param name Name of variable
-   */
   @Override
-  public @Nullable Object get(String name) {
-    return variables.get(name);
-  }
-
-  // Utility methods
-  public boolean hasSource(String name) {
-    return variables.containsKey(name);
-  }
-
-  @SuppressWarnings("unchecked")
-  public <T> T getSource(String name, Class<T> clazz) {
-    Object obj = variables.get(name);
-    if (obj == null) {
-      throw new IllegalArgumentException("No source found for name: " + name);
+  public Object get(String name) {
+    if (Variable.TIME_ZONE.camelName.equals(name)) {
+      return runtimeContext.timeZone();
     }
-    return (T) clazz.cast(obj);
-  }
+    if (Variable.LOCALE.camelName.equals(name)) {
+      return runtimeContext.locale();
+    }
+    if (Variable.CANCEL_FLAG.camelName.equals(name)) {
+      return runtimeContext.cancelFlag();
+    }
 
-  public Map<String, Object> allSources() {
-    return Collections.unmodifiableMap(variables);
+    if (runtimeContext.hasParameter(name)) {
+      return runtimeContext.parameter(name);
+    }
+
+    return null;
   }
 }

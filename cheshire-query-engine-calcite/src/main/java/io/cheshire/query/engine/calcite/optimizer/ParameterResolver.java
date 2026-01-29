@@ -15,10 +15,8 @@ import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.*;
-import org.apache.calcite.DataContext;
 import org.apache.calcite.rel.type.RelDataTypeFactory;
 import org.apache.calcite.rex.*;
-import org.apache.calcite.schema.SchemaPlus;
 import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.calcite.util.DateString;
 import org.apache.calcite.util.TimeString;
@@ -109,11 +107,6 @@ public class ParameterResolver {
 
     // Fallback: convert to string
     return rexBuilder.makeLiteral(value.toString());
-  }
-
-  /** Create a DataContext for parameter resolution */
-  public DataContext createDataContext(SchemaPlus rootSchema) {
-    return new ParameterDataContext(rootSchema, parameters);
   }
 
   /** Validates that all required parameters are provided */

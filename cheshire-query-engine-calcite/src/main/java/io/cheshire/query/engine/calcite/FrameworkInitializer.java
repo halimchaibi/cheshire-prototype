@@ -12,6 +12,8 @@ package io.cheshire.query.engine.calcite;
 
 import io.cheshire.query.engine.calcite.optimizer.CalciteDataContext;
 import io.cheshire.query.engine.calcite.optimizer.PlannerContext;
+import io.cheshire.query.engine.calcite.optimizer.QueryRuntimeContext;
+import io.cheshire.query.engine.calcite.optimizer.RuleSetManager;
 import io.cheshire.query.engine.calcite.schema.SchemaManager;
 import io.cheshire.spi.query.exception.QueryEngineInitializationException;
 import java.util.List;
@@ -32,17 +34,14 @@ import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.sql.parser.SqlParser;
 import org.apache.calcite.sql.util.SqlOperatorTables;
 import org.apache.calcite.sql.validate.SqlConformanceEnum;
-import org.apache.calcite.tools.FrameworkConfig;
-import org.apache.calcite.tools.Frameworks;
-import org.apache.calcite.tools.Program;
-import org.apache.calcite.tools.Programs;
+import org.apache.calcite.tools.*;
 
 public class FrameworkInitializer {
-  private final SchemaManager schemaManager;
+
   private FrameworkConfig config;
 
-  public FrameworkInitializer(SchemaManager schemaManager) {
-    this.schemaManager = schemaManager;
+  private FrameworkInitializer() {
+    // Use builders;
   }
 
   public static Builder builder() {
@@ -122,7 +121,7 @@ public class FrameworkInitializer {
       return this;
     }
 
-    public FrameworkConfig build() throws QueryEngineInitializationException {
+    public FrameworkConfig buildBaseConfig() throws QueryEngineInitializationException {
       if (this.schemaManager == null) {
         throw new QueryEngineInitializationException("SchemaManager is required");
       }
@@ -137,15 +136,18 @@ public class FrameworkInitializer {
 
       List<RelTraitDef> finalTraitDefs = this.traitDefs != null ? this.traitDefs : buildTraitDefs();
 
-      // TODO: This is supposed to be query-scoped
-      DataContext finalDataContext =
-          this.dataContext != null ? this.dataContext : new CalciteDataContext(schemaManager);
+      // TODO: These are is supposed to be query-scoped, they will be used as default if not
+      // provided
+      //      DataContext finalDataContext =
+      //          this.dataContext != null ? this.dataContext : new
+      // CalciteDataContext(schemaManager);
+      //
+      //      Context finalPlannerContext =
+      //          this.plannerContext != null ? this.plannerContext : new
+      // PlannerContext(finalDataContext);
 
-      Context finalPlannerContext =
-          this.plannerContext != null ? this.plannerContext : new PlannerContext(finalDataContext);
-
-      RexExecutor finalExecutor =
-          this.executor != null ? this.executor : new RexExecutorImpl(finalDataContext);
+      //      RexExecutor finalExecutor =
+      //          this.executor != null ? this.executor : new RexExecutorImpl(finalDataContext);
 
       SchemaPlus finalDefaultSchema =
           this.defaultSchema != null ? this.defaultSchema : schemaManager.rootSchema();
@@ -157,15 +159,41 @@ public class FrameworkInitializer {
           this.costFactory != null ? this.costFactory : RelOptCostImpl.FACTORY;
 
       return Frameworks.newConfigBuilder()
-          .parserConfig(finalParserConfig)
-          .defaultSchema(finalDefaultSchema)
-          .operatorTable(finalOperatorTable)
-          .programs(finalPrograms)
-          .traitDefs(finalTraitDefs)
-          .typeSystem(typeSystem)
-          .costFactory(costFactory)
-          .context(finalPlannerContext)
-          .executor(finalExecutor)
+          .parserConfig(buildParserConfig())
+          .operatorTable(buildOperatorTable())
+          .traitDefs(buildTraitDefs())
+          .typeSystem(RelDataTypeSystem.DEFAULT)
+          .costFactory(RelOptCostImpl.FACTORY)
+          .defaultSchema(schemaManager.rootSchema())
+          .programs(List.of(Programs.standard()))
+          .build();
+    }
+
+    public FrameworkConfig buildQueryConfig(
+        FrameworkConfig baseConfig,
+        QueryRuntimeContext queryContext,
+        RuleSetManager ruleSetManager) {
+
+      CalciteDataContext dataContext =
+          new CalciteDataContext(queryContext, schemaManager.rootSchema());
+
+      Context plannerContext = new PlannerContext(dataContext);
+
+      Program program = Programs.of(RuleSets.ofList(ruleSetManager.getRules()));
+
+      //      Planner planner =
+      //        Frameworks.getPlanner(
+      //          Frameworks.newConfigBuilder(baseConfig)
+      //            .context(plannerContext)
+      //            .programs(program)
+      //            .executor(new RexExecutorImpl(dataContext))
+      //            .build()
+      //        );
+
+      return Frameworks.newConfigBuilder(baseConfig)
+          .context(plannerContext) // attach query-scoped context
+          .executor(new RexExecutorImpl(dataContext)) // attach query-scoped RexExecutor
+          .programs(program)
           .build();
     }
   }
