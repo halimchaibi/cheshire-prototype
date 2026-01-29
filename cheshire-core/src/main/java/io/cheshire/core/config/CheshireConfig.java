@@ -202,6 +202,7 @@ public class CheshireConfig {
   @Data
   @NoArgsConstructor
   public static class Source {
+    String type;
     private String name;
     private String description;
     private String factory;
@@ -237,6 +238,7 @@ public class CheshireConfig {
     String name;
     String description;
     String factory;
+    List<String> sources;
     Map<String, Object> config;
   }
 

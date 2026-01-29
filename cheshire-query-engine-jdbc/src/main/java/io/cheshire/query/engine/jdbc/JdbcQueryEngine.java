@@ -14,6 +14,8 @@ import io.cheshire.source.jdbc.JdbcSourceProvider;
 import io.cheshire.source.jdbc.QueryResultConverter;
 import io.cheshire.source.jdbc.SqlSourceProviderQueryResult;
 import io.cheshire.spi.query.engine.QueryEngine;
+import io.cheshire.spi.query.engine.QueryEngineConfig;
+import io.cheshire.spi.query.exception.QueryEngineConfigurationException;
 import io.cheshire.spi.query.exception.QueryEngineException;
 import io.cheshire.spi.query.exception.QueryExecutionException;
 import io.cheshire.spi.query.request.QueryEngineContext;
@@ -65,30 +67,29 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class JdbcQueryEngine implements QueryEngine<SqlQueryEngineRequest> {
 
-  private final String name;
+  private final QueryEngineConfig jdbcQueryEngineConfig;
   private volatile boolean opened = false;
 
-  public JdbcQueryEngine(JdbcQueryEngineConfig config) {
-    if (config == null) {
-      throw new IllegalArgumentException("JdbcQueryEngineConfig cannot be null");
+  public JdbcQueryEngine(JdbcQueryEngineConfig jdbcQueryEngineConfig)
+      throws QueryEngineConfigurationException {
+    if (!jdbcQueryEngineConfig.validate()) {
+      throw new QueryEngineConfigurationException(
+          "Invalid JdbcQueryEngineConfig: " + jdbcQueryEngineConfig.name());
     }
-    if (!config.validate()) {
-      throw new IllegalArgumentException("Invalid JdbcQueryEngineConfig: " + config);
-    }
-    this.name = config.name();
-    log.debug("Created JdbcQueryEngine '{}'", name);
+    this.jdbcQueryEngineConfig = jdbcQueryEngineConfig;
+    log.debug("Created JdbcQueryEngine '{}'", jdbcQueryEngineConfig.name());
   }
 
   @Override
   public void open() throws QueryEngineException {
     if (opened) {
-      log.debug("JdbcQueryEngine '{}' is already open", name);
+      log.debug("JdbcQueryEngine '{}' is already open", jdbcQueryEngineConfig.name());
       return;
     }
 
-    log.info("Opening JdbcQueryEngine '{}'", name);
+    log.info("Opening JdbcQueryEngine '{}'", jdbcQueryEngineConfig.name());
     opened = true;
-    log.info("JdbcQueryEngine '{}' opened successfully", name);
+    log.info("JdbcQueryEngine '{}' opened successfully", jdbcQueryEngineConfig.name());
   }
 
   @Override
@@ -96,7 +97,8 @@ public class JdbcQueryEngine implements QueryEngine<SqlQueryEngineRequest> {
     if (!opened) {
       throw new QueryExecutionException(
           String.format(
-              "Query engine '%s' is not open. Call open() before explaining queries.", name));
+              "Query engine '%s' is not open. Call open() before explaining queries.",
+              jdbcQueryEngineConfig.name()));
     }
 
     if (query == null) {
@@ -107,7 +109,8 @@ public class JdbcQueryEngine implements QueryEngine<SqlQueryEngineRequest> {
       throw new QueryExecutionException("SQL query cannot be null or empty");
     }
 
-    log.debug("Explaining query on engine '{}': {}", name, query.sqlQuery());
+    log.debug(
+        "Explaining query on engine '{}': {}", jdbcQueryEngineConfig.name(), query.sqlQuery());
 
     // JDBC engine doesn't provide query planning, return a simple explanation
     String explanation =
@@ -118,7 +121,7 @@ public class JdbcQueryEngine implements QueryEngine<SqlQueryEngineRequest> {
                 + "  Note: This engine executes queries directly without planning or optimization",
             query.query());
 
-    log.debug("Query explanation generated for engine '{}'", name);
+    log.debug("Query explanation generated for engine '{}'", jdbcQueryEngineConfig.name());
     return explanation;
   }
 
@@ -127,7 +130,7 @@ public class JdbcQueryEngine implements QueryEngine<SqlQueryEngineRequest> {
 
     String sql = query.sqlQuery();
     if (!opened) {
-      log.debug("Query validation failed: engine '{}' is not open", name);
+      log.debug("Query validation failed: engine '{}' is not open", jdbcQueryEngineConfig.name());
       return false;
     }
 
@@ -212,7 +215,7 @@ public class JdbcQueryEngine implements QueryEngine<SqlQueryEngineRequest> {
     long startTime = System.currentTimeMillis();
     log.debug(
         "Executing query on engine '{}' using source '{}': {}",
-        name,
+        jdbcQueryEngineConfig.name(),
         source.config().schema(),
         sql);
 
@@ -230,7 +233,7 @@ public class JdbcQueryEngine implements QueryEngine<SqlQueryEngineRequest> {
       long duration = System.currentTimeMillis() - startTime;
       log.info(
           "Query executed successfully on engine '{}' in {}ms, returned {} rows",
-          name,
+          jdbcQueryEngineConfig.name(),
           duration,
           queryResult.rowCount());
 
@@ -240,14 +243,14 @@ public class JdbcQueryEngine implements QueryEngine<SqlQueryEngineRequest> {
       String errorMsg =
           String.format(
               "Failed to execute query on engine '%s' against source '%s' for query '%s': %s",
-              name, source.config().schema(), sql, e.getMessage());
+              jdbcQueryEngineConfig.name(), source.config().schema(), sql, e.getMessage());
       log.error(errorMsg, e);
       throw new QueryExecutionException(errorMsg, e);
     } catch (Exception e) {
       String errorMsg =
           String.format(
               "Unexpected error executing query on engine '%s' for query '%s': %s",
-              name, sql, e.getMessage());
+              jdbcQueryEngineConfig.name(), sql, e.getMessage());
       log.error(errorMsg, e);
       throw new QueryExecutionException(errorMsg, e);
     }
@@ -256,17 +259,17 @@ public class JdbcQueryEngine implements QueryEngine<SqlQueryEngineRequest> {
   @Override
   public void close() throws QueryEngineException {
     if (!opened) {
-      log.debug("JdbcQueryEngine '{}' is already closed", name);
+      log.debug("JdbcQueryEngine '{}' is already closed", jdbcQueryEngineConfig.name());
       return;
     }
 
-    log.info("Closing JdbcQueryEngine '{}'", name);
+    log.info("Closing JdbcQueryEngine '{}'", jdbcQueryEngineConfig.name());
     opened = false;
-    log.info("JdbcQueryEngine '{}' closed successfully", name);
+    log.info("JdbcQueryEngine '{}' closed successfully", jdbcQueryEngineConfig.name());
   }
 
   @Override
   public String name() {
-    return name;
+    return jdbcQueryEngineConfig.name();
   }
 }

@@ -23,10 +23,9 @@
     <module>cheshire-source-provider-spi</module>
     <module>cheshire-source-provider-jdbc</module>
     <module>cheshire-query-engine-jdbc</module>
-    <!--    Disable, as the spis had been refactored-->
-    <!--    <module>cheshire-query-engine-calcite</module>-->
+    <module>cheshire-query-engine-calcite</module>
     <module>cheshire-runtime</module>
-    <module>cheshire-test-common</module>
+<!--    <module>cheshire-test-common</module>-->
   </modules>
 
   <properties>
@@ -52,7 +51,7 @@
     <maven-failsafe-plugin.version>3.5.0</maven-failsafe-plugin.version>
     <license-maven-plugin.version>2.7.1</license-maven-plugin.version>
     <spotless-maven-plugin.version>3.1.0</spotless-maven-plugin.version>
-    <skip.spotless>false</skip.spotless>
+    <spotless.skip>false</spotless.skip>
     <java.google.format.version>1.33.0</java.google.format.version>
   </properties>
 
@@ -375,7 +374,7 @@
           </execution>
         </executions>
         <configuration>
-          <skip>${skip.spotless}</skip>
+          <skip>${spotless.skip}</skip>
         </configuration>
       </plugin>
       <!-- SpotBugs verify -->
@@ -464,21 +463,35 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <skipTests>true</skipTests>
         <maven.test.skip>true</maven.test.skip>
         <enforcer.skip>true</enforcer.skip>
         <checkstyle.skip>true</checkstyle.skip>
         <spotbugs.skip>true</spotbugs.skip>
         <dependency-check.skip>true</dependency-check.skip>
-        <license.skip>false</license.skip>
+        <license.skip>true</license.skip>
         <formatter.skip>true</formatter.skip>
-        <skip.spotless>false</skip.spotless>
+        <spotless.skip>false</spotless.skip>
+      </properties>
+    </profile>
+    <profile>
+      <id>test</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <properties>
+        <maven.test.skip>false</maven.test.skip>
+        <enforcer.skip>true</enforcer.skip>
+        <checkstyle.skip>true</checkstyle.skip>
+        <spotbugs.skip>true</spotbugs.skip>
+        <dependency-check.skip>true</dependency-check.skip>
+        <license.skip>true</license.skip>
+        <formatter.skip>true</formatter.skip>
+        <spotless.skip>false</spotless.skip>
       </properties>
     </profile>
     <profile>
       <id>github</id>
       <properties>
-        <skipTests>false</skipTests>
         <maven.test.skip>false</maven.test.skip>
         <enforcer.skip>false</enforcer.skip>
         <checkstyle.skip>false</checkstyle.skip>
@@ -486,7 +499,7 @@
         <spotbugs.skip>false</spotbugs.skip>
         <dependency-check.skip>false</dependency-check.skip>
         <license.skip>false</license.skip>
-        <skip.spotless>false</skip.spotless>
+        <spotless.skip>false</spotless.skip>
       </properties>
     </profile>
   </profiles>

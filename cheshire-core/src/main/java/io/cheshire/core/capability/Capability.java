@@ -12,7 +12,9 @@ package io.cheshire.core.capability;
 
 import io.cheshire.core.config.ActionsConfig;
 import io.cheshire.core.config.CheshireConfig;
-import io.cheshire.spi.pipeline.*;
+import io.cheshire.spi.pipeline.CanonicalInput;
+import io.cheshire.spi.pipeline.CanonicalOutput;
+import io.cheshire.spi.pipeline.PipelineProcessor;
 import java.util.List;
 import java.util.Map;
 

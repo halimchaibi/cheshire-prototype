@@ -1,0 +1,143 @@
+@startuml
+
+' Calcite Query Engine - Core Execution Pipeline
+
+skinparam classAttributeIconSize 0
+
+namespace io.cheshire.query.engine.calcite {
+
+  class CalciteQueryEngine {
+    - CalciteQueryEngineConfig calciteConfig
+    - SchemaManager schemaManager
+    - QueryParser parser
+    - QueryValidator validator
+    - Converter converter
+    - QueryOptimizer optimizer
+    - QueryExecutor executor
+    - ResultTransformer resultTransformer
+    - QueryPlanCache planCache
+    - FrameworkConfig frameworkConfig
+    - SqlTypeFactoryImpl typeFactory
+    - boolean isOpen
+    + open()
+    + execute(LogicalQuery, QueryEngineContext) : QueryEngineResult
+    + validate(LogicalQuery) : boolean
+    + explain(LogicalQuery) : String
+    + close()
+    + isOpen() : boolean
+    --
+    - initialize()
+    - <T> stage(ExecutionStage, CheckedSupplier<T>) : T
+  }
+
+  enum ExecutionStage {
+    PARSE
+    VALIDATE
+    CONVERT
+    OPTIMIZE
+    EXECUTE
+    TRANSFORM
+  }
+
+  class FrameworkInitializer {
+    - SchemaManager schemaManager
+    + <<builder>> builder() : Builder
+    --
+    + Builder.withSchemaManager(SchemaManager) : Builder
+    + Builder.build() : FrameworkConfig
+  }
+
+  class SchemaManager {
+    - SchemaPlus rootSchema
+    + rootSchema() : SchemaPlus
+    + schemas() : Map<String, Schema>
+    + getSourceConfig(String) : Map<String, Object>
+    + getSourceNames() : Set<String>
+    + close()
+  }
+
+  class QueryParser {
+    + parse(LogicalQuery) : SqlNode
+  }
+
+  class QueryValidator {
+    + validate(SqlNode) : SqlNode
+  }
+
+  class Converter {
+    + convert(SqlNode) : RelNode
+  }
+
+  class QueryOptimizer {
+    + optimizeWithVolcano(RelNode, OptimizationContext) : RelNode
+    + optimize(RelNode, OptimizationContext) : RelNode
+  }
+
+  class QueryExecutor {
+    + execute(RelNode) : ResultSet
+  }
+
+  class ResultTransformer {
+    + transform(ResultSet) : QueryEngineResult
+    + transform(ResultSet, RelNode) : QueryEngineResult
+  }
+
+  class QueryPlanCache {
+    + get(String) : RelNode
+    + put(String, RelNode)
+    + clear()
+  }
+
+  class OptimizationContext {
+    + getQueryType() : QueryType
+    + getSchemaMap() : Map<String, Schema>
+    + getCharacteristics() : QueryCharacteristics
+    + isFederatedQuery() : boolean
+  }
+
+  class QueryCharacteristics {
+    + hasAggregations() : boolean
+    + hasJoins() : boolean
+    + getTableCount() : int
+    + isComplex() : boolean
+  }
+
+  enum QueryType {
+    OLTP
+    OLAP
+    FEDERATED
+    SIMPLE_SELECT
+    COMPLEX_JOIN
+    WINDOW_QUERY
+    NESTED_QUERY
+    UNKNOWN
+  }
+}
+
+namespace io.cheshire.spi.query {
+  class LogicalQuery
+  class QueryEngineContext
+  class QueryEngineResult {
+    + rowCount() : int
+  }
+}
+
+CalciteQueryEngine --> FrameworkInitializer : uses to build\nFrameworkConfig
+CalciteQueryEngine --> SchemaManager : manages schemas
+CalciteQueryEngine --> QueryParser
+CalciteQueryEngine --> QueryValidator
+CalciteQueryEngine --> Converter
+CalciteQueryEngine --> QueryOptimizer
+CalciteQueryEngine --> QueryExecutor
+CalciteQueryEngine --> ResultTransformer
+CalciteQueryEngine --> QueryPlanCache
+CalciteQueryEngine --> OptimizationContext : builds per query
+CalciteQueryEngine --> LogicalQuery
+CalciteQueryEngine --> QueryEngineContext
+CalciteQueryEngine --> QueryEngineResult
+
+OptimizationContext --> QueryCharacteristics
+OptimizationContext --> QueryType
+
+@enduml
+

@@ -14,9 +14,9 @@ trim_trailing_whitespace = true
 # Java source files
 [*.java]
 indent_style = space
-indent_size = 4
-max_line_length = 120
-continuation_indent_size = 8
+indent_size = 2
+max_line_length = 100
+continuation_indent_size = 2
 
 # XML files (pom.xml, build files, config)
 [*.xml]
