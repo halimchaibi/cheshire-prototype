@@ -1,8 +1,9 @@
 ## [ADR-00X]: [Project Title/Decision Name]
 
-* **Status:** Proposed / Accepted / Superseded
+* **Status:** Proposed / Accepted / Amended / Superseded
 * **Deciders:** [Name/Role], [Name/Role]
 * **Date:** 2026-01-27
+* **Last Updated:** 2026-01-29
 * **Technical Story:** [Link to Jira Ticket or GitHub Issue]
 
 ### 1. Context and Problem Statement
@@ -49,8 +50,21 @@
 * **Negative (-):** Requires robust monitoring and service discovery (e.g., Kubernetes, Service Mesh).
 * **Neutral:** Shift in team culture toward "DevOps" and ownership of end-to-end services.
 
+---
+
 ### 7. Links & References
 
 * [Link to Design Document]
 * [Link to Benchmarking Results]
-* [Link to Industry Standard (e.g., Martin Fowler on Microservices)]
+* [Link to Industry Standard]
+
+---
+
+## 8. Revision History
+
+| Date | Version | Status | Description | Author |
+| :--- | :--- | :--- | :--- | :--- |
+| 2026-01-27 | v1.0 | **Accepted** | Initial template. | Halim Chaibi |
+| 2026-01-29 | v1.1 | **Amended** | Implementation started; added internal `stage()` helper logic. | Halim Chaibi |
+
+> **Note:** This ADR is currently being refined
