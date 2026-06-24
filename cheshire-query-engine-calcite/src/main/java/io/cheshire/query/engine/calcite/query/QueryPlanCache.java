@@ -27,7 +27,7 @@ public class QueryPlanCache {
         new LinkedHashMap<>(config.maxCacheSize(), 0.75f, true) {
           @Override
           protected boolean removeEldestEntry(Map.Entry<String, CachedPlan> eldest) {
-            return size() > config.maxCacheSize();
+            return super.size() > config.maxCacheSize();
           }
         };
   }

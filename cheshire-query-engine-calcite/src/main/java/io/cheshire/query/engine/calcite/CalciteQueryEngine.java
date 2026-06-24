@@ -56,7 +56,7 @@ public class CalciteQueryEngine implements QueryEngine<LogicalQuery> {
   // RelDataTypeSystem
   // private SqlTypeFactoryImpl typeFactory = new SqlTypeFactoryImpl(RelDataTypeSystem.DEFAULT);
 
-  private boolean isOpen = false;
+  private boolean opened = false;
 
   public CalciteQueryEngine(CalciteQueryEngineConfig config) {
     this.calciteConfig = config;
@@ -65,7 +65,7 @@ public class CalciteQueryEngine implements QueryEngine<LogicalQuery> {
   @Override
   public void open() throws QueryEngineException {
     try {
-      if (isOpen) {
+      if (opened) {
         log.warn("Query engine in open state, already initialized and opened");
         return;
       }
@@ -75,7 +75,7 @@ public class CalciteQueryEngine implements QueryEngine<LogicalQuery> {
       CacheConfig cacheConfig = extractCacheConfig();
       this.planCache = new QueryPlanCache(cacheConfig);
 
-      this.isOpen = true;
+      this.opened = true;
       log.info("Calcite query engine opened successfully");
 
     } catch (Exception e) {
@@ -235,7 +235,7 @@ public class CalciteQueryEngine implements QueryEngine<LogicalQuery> {
 
   @Override
   public void close() {
-    if (!isOpen) {
+    if (!opened) {
       return;
     }
 
@@ -246,7 +246,7 @@ public class CalciteQueryEngine implements QueryEngine<LogicalQuery> {
       if (planCache != null) {
         planCache.clear();
       }
-      isOpen = false;
+      opened = false;
       log.info("Calcite query engine closed successfully");
     } catch (Exception e) {
       throw new IllegalStateException("Failed to close CalciteQueryEngine", e);
@@ -255,7 +255,7 @@ public class CalciteQueryEngine implements QueryEngine<LogicalQuery> {
 
   @Override
   public boolean isOpen() {
-    return isOpen;
+    return opened;
   }
 
   @Override
@@ -264,7 +264,7 @@ public class CalciteQueryEngine implements QueryEngine<LogicalQuery> {
   }
 
   private void ensureOpen() throws QueryEngineException {
-    if (!isOpen) {
+    if (!opened) {
       throw new QueryEngineInitializationException("Engine not open. Call open() first.");
     }
   }

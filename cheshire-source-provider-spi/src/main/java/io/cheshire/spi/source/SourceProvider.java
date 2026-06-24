@@ -13,7 +13,6 @@ package io.cheshire.spi.source;
 import io.cheshire.spi.source.exception.SourceProviderConnectionException;
 import io.cheshire.spi.source.exception.SourceProviderException;
 import io.cheshire.spi.source.exception.SourceProviderExecutionException;
-import io.cheshire.spi.source.exception.SourceProviderInitializationException;
 
 /**
  * Service Provider Interface (SPI) for pluggable data source providers.
@@ -114,7 +113,6 @@ public interface SourceProvider<Q extends SourceProviderQuery> extends AutoClose
    * </ul>
    *
    * @throws SourceProviderConnectionException if the connection cannot be established
-   * @throws SourceProviderInitializationException if initialization fails
    * @see #isOpen()
    * @see #close()
    */

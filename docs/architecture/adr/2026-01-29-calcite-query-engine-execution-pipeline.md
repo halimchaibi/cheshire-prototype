@@ -54,8 +54,8 @@ The goal is to:
 
 1. **PARSE**: `planner.parse(sql)`  
 2. **VALIDATE**: `planner.validate(parsed)` (eventually via `QueryValidator`)  
-3. **CONVERT**: `converter.convert(validated)` → `RelNode`  
-4. **OPTIMIZE**: `QueryOptimizer.optimizeWithVolcano(logicalPlan, OptimizationContext)`  
+3. **CONVERT**: `planner.rel(validated).rel` → `RelNode`
+4. **OPTIMIZE**: query-scoped rule program boundary for the `logicalPlan`
 5. **EXECUTE**: `QueryExecutor.execute(optimizedPlan)` → `ResultSet`  
 6. **TRANSFORM**: `ResultTransformer.transform(resultSet)` → `QueryEngineResult`
 

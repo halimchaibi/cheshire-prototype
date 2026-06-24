@@ -93,7 +93,6 @@ public class QueryParameterExtractor {
    * WHERE id = :userId" -> "SELECT * FROM users WHERE id = ?"
    */
   public static String convertNamedToPositional(String sql, Map<String, Object> parameters) {
-    List<String> orderedParams = new ArrayList<>();
     StringBuilder result = new StringBuilder();
 
     java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(":([a-zA-Z_][a-zA-Z0-9_]*)");
@@ -104,7 +103,6 @@ public class QueryParameterExtractor {
       String paramName = matcher.group(1);
       result.append(sql, lastEnd, matcher.start());
       result.append("?");
-      orderedParams.add(paramName);
       lastEnd = matcher.end();
     }
     result.append(sql.substring(lastEnd));

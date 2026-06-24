@@ -38,8 +38,6 @@ import org.apache.calcite.tools.*;
 
 public class FrameworkInitializer {
 
-  private FrameworkConfig config;
-
   private FrameworkInitializer() {
     // Use builders;
   }
@@ -125,48 +123,42 @@ public class FrameworkInitializer {
       if (this.schemaManager == null) {
         throw new QueryEngineInitializationException("SchemaManager is required");
       }
-      // defaults if not provided
       SqlParser.Config finalParserConfig =
           this.parserConfig != null ? this.parserConfig : buildParserConfig();
-
       SqlOperatorTable finalOperatorTable =
           this.operatorTable != null ? this.operatorTable : buildOperatorTable();
-
       List<Program> finalPrograms = this.programs != null ? this.programs : buildPrograms();
-
       List<RelTraitDef> finalTraitDefs = this.traitDefs != null ? this.traitDefs : buildTraitDefs();
-
-      // TODO: These are is supposed to be query-scoped, they will be used as default if not
-      // provided
-      //      DataContext finalDataContext =
-      //          this.dataContext != null ? this.dataContext : new
-      // CalciteDataContext(schemaManager);
-      //
-      //      Context finalPlannerContext =
-      //          this.plannerContext != null ? this.plannerContext : new
-      // PlannerContext(finalDataContext);
-
-      //      RexExecutor finalExecutor =
-      //          this.executor != null ? this.executor : new RexExecutorImpl(finalDataContext);
-
       SchemaPlus finalDefaultSchema =
           this.defaultSchema != null ? this.defaultSchema : schemaManager.rootSchema();
-
-      RelDataTypeSystem typeSystem =
+      RelDataTypeSystem finalTypeSystem =
           this.typeSystem != null ? this.typeSystem : RelDataTypeSystem.DEFAULT;
-
-      RelOptCostFactory costFactory =
+      RelOptCostFactory finalCostFactory =
           this.costFactory != null ? this.costFactory : RelOptCostImpl.FACTORY;
 
-      return Frameworks.newConfigBuilder()
-          .parserConfig(buildParserConfig())
-          .operatorTable(buildOperatorTable())
-          .traitDefs(buildTraitDefs())
-          .typeSystem(RelDataTypeSystem.DEFAULT)
-          .costFactory(RelOptCostImpl.FACTORY)
-          .defaultSchema(schemaManager.rootSchema())
-          .programs(List.of(Programs.standard()))
-          .build();
+      Frameworks.ConfigBuilder configBuilder =
+          Frameworks.newConfigBuilder()
+              .parserConfig(finalParserConfig)
+              .operatorTable(finalOperatorTable)
+              .traitDefs(finalTraitDefs)
+              .typeSystem(finalTypeSystem)
+              .costFactory(finalCostFactory)
+              .defaultSchema(finalDefaultSchema)
+              .programs(finalPrograms);
+
+      if (this.plannerContext != null) {
+        configBuilder.context(this.plannerContext);
+      } else if (this.dataContext != null) {
+        configBuilder.context(new PlannerContext(this.dataContext));
+      }
+
+      if (this.executor != null) {
+        configBuilder.executor(this.executor);
+      } else if (this.dataContext != null) {
+        configBuilder.executor(new RexExecutorImpl(this.dataContext));
+      }
+
+      return configBuilder.build();
     }
 
     public FrameworkConfig buildQueryConfig(
@@ -180,15 +172,6 @@ public class FrameworkInitializer {
       Context plannerContext = new PlannerContext(dataContext);
 
       Program program = Programs.of(RuleSets.ofList(ruleSetManager.getRules()));
-
-      //      Planner planner =
-      //        Frameworks.getPlanner(
-      //          Frameworks.newConfigBuilder(baseConfig)
-      //            .context(plannerContext)
-      //            .programs(program)
-      //            .executor(new RexExecutorImpl(dataContext))
-      //            .build()
-      //        );
 
       return Frameworks.newConfigBuilder(baseConfig)
           .context(plannerContext) // attach query-scoped context
