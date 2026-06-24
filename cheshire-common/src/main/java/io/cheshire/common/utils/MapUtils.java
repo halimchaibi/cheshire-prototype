@@ -89,7 +89,13 @@ public class MapUtils {
       return switch (content) {
         case null -> null;
         case Object o when target.isInstance(o) -> target.cast(o);
-        case String s when target == Integer.class -> (C) Integer.valueOf(s);
+        case String s when target == Integer.class -> {
+          try {
+            yield (C) Integer.valueOf(s);
+          } catch (NumberFormatException e) {
+            yield null;
+          }
+        }
         case String s when target == Boolean.class -> (C) Boolean.valueOf(s);
         case List<?> list when !target.isAssignableFrom(List.class) && !list.isEmpty() ->
             wrap(list.getFirst()).unwrap(target);
