@@ -259,7 +259,7 @@ public final class QueryEngineManager implements Initializable {
           engineMap.put("description", engine.getDescription());
 
           Map<String, Object> resolvedSources =
-              engine.getSources().stream()
+              sourceNames(engine).stream()
                   .filter(sources::containsKey)
                   .collect(
                       Collectors.toMap(
@@ -273,6 +273,24 @@ public final class QueryEngineManager implements Initializable {
         });
 
     return Collections.unmodifiableMap(result);
+  }
+
+  private List<String> sourceNames(CheshireConfig.QueryEngine engine) {
+    if (engine.getSources() != null) {
+      return engine.getSources();
+    }
+
+    Map<String, Object> engineConfig = engine.getConfig();
+    if (engineConfig == null) {
+      return List.of();
+    }
+
+    Object configuredSources = engineConfig.get("sources");
+    if (configuredSources instanceof List<?> list) {
+      return list.stream().filter(String.class::isInstance).map(String.class::cast).toList();
+    }
+
+    return List.of();
   }
 
   /**
