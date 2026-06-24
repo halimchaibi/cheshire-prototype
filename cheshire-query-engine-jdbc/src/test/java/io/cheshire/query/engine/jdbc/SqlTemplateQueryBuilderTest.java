@@ -189,7 +189,7 @@ final class SqlTemplateQueryBuilderTest {
           .isInstanceOf(QueryEngineException.class);
     }
 
-    // TODO: handle missing parameter and raise a meaningfull ecep^tion
+    // TODO: handle missing parameter and raise a meaningful exception
     //    @Test
     //    @DisplayName("should throw exception for missing required parameter")
     //    void shouldThrowExceptionForMissingParameter() {

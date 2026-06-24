@@ -116,7 +116,7 @@ which provides logging, timing, and unified error handling (`QueryExecutionExcep
 - Tests rely on reflection to call private `stage()` – acceptable as they are strictly in the test layer.
 
 ### 8. Links & References
-* Class Diragram `cheshire-prototype/docs/diagrams/src/class/class-calcite-query-engine.puml`
+* Class Diagram `cheshire-prototype/docs/diagrams/src/class/class-calcite-query-engine.puml`
 * `cheshire-query-engine-calcite/src/main/java/io/cheshire/query/engine/calcite/CalciteQueryEngine.java`
 * `cheshire-query-engine-calcite/src/main/java/io/cheshire/query/engine/calcite/FrameworkInitializer.java`
 * `cheshire-query-engine-calcite/src/main/java/io/cheshire/query/engine/calcite/optimizer/QueryOptimizer.java`
