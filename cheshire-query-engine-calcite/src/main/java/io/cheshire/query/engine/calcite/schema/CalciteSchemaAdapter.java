@@ -38,7 +38,7 @@ public class CalciteSchemaAdapter {
                         "Source config for '" + name + "' is missing required 'type' field"));
 
     return switch (EngineType.fromString(type.toLowerCase())) {
-      case JDBC -> jdbcAdapter.createSchema(config, parent);
+      case JDBC -> jdbcAdapter.createSchema(name, config, parent);
       default -> throw new UnsupportedOperationException("Unknown source type: " + type);
     };
   }

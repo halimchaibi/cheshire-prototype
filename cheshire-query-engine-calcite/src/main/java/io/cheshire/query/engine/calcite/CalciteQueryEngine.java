@@ -70,7 +70,7 @@ public class CalciteQueryEngine implements QueryEngine<LogicalQuery> {
         return;
       }
       initialize();
-      this.executor = new QueryExecutor(frameworkConfig);
+      this.executor = new QueryExecutor(frameworkConfig, schemaManager.schemas());
       this.resultTransformer = new ResultTransformer();
       CacheConfig cacheConfig = extractCacheConfig();
       this.planCache = new QueryPlanCache(cacheConfig);
@@ -130,9 +130,10 @@ public class CalciteQueryEngine implements QueryEngine<LogicalQuery> {
 
       RelNode optimizedPlan = stage(ExecutionStage.OPTIMIZE, () -> logicalPlan);
 
-      ResultSet resultSet = stage(ExecutionStage.EXECUTE, () -> executor.execute(optimizedPlan));
-
-      return stage(ExecutionStage.TRANSFORM, () -> resultTransformer.transform(resultSet));
+      try (ResultSet resultSet =
+          stage(ExecutionStage.EXECUTE, () -> executor.execute(optimizedPlan))) {
+        return stage(ExecutionStage.TRANSFORM, () -> resultTransformer.transform(resultSet));
+      }
 
     } catch (QueryExecutionException e) {
       throw e;

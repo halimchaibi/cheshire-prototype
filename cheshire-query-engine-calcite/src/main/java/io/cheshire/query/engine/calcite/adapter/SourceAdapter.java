@@ -35,7 +35,7 @@ public interface SourceAdapter {
     }
   }
 
-  Schema createSchema(Map<String, Object> config, SchemaPlus schema)
+  Schema createSchema(String name, Map<String, Object> config, SchemaPlus schema)
       throws QueryEngineInitializationException;
 
   String supportedType();

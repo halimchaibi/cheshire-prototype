@@ -22,7 +22,7 @@ import org.apache.calcite.schema.SchemaPlus;
 public class JdbcAdapter implements SourceAdapter {
 
   @Override
-  public Schema createSchema(Map<String, Object> config, SchemaPlus schema)
+  public Schema createSchema(String name, Map<String, Object> config, SchemaPlus schema)
       throws QueryEngineInitializationException {
     try {
       @SuppressWarnings("unchecked")
@@ -35,16 +35,15 @@ public class JdbcAdapter implements SourceAdapter {
 
       validate(jdbcConfig);
 
-      return createJdbcSchema(jdbcConfig, schema);
+      return createJdbcSchema(name, jdbcConfig, schema);
 
     } catch (Exception e) {
-      String name = MapUtils.someValueFromMapAs(config, "name", String.class).orElse("unknown");
       throw new QueryEngineInitializationException(
           "Failed to create JDBC schema for source: " + name, e);
     }
   }
 
-  private Schema createJdbcSchema(Map<String, Object> config, SchemaPlus rootSchema)
+  private Schema createJdbcSchema(String name, Map<String, Object> config, SchemaPlus rootSchema)
       throws QueryEngineConfigurationException {
 
     String schemaName =
@@ -52,18 +51,17 @@ public class JdbcAdapter implements SourceAdapter {
             .orElseThrow(
                 () ->
                     new QueryEngineConfigurationException(
-                        "Source config missing required 'type' field"))
-            .toUpperCase();
+                        "Source config missing required 'schema' field"));
 
-    if (rootSchema.getSubSchema(schemaName) != null) {
-      return rootSchema.getSubSchema(schemaName);
+    if (rootSchema.getSubSchema(name) != null) {
+      return rootSchema.getSubSchema(name);
     }
 
-    Map<String, Object> operand = asCalciteOperand(config);
-    return JdbcSchema.create(rootSchema, schemaName, operand);
+    Map<String, Object> operand = asCalciteOperand(config, schemaName);
+    return JdbcSchema.create(rootSchema, name, operand);
   }
 
-  private Map<String, Object> asCalciteOperand(Map<String, Object> config)
+  private Map<String, Object> asCalciteOperand(Map<String, Object> config, String schemaName)
       throws QueryEngineConfigurationException {
 
     Map<String, Object> operand = new HashMap<>();
@@ -97,6 +95,7 @@ public class JdbcAdapter implements SourceAdapter {
 
     operand.put("jdbcUrl", jdbcUrl);
     operand.put("jdbcDriver", jdbcDriver);
+    operand.put("jdbcSchema", schemaName);
 
     if (username != null) {
       operand.put("jdbcUser", username);
