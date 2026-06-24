@@ -43,9 +43,6 @@ public final class QueryRuntimeContext {
     if (ctx != null) {
       builder.userId = ctx.userId();
       builder.traceId = ctx.traceId();
-      // TODO: review QueryEngineContext and what needs to be added to it
-      //      builder.timeZone = ctx.timeZone() != null ? ctx.timeZone() : TimeZone.getDefault();
-      //      builder.locale = ctx.locale() != null ? ctx.locale() : Locale.getDefault();
     }
     return builder;
   }

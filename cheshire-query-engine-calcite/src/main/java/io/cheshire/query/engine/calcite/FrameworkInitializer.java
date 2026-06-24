@@ -190,27 +190,14 @@ public class FrameworkInitializer {
   }
 
   private static SqlOperatorTable buildOperatorTable() {
-    return SqlOperatorTables.chain(
-        SqlStdOperatorTable.instance()
-        // TODO: Add operators here, merge ANSI + adapter functions
-        );
+    return SqlOperatorTables.chain(SqlStdOperatorTable.instance());
   }
 
   private static List<Program> buildPrograms() {
-    // TODO; Using the standard programs
-    return List.of(
-        Programs.standard() // VolcanoPlanner, cost-based
-        );
+    return List.of(Programs.standard());
   }
 
-  // TODO; This had be redefined in Query Optimizer, requires to set boundaries
   private static List<RelTraitDef> buildTraitDefs() {
-    return List.of(
-        ConventionTraitDef.INSTANCE, RelCollationTraitDef.INSTANCE
-        // Optional:
-        // TODO: Kept as reference for advanced use cases(engine         // that support
-        // distribution)
-        // RelDistributionTraitDef.INSTANCE
-        );
+    return List.of(ConventionTraitDef.INSTANCE, RelCollationTraitDef.INSTANCE);
   }
 }

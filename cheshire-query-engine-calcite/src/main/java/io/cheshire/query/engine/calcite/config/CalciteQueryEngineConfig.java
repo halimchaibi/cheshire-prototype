@@ -11,6 +11,9 @@
 package io.cheshire.query.engine.calcite.config;
 
 import io.cheshire.spi.query.engine.QueryEngineConfig;
+import io.cheshire.spi.query.exception.QueryEngineConfigurationException;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public record CalciteQueryEngineConfig(
@@ -19,13 +22,22 @@ public record CalciteQueryEngineConfig(
 
   @Override
   public Map<String, Object> asMap() {
-    // TODO: As of now rebuild the original map ...
-    return Map.of("name", name, "sources", sources, "config", config);
+    Map<String, Object> values = new LinkedHashMap<>();
+    values.put("name", name);
+    values.put("sources", sources == null ? Map.of() : Map.copyOf(sources));
+    values.put("config", config == null ? Map.of() : Map.copyOf(config));
+    return Collections.unmodifiableMap(values);
   }
 
   @Override
-  public boolean validate() {
-    // TODO: Validation logic placeholder
-    return name != null && !name.isBlank();
+  public boolean validate() throws QueryEngineConfigurationException {
+    if (name == null || name.isBlank()) {
+      throw new QueryEngineConfigurationException("Calcite query engine name is required", this);
+    }
+    if (sources == null || sources.isEmpty()) {
+      throw new QueryEngineConfigurationException(
+          "Calcite query engine requires at least one source", this);
+    }
+    return true;
   }
 }

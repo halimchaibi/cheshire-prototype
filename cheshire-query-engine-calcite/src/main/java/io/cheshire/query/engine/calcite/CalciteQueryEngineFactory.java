@@ -12,6 +12,8 @@ package io.cheshire.query.engine.calcite;
 
 import io.cheshire.query.engine.calcite.config.CalciteQueryEngineConfig;
 import io.cheshire.spi.query.engine.QueryEngineFactory;
+import io.cheshire.spi.query.exception.QueryEngineConfigurationException;
+import io.cheshire.spi.query.exception.QueryEngineException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -33,8 +35,11 @@ public class CalciteQueryEngineFactory implements QueryEngineFactory<CalciteQuer
   }
 
   @Override
-  public void validate(CalciteQueryEngineConfig config) {
-    // TODO: implement validation logic
+  public void validate(CalciteQueryEngineConfig config) throws QueryEngineException {
     log.debug("Validating query engine config");
+    if (config == null) {
+      throw new QueryEngineConfigurationException("Calcite query engine config is required");
+    }
+    config.validate();
   }
 }

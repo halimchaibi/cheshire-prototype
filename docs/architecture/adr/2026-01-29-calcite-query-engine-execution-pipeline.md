@@ -3,14 +3,14 @@
 * **Status:** Accepted  
 * **Deciders:** Halim Chaibi (Author/Architect)  
 * **Date:** 2026-01-29
-* **Last Updated:** 2026-01-29 (Implementation in progress)
+* **Last Updated:** 2026-06-24
 * **Technical Story:** Calcite-based query engine refactor & unit test pipeline
 
 ### 1. Context and Problem Statement
 
 The original Calcite-based query engine prototype in `cheshire-query-engine-calcite` had:
 
-- Incomplete or placeholder components (`FrameworkInitializer`, `QueryExecutor`, `Converter`, `QueryOptimizer`)
+- Incomplete planning and execution boundaries in the original prototype
 - No clear separation between **session-level** and **query-level** responsibilities
 - A monolithic `execute()` method without isolated tests for each stage (parse, validate, convert, optimize, execute, transform)
 - Tight coupling to configuration maps with hardcoded string keys
@@ -20,7 +20,7 @@ This made the engine hard to reason about, difficult to test incrementally, and 
 The goal is to:
 
 - Define a **staged execution pipeline** for the Calcite engine
-- Provide **fine-grained unit tests** that validate each stage independently
+- Provide **fine-grained tests** that validate stage behavior and public engine contracts
 - Establish a baseline architecture for future rule selection and adapter expansion
 
 ### 2. Decision Drivers
@@ -32,7 +32,8 @@ The goal is to:
 
 ### 3. Considered Options
 
-**Staged execution pipeline** with explicit components (`QueryParser`, `QueryValidator`, `Converter`, `QueryOptimizer`, `QueryExecutor`, `ResultTransformer`) orchestrated via a `stage(ExecutionStage, CheckedSupplier)` helper.
+**Staged execution pipeline** with explicit planning, execution, and result-transformation
+boundaries orchestrated via a `stage(ExecutionStage, CheckedSupplier)` helper.
 
 ### 4. Decision Outcome
 
@@ -40,7 +41,7 @@ The goal is to:
 
 **Justification:**
 
-- Allows each stage to be tested and refactored independently (Phase 1–3 tests).
+- Allows each stage to be tested and refactored independently.
 - Makes it straightforward to insert instrumentation, metrics, or alternative implementations for specific stages (e.g., different optimizers).
 - Aligns with Calcite’s conceptual pipeline (SQL → SqlNode → RelNode → optimized RelNode → results).
 
@@ -53,9 +54,9 @@ The goal is to:
 `CalciteQueryEngine` now orchestrates the following stages:
 
 1. **PARSE**: `planner.parse(sql)`  
-2. **VALIDATE**: `planner.validate(parsed)` (eventually via `QueryValidator`)  
+2. **VALIDATE**: `planner.validate(parsed)`
 3. **CONVERT**: `planner.rel(validated).rel` → `RelNode`
-4. **OPTIMIZE**: query-scoped rule program boundary for the `logicalPlan`
+4. **OPTIMIZE**: query-scoped rule program boundary for the `RelNode`
 5. **EXECUTE**: `QueryExecutor.execute(optimizedPlan)` → `ResultSet`  
 6. **TRANSFORM**: `ResultTransformer.transform(resultSet)` → `QueryEngineResult`
 
@@ -72,12 +73,12 @@ which provides logging, timing, and unified error handling (`QueryExecutionExcep
 - **Session-level:**
   - `SchemaManager`: registers sources and builds Calcite schemas.
   - `FrameworkInitializer`: builds `FrameworkConfig` (parser config, operator table, programs, trait defs, executor, default schema).
-  - `CalciteQueryEngine.open()`: initializes parser, validator, converter, optimizer, executor, result transformer, and plan cache.
+  - `CalciteQueryEngine.open()`: initializes the schema manager, base framework config, executor,
+    result transformer, and plan cache.
 
 - **Query-level:**
-  - `OptimizationContext`: captures query type, involved schemas, characteristics, and hints.
-  - `QueryCharacteristics`: describes structural aspects (joins, aggregates, table count, etc.).
-  - `QueryOptimizer`: selects rules via `RuleSelector` and applies them (HepPlanner / Volcano).
+  - `RuleSetBuilder`: selects Calcite rules from configured source capabilities.
+  - `CalcitePlanner`: parses, validates, and converts SQL using a query-scoped framework config.
 
 ### 6. Pros and Cons
 
@@ -86,16 +87,20 @@ which provides logging, timing, and unified error handling (`QueryExecutionExcep
 **Pros:**
 
 - High testability: each stage is covered by targeted JUnit tests:
-  - Phase 1: Instantiation (engine, factory, config adapter)
-  - Phase 2: `open()` initializes `SchemaManager` and `FrameworkConfig`
-  - Phase 3: PARSE, VALIDATE, CONVERT, OPTIMIZE, EXECUTE, TRANSFORM stages
+- Public contract coverage for `validate(...)`, `explain(...)`, streaming capability, and factory
+  config validation.
+- H2-backed query execution coverage for constants, filters, joins, aggregation, ordering, and
+  nested query shapes.
+- Focused unit coverage for query plan cache behavior.
 - Clear separation of concerns: easier to trace and debug failures.
-- Supports future enhancements (custom rule selectors, multiple executors, streaming).
+- Supports future enhancements such as adapter-specific rule selectors, multiple executors, and
+  streaming.
 
 **Cons:**
 
 - More classes and wiring to understand (slightly higher initial complexity).
-- Uses reflection in tests to exercise internal `stage()` method (test-only complexity).
+- Maintains a small amount of internal stage-test complexity while public contract tests cover the
+  externally visible behavior.
 
 ---
 
@@ -113,7 +118,8 @@ which provides logging, timing, and unified error handling (`QueryExecutionExcep
 
 **Neutral:**
 
-- Tests rely on reflection to call private `stage()` – acceptable as they are strictly in the test layer.
+- The MVP intentionally reports `supportsStreaming() == false` because the current executor
+  materializes rows through `ResultTransformer`.
 
 ### 8. Links & References
 * Class Diagram `cheshire-prototype/docs/diagrams/src/class/class-calcite-query-engine.puml`
@@ -124,6 +130,8 @@ which provides logging, timing, and unified error handling (`QueryExecutionExcep
 * `cheshire-query-engine-calcite/src/main/java/io/cheshire/query/engine/calcite/executor/QueryExecutor.java`
 * `cheshire-query-engine-calcite/src/main/java/io/cheshire/query/engine/calcite/transformer/ResultTransformer.java`
 * `cheshire-query-engine-calcite/src/test/java/io/cheshire/query/engine/calcite/CalciteQueryEngineTest.java`
+* `cheshire-query-engine-calcite/src/test/java/io/cheshire/query/engine/calcite/CalciteQueryEngineContractTest.java`
+* `cheshire-query-engine-calcite/src/test/java/io/cheshire/query/engine/calcite/query/QueryPlanCacheTest.java`
 
 ---
 
@@ -132,6 +140,4 @@ which provides logging, timing, and unified error handling (`QueryExecutionExcep
 | Date | Version | Status | Description | Author |
 | :--- | :--- | :--- | :--- | :--- |
 | 2026-01-29 | v1.0 | **Accepted** | Initial design of the 6-stage execution pipeline. | Halim Chaibi |
-| 2026-01-29 | v1.1 | **In Progress** | Implementation in progress; added internal `stage()` helper logic. | Halim Chaibi |
-
-> **Note:** This ADR is currently being refined in parallel with the implementation of the `cheshire-query-engine-calcite` module.
+| 2026-06-24 | v1.1 | **Accepted** | Updated for MVP behavior: validation, explain, materialized execution, and public contract tests. | Halim Chaibi |

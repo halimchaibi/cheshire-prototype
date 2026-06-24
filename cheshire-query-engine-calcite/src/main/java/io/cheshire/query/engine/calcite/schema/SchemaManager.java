@@ -27,8 +27,6 @@ public class SchemaManager {
   private final CalciteSchemaAdapter schemaAdapter;
   private SchemaPlus rootSchema;
   private final Map<String, Object> sources = new HashMap<>();
-
-  // TODO: This is seems redundant. Review to see if rootSchema can be used instead
   private final Map<String, Schema> schemaLookup = new HashMap<>();
 
   public SchemaManager() {

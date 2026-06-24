@@ -34,24 +34,13 @@ import org.apache.calcite.schema.SchemaPlus;
 import org.apache.calcite.tools.FrameworkConfig;
 import org.apache.calcite.tools.RelRunner;
 
-// TODO (EXECUTION): QueryExecutor currently relies on Calcite's local JVM
-// enumerable execution path.
-//
-// Limitations:
-//  - QueryRuntimeContext (timezone, locale, cancel flag) is not propagated
-//  - No execution strategy selection (local vs pushdown vs federated)
-//  - No timeout, cancellation, or observability hooks
-//
-// Target design:
-//  - Make execution context-aware (DataContext binding)
-//  - Allow multiple execution strategies
-//  - Delegate execution to adapters when full pushdown is possible
-
 /**
  * Executes optimized RelNode plans using Calcite's local enumerable path.
  *
  * <p>This executor prepares the optimized relational plan against a Calcite execution connection
- * with the configured source schemas registered under their source names.
+ * with the configured source schemas registered under their source names. The current MVP
+ * materializes query results locally; streaming and distributed execution strategies are
+ * intentionally outside this executor.
  */
 @Slf4j
 public class QueryExecutor {

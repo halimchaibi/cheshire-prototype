@@ -15,27 +15,6 @@ import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.calcite.rel.rules.CoreRules;
 
-// TODO: Estimated rules. Requires testing, review, and fine tuning.
-// TODO (ARCH): Resolve responsibility split between OptimizationContext and RuleSetBuilder.
-// Currently:
-//  - OptimizationContext describes query intent (query type, characteristics, federation, hints)
-//  - RuleSetBuilder decides which Calcite rules are enabled
-// Problem:
-//  - Some optimization decisions are duplicated or implied in both places
-//  - RuleSetBuilder partially re-derives information already present in OptimizationContext
-//
-// Target design:
-//  - OptimizationContext is a pure, read-only description of query intent and environment
-//  - RuleSetBuilder is the single authority that translates intent + source capabilities
-//    into a concrete RuleSet
-//  - All rule-selection logic must live in RuleSetBuilder
-//  - No Calcite/CoreRules knowledge should leak into OptimizationContext
-//
-// Follow-up work:
-//  - Add withOptimizationContext(OptimizationContext) to RuleSetBuilder
-//  - Remove duplicated intent inference from RuleSetBuilder
-//  - Gate rule activation by (capability AND intent), not capability alone
-
 /**
  * Builder for creating query-scoped rule sets based on source capabilities.
  *
@@ -43,15 +22,14 @@ import org.apache.calcite.rel.rules.CoreRules;
  * matches their pushdown capabilities. This allows for optimal query optimization per query rather
  * than using a one-size-fits-all approach.
  *
- * <p>The builder uses SchemaManager to get source configurations, which already contain the type
- * information needed to determine capabilities.
+ * <p>The current MVP selects rules from SchemaManager source configuration. Query characteristics
+ * can be layered into this decision later without changing the engine orchestration.
  */
 @Slf4j
 public class RuleSetBuilder {
   private final List<String> sourceNames;
   private SchemaManager schemaManager;
   private final RuleSetManager.Builder ruleSetBuilder;
-  OptimizationContext optimizationContext;
 
   private RuleSetBuilder(List<String> sourceNames) {
     this.sourceNames = Objects.requireNonNull(sourceNames, "Source names cannot be null");
@@ -76,11 +54,6 @@ public class RuleSetBuilder {
    */
   public RuleSetBuilder withSchemaManager(SchemaManager schemaManager) {
     this.schemaManager = schemaManager;
-    return this;
-  }
-
-  public RuleSetBuilder withOptimizationContext(OptimizationContext optimizationContext) {
-    this.optimizationContext = optimizationContext;
     return this;
   }
 
@@ -149,11 +122,6 @@ public class RuleSetBuilder {
     boolean supportsJoinPushdown = false;
     boolean supportsAggregationPushdown = false;
 
-    // Get source configurations from SchemaManager
-    // SchemaManager stores sources as Map<String, Object> where Object is the source config
-    // We need to access the internal sources map - for now we'll use reflection or add a getter
-
-    // Check capabilities of all sources
     for (String sourceName : sourceNames) {
       String sourceType = inferSourceTypeFromSchemaManager(sourceName);
 

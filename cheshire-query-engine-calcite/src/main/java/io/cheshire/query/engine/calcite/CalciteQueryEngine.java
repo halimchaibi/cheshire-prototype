@@ -15,14 +15,10 @@ import io.cheshire.common.utils.ObjectUtils;
 import io.cheshire.query.engine.calcite.config.CacheConfig;
 import io.cheshire.query.engine.calcite.config.CalciteQueryEngineConfig;
 import io.cheshire.query.engine.calcite.executor.QueryExecutor;
-import io.cheshire.query.engine.calcite.optimizer.OptimizationContext;
 import io.cheshire.query.engine.calcite.optimizer.QueryRuntimeContext;
 import io.cheshire.query.engine.calcite.optimizer.RuleSetBuilder;
 import io.cheshire.query.engine.calcite.optimizer.RuleSetManager;
-import io.cheshire.query.engine.calcite.parser.QueryCharacteristicsVisitor;
-import io.cheshire.query.engine.calcite.query.QueryCharacteristics;
 import io.cheshire.query.engine.calcite.query.QueryPlanCache;
-import io.cheshire.query.engine.calcite.query.QueryType;
 import io.cheshire.query.engine.calcite.schema.SchemaManager;
 import io.cheshire.query.engine.calcite.transformer.ResultTransformer;
 import io.cheshire.spi.query.engine.QueryEngine;
@@ -36,6 +32,7 @@ import io.cheshire.spi.source.SourceProvider;
 import java.sql.ResultSet;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.calcite.plan.RelOptUtil;
 import org.apache.calcite.rel.RelNode;
 import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.tools.FrameworkConfig;
@@ -51,10 +48,6 @@ public class CalciteQueryEngine implements QueryEngine<LogicalQuery> {
   private ResultTransformer resultTransformer;
   private QueryPlanCache planCache;
   private FrameworkConfig frameworkConfig;
-
-  // TODO: This should be enough to start with, advanced use cases might require a custom
-  // RelDataTypeSystem
-  // private SqlTypeFactoryImpl typeFactory = new SqlTypeFactoryImpl(RelDataTypeSystem.DEFAULT);
 
   private boolean opened = false;
 
@@ -95,9 +88,8 @@ public class CalciteQueryEngine implements QueryEngine<LogicalQuery> {
         FrameworkInitializer.builder().withSchemaManager(schemaManager).buildBaseConfig();
   }
 
-  /** Extracts cache configuration from engine config, using defaults if not specified. */
+  /** Extracts cache configuration from engine config, using defaults for the current MVP. */
   private CacheConfig extractCacheConfig() {
-    // TODO: Extract from calciteConfig once cache config is added
     return CacheConfig.defaults();
   }
 
@@ -109,26 +101,10 @@ public class CalciteQueryEngine implements QueryEngine<LogicalQuery> {
     QueryRuntimeContext runtimeContext =
         QueryRuntimeContext.fromQuery(logicalQuery, context).build();
 
-    String sql = ObjectUtils.requireObjectAs(logicalQuery.query(), String.class);
-    QueryCharacteristics characteristics = analyzeCharacteristics(sql);
-    RuleSetManager ruleSet = buildQueryRuleSet(logicalQuery, characteristics, context);
-
-    // Build query scoped config
-    FrameworkConfig queryConfig =
-        FrameworkInitializer.builder()
-            .withSchemaManager(schemaManager)
-            .buildQueryConfig(this.frameworkConfig, runtimeContext, ruleSet);
-    Planner planner = new CalcitePlanner(queryConfig);
-
     try {
+      PlannedQuery plannedQuery = plan(logicalQuery, runtimeContext, context);
 
-      SqlNode parsed = stage(ExecutionStage.PARSE, () -> planner.parse(sql));
-
-      SqlNode validated = stage(ExecutionStage.VALIDATE, () -> planner.validate(parsed));
-
-      RelNode logicalPlan = stage(ExecutionStage.CONVERT, () -> planner.rel(validated).rel);
-
-      RelNode optimizedPlan = stage(ExecutionStage.OPTIMIZE, () -> logicalPlan);
+      RelNode optimizedPlan = stage(ExecutionStage.OPTIMIZE, plannedQuery::relNode);
 
       try (ResultSet resultSet =
           stage(ExecutionStage.EXECUTE, () -> executor.execute(optimizedPlan))) {
@@ -142,43 +118,11 @@ public class CalciteQueryEngine implements QueryEngine<LogicalQuery> {
     }
   }
 
-  private QueryCharacteristics analyzeCharacteristics(String sql) {
-    try {
-      SqlNode parsed =
-          org.apache.calcite.sql.parser.SqlParser.create(sql, frameworkConfig.getParserConfig())
-              .parseStmt();
-      QueryCharacteristicsVisitor visitor = new QueryCharacteristicsVisitor();
-      parsed.accept(visitor);
-      return visitor.buildCharacteristics();
-    } catch (Exception e) {
-      log.debug("Could not analyze SQL characteristics, using defaults", e);
-      return new QueryCharacteristics();
-    }
-  }
-
-  /**
-   * Builds a query-scoped rule set based on the sources involved in the query. Uses SchemaManager
-   * which already has all source configurations registered.
-   *
-   * @param context the query execution context
-   * @return a CustomRuleSet optimized for the query's sources
-   */
-  private RuleSetManager buildQueryRuleSet(
-      LogicalQuery logicalQuery, QueryCharacteristics characteristics, QueryEngineContext context) {
-
-    OptimizationContext optimizationContext =
-        OptimizationContext.builder()
-            .withQueryType(QueryType.OLTP)
-            .withSchemas(schemaManager.schemas())
-            .withCharacteristics(characteristics)
-            .build();
-
+  /** Builds a query-scoped rule set based on the sources involved in the query. */
+  private RuleSetManager buildQueryRuleSet(QueryEngineContext context) {
     List<String> sourceNames = extractSourceNames(context);
 
-    return RuleSetBuilder.forSources(sourceNames)
-        .withSchemaManager(schemaManager)
-        .withOptimizationContext(optimizationContext)
-        .build();
+    return RuleSetBuilder.forSources(sourceNames).withSchemaManager(schemaManager).build();
   }
 
   /**
@@ -212,17 +156,30 @@ public class CalciteQueryEngine implements QueryEngine<LogicalQuery> {
 
   @Override
   public boolean validate(LogicalQuery query) throws QueryEngineException {
-    // TODO: Validate LogicalQuery
-    return true;
+    ensureOpen();
+    try {
+      String sql = ObjectUtils.requireObjectAs(query.query(), String.class);
+      Planner planner = new CalcitePlanner(frameworkConfig);
+      try {
+        SqlNode parsed = planner.parse(sql);
+        planner.validate(parsed);
+      } finally {
+        planner.close();
+      }
+      return true;
+    } catch (Exception e) {
+      log.debug("Query validation failed: {}", conciseMessage(e));
+      return false;
+    }
   }
 
   @Override
   public String explain(LogicalQuery query) throws QueryEngineException {
-
     try {
       ensureOpen();
-      // TODO: Implement a clean explain
-      throw new UnsupportedOperationException("Explain not supported yet");
+      QueryRuntimeContext runtimeContext =
+          QueryRuntimeContext.fromQuery(query, QueryEngineContext.empty()).build();
+      return RelOptUtil.toString(plan(query, runtimeContext, QueryEngineContext.empty()).relNode());
     } catch (Exception e) {
       throw new QueryExecutionException("Explain failed", e);
     }
@@ -230,7 +187,7 @@ public class CalciteQueryEngine implements QueryEngine<LogicalQuery> {
 
   @Override
   public boolean supportsStreaming() {
-    return true;
+    return false;
   }
 
   @Override
@@ -288,4 +245,38 @@ public class CalciteQueryEngine implements QueryEngine<LogicalQuery> {
       }
     };
   }
+
+  private String conciseMessage(Throwable e) {
+    String message = e.getMessage();
+    if (message == null || message.isBlank()) {
+      return e.getClass().getSimpleName();
+    }
+    return message.lines().findFirst().orElse(message);
+  }
+
+  private PlannedQuery plan(
+      LogicalQuery logicalQuery, QueryRuntimeContext runtimeContext, QueryEngineContext context)
+      throws Exception {
+    String sql = ObjectUtils.requireObjectAs(logicalQuery.query(), String.class);
+    QueryEngineContext executionContext = context != null ? context : QueryEngineContext.empty();
+    RuleSetManager ruleSet = buildQueryRuleSet(executionContext);
+
+    FrameworkConfig queryConfig =
+        FrameworkInitializer.builder()
+            .withSchemaManager(schemaManager)
+            .buildQueryConfig(this.frameworkConfig, runtimeContext, ruleSet);
+    Planner planner = new CalcitePlanner(queryConfig);
+
+    try {
+      SqlNode parsed = stage(ExecutionStage.PARSE, () -> planner.parse(sql));
+      SqlNode validated = stage(ExecutionStage.VALIDATE, () -> planner.validate(parsed));
+      RelNode relNode = stage(ExecutionStage.CONVERT, () -> planner.rel(validated).rel);
+
+      return new PlannedQuery(relNode);
+    } finally {
+      planner.close();
+    }
+  }
+
+  private record PlannedQuery(RelNode relNode) {}
 }

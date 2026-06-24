@@ -14,12 +14,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import io.cheshire.common.utils.LambdaUtils;
 import io.cheshire.query.engine.calcite.config.CalciteQueryEngineConfig;
-import io.cheshire.query.engine.calcite.optimizer.OptimizationContext;
 import io.cheshire.query.engine.calcite.optimizer.QueryRuntimeContext;
 import io.cheshire.query.engine.calcite.optimizer.RuleSetBuilder;
 import io.cheshire.query.engine.calcite.optimizer.RuleSetManager;
-import io.cheshire.query.engine.calcite.query.QueryCharacteristics;
-import io.cheshire.query.engine.calcite.query.QueryType;
 import io.cheshire.query.engine.calcite.query.SqlQuery;
 import io.cheshire.query.engine.calcite.schema.SchemaManager;
 import io.cheshire.spi.query.exception.QueryEngineException;
@@ -426,7 +423,6 @@ class CalciteQueryEngineTest {
     log.info("  - Type: {}", logicalPlan.getClass().getName());
     log.info("  - RelNode: {}", logicalPlan);
     log.info("  - toString: {}", logicalPlan.toString());
-    log.info("  - Description: {}", logicalPlan.getDescription());
     if (logicalPlan.getRowType() != null) {
       log.info("  - RowType: {}", logicalPlan.getRowType());
     }
@@ -498,7 +494,6 @@ class CalciteQueryEngineTest {
     log.info("  - Type: {}", optimizedPlan.getClass().getName());
     log.info("  - RelNode: {}", optimizedPlan);
     log.info("  - toString: {}", optimizedPlan.toString());
-    log.info("  - Description: {}", optimizedPlan.getDescription());
     if (optimizedPlan.getRowType() != null) {
       log.info("  - RowType: {}", optimizedPlan.getRowType());
     }
@@ -587,7 +582,6 @@ class CalciteQueryEngineTest {
       }
       if (resultSet.next()) {
         log.info("  - First row retrieved successfully");
-        resultSet.beforeFirst(); // Reset for potential reuse
       }
     } catch (Exception e) {
       log.debug("Could not extract ResultSet metadata", e);
@@ -781,19 +775,6 @@ class CalciteQueryEngineTest {
     QueryRuntimeContext runtimeContext =
         QueryRuntimeContext.fromQuery(logicalQuery, queryContext).build();
 
-    // Build OptimizationContext (simplified for tests)
-    OptimizationContext optimizationContext =
-        OptimizationContext.builder()
-            .withQueryType(QueryType.OLTP)
-            .withSchemas(schemaManager.schemas())
-            .withCharacteristics(
-                QueryCharacteristics.builder()
-                    .withJoins(false)
-                    .withAggregations(false)
-                    .withTableCount(1)
-                    .build())
-            .build();
-
     // Extract source names (similar to CalciteQueryEngine.extractSourceNames())
     List<String> sourceNames = new java.util.ArrayList<>();
     if (queryContext != null && queryContext.sources() != null) {
@@ -814,10 +795,7 @@ class CalciteQueryEngineTest {
 
     // Build RuleSetManager
     RuleSetManager ruleSet =
-        RuleSetBuilder.forSources(sourceNames)
-            .withSchemaManager(schemaManager)
-            .withOptimizationContext(optimizationContext)
-            .build();
+        RuleSetBuilder.forSources(sourceNames).withSchemaManager(schemaManager).build();
 
     // Build query-scoped FrameworkConfig
     FrameworkConfig queryConfig =
