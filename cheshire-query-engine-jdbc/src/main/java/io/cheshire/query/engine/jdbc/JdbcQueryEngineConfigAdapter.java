@@ -10,26 +10,36 @@
 
 package io.cheshire.query.engine.jdbc;
 
+import io.cheshire.common.utils.MapUtils;
 import io.cheshire.spi.query.engine.QueryEngineConfigAdapter;
 import io.cheshire.spi.query.exception.QueryEngineConfigurationException;
 import io.cheshire.spi.query.exception.QueryEngineException;
-import java.util.List;
 import java.util.Map;
 
 public final class JdbcQueryEngineConfigAdapter
     implements QueryEngineConfigAdapter<JdbcQueryEngineConfig> {
 
   @Override
-  public JdbcQueryEngineConfig adapt(Map<String, Object> config) throws QueryEngineException {
+  public JdbcQueryEngineConfig adapt(Map<String, Object> engineConfig) throws QueryEngineException {
 
     // TODO: validate config cleanly here.
-    if (config == null || config.isEmpty()) {
-      throw new QueryEngineConfigurationException("Engine name cannot be null or blank");
-    }
+    String name =
+        MapUtils.someValueFromMapAs(engineConfig, "name", String.class)
+            .orElseThrow(
+                () -> new QueryEngineConfigurationException("Source name cannot be null or blank"));
 
-    // TODO: Make it type safe
-    List<String> sources = (List<String>) config.getOrDefault("sources", List.of());
+    @SuppressWarnings("unchecked")
+    Map<String, Object> sources =
+        MapUtils.someValueFromMapAs(engineConfig, "sources", Map.class)
+            .orElseThrow(
+                () -> new QueryEngineConfigurationException("Sources cannot be null or blank"));
 
-    return new JdbcQueryEngineConfig("jdbc", sources);
+    @SuppressWarnings("unchecked")
+    Map<String, Object> config =
+        MapUtils.someValueFromMapAs(engineConfig, "config", Map.class)
+            .orElseThrow(
+                () -> new QueryEngineConfigurationException("Sources cannot be null or blank"));
+
+    return new JdbcQueryEngineConfig(name, sources, config);
   }
 }

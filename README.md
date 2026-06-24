@@ -20,7 +20,7 @@ This framework is currently in **prototype stage**. While it compiles and demons
 
 Cheshire is a framework that enables developers to expose various resources—databases, APIs, and services—as unified **capabilities** accessible through multiple protocols including REST, MCP (Model Context Protocol), and more.
 
-The framework features a powerful **three-stage pipeline architecture**, **DSL-based query templates**, and **federated query processing** capabilities, making it ideal for building modern data-driven applications and LLM-powered agents.
+The framework features a powerful **three-stage pipeline architecture**, **DSL-based query templates**, and **federated query processing** capabilities, making it ideal for building modern data-driven applications and MCP clients.
 
 > *"We're all mad here."* — The Cheshire Cat
 
@@ -161,7 +161,7 @@ Run with different protocols:
 # REST API on http://localhost:9000/api/v1/blog
 java -jar blog-app.jar --config blog-rest.yaml
 
-# MCP via stdio (for LLM agents and Claude Desktop)
+# MCP via stdio (for MCP clients and Claude Desktop)
 java -jar blog-app.jar --config blog-mcp-stdio.yaml \
   --log-file /tmp/blog-mcp-stdio.log \
   --redirect-stderr
@@ -309,9 +309,9 @@ See [SQL_TEMPLATE_DSL_REFERENCE.md](docs/guides/user/SQL_TEMPLATE_DSL_REFERENCE.
 
 ## 🎯 Use Cases
 
-### 1. LLM Agent Data Access
+### 1. MCP Data Access
 
-Expose databases to LLM agents via MCP protocol:
+Expose databases to MCP clients via MCP protocol:
 
 ```yaml
 # config/blog-mcp-stdio.yaml
@@ -328,7 +328,7 @@ capabilities:
     pipelines-definition-file: blog-pipelines.yaml
 ```
 
-**Exposed Actions** (automatically discovered by LLM agents):
+**Exposed Actions** (automatically discovered by MCP clients):
 
 - `create_author`, `update_author`, `delete_author`, `get_author`, `list_authors`
 - `create_article`, `update_article`, `delete_article`, `get_article`, `list_articles`
@@ -486,7 +486,7 @@ The blog application is a complete reference implementation demonstrating all Ch
 - ✅ DSL-based query templates
 - ✅ PostgreSQL with Docker or H2 in-memory database
 - ✅ Complete testing guide with curl examples
-- ✅ Claude Desktop integration for AI agents
+- ✅ Claude Desktop integration for MCP clients
 - ✅ OpenAPI and Postman collections
 
 ### Quick Start
@@ -682,4 +682,3 @@ See the [LICENSE](LICENSE) file for the full license text.
 **Created by [Halim Chaibi](https://github.com/halimchaibi)**
 
 </div>
-

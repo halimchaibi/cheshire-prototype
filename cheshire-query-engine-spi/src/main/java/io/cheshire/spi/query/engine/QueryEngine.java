@@ -15,69 +15,8 @@ import io.cheshire.spi.query.request.LogicalQuery;
 import io.cheshire.spi.query.request.QueryEngineContext;
 import io.cheshire.spi.query.result.QueryEngineResult;
 
-/**
- * Service Provider Interface (SPI) for pluggable query execution engines.
- *
- * <p>A {@code QueryEngine} processes logical queries against one or more data sources provided in
- * the {@link QueryEngineContext}. Implementations can range from simple pass-through engines to
- * sophisticated query planners with optimization and federation capabilities.
- *
- * <h2>Engine Capabilities</h2>
- *
- * <ul>
- *   <li><b>Direct Execution</b>: Pass-through to single source (e.g., JDBC engine)
- *   <li><b>Query Planning</b>: Cost-based optimization (e.g., Calcite engine)
- *   <li><b>Federation</b>: Join data from multiple heterogeneous sources
- *   <li><b>Streaming</b>: Process large result sets incrementally
- * </ul>
- *
- * <h2>Lifecycle</h2>
- *
- * <ol>
- *   <li><b>Creation</b>: Instantiated via {@link QueryEngineFactory}
- *   <li><b>Opening</b>: Initialized via {@link #open()}
- *   <li><b>Execution</b>: Queries executed via {@link #execute(LogicalQuery, QueryEngineContext)}
- *   <li><b>Closing</b>: Resources released via {@link #close()}
- * </ol>
- *
- * <h2>Example Usage</h2>
- *
- * <pre>{@code
- * // Create context with source providers
- * QueryEngineContext context = new QueryEngineContext(
- *     sessionId, userId, traceId,
- *     securityContext,
- *     List.of(jdbcSourceProvider, restSourceProvider),
- *     new ConcurrentHashMap<>(),
- *     Instant.now(),
- *     Instant.now().plusSeconds(30)
- * );
- *
- * // Execute query
- * try (QueryEngine<SqlQuery> engine = factory.create(config)) {
- *     engine.open();
- *
- *     SqlQuery query = new SqlQuery("SELECT * FROM users WHERE age > :minAge");
- *     QueryEngineResult result = engine.execute(query, context);
- *
- *     System.out.println("Columns: " + result.columns());
- *     result.rows().forEach(row -> System.out.println(row));
- * }
- * }</pre>
- *
- * @param <Q> the logical query type extending {@link LogicalQuery}
- * @see QueryEngineFactory
- * @see QueryEngineContext
- * @see QueryEngineResult
- * @since 1.0
- */
 public interface QueryEngine<Q extends LogicalQuery> extends AutoCloseable {
 
-  /**
-   * Returns the unique name or identifier of this query engine.
-   *
-   * @return the engine name, never {@code null}
-   */
   String name();
 
   /**

@@ -44,7 +44,7 @@
     <commons-lang3.version>3.20.0</commons-lang3.version>
 
     <!-- Skip Spotless formatting in BOM -->
-    <skip.spotless>true</skip.spotless>
+    <spotless.skip>true</spotless.skip>
   </properties>
 
   <dependencyManagement>

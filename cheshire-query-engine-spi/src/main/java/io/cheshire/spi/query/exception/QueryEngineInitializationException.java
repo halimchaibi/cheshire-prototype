@@ -11,6 +11,7 @@
 package io.cheshire.spi.query.exception;
 
 public final class QueryEngineInitializationException extends QueryEngineException {
+
   public QueryEngineInitializationException(String message) {
     super(message);
   }

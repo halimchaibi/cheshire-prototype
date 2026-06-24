@@ -10,44 +10,36 @@
 
 package io.cheshire.query.engine.calcite;
 
-import io.cheshire.core.config.CheshireConfig;
-import io.cheshire.spi.query.engine.QueryEngineConfigAdapter;
+import io.cheshire.query.engine.calcite.config.CalciteQueryEngineConfig;
 import io.cheshire.spi.query.engine.QueryEngineFactory;
+import io.cheshire.spi.query.exception.QueryEngineConfigurationException;
 import io.cheshire.spi.query.exception.QueryEngineException;
+import lombok.extern.slf4j.Slf4j;
 
-public class CalciteQueryEngineFactory
-        implements QueryEngineFactory<CalciteQueryEngineConfig, CalciteQueryEngine, CheshireConfig.QueryEngine> {
+@Slf4j
+public class CalciteQueryEngineFactory implements QueryEngineFactory<CalciteQueryEngineConfig> {
 
-    public CalciteQueryEngineFactory() {
-        // For ServiceLoader
+  @Override
+  public Class<CalciteQueryEngineConfig> configType() {
+    return CalciteQueryEngineConfig.class;
+  }
+
+  @Override
+  public CalciteQueryEngine create(CalciteQueryEngineConfig config) {
+    return new CalciteQueryEngine(config);
+  }
+
+  @Override
+  public CalciteQueryEngineConfigAdapter adapter() {
+    return new CalciteQueryEngineConfigAdapter();
+  }
+
+  @Override
+  public void validate(CalciteQueryEngineConfig config) throws QueryEngineException {
+    log.debug("Validating query engine config");
+    if (config == null) {
+      throw new QueryEngineConfigurationException("Calcite query engine config is required");
     }
-
-    @Override
-    public CalciteQueryEngine create(CalciteQueryEngineConfig config) throws QueryEngineException {
-        try {
-            return new CalciteQueryEngine(config);
-        } catch (IllegalArgumentException e) {
-            throw new QueryEngineException("Failed to create CalciteQueryEngine", e);
-        }
-    }
-
-    @Override
-    public QueryEngineConfigAdapter<CheshireConfig.QueryEngine> adapter() {
-        return (name, queryDef) -> CalciteQueryEngineConfig.from(name, queryDef);
-    }
-
-    @Override
-    public Class<CalciteQueryEngineConfig> configClass() {
-        return CalciteQueryEngineConfig.class;
-    }
-
-    @Override
-    public Class<CalciteQueryEngine> queryEngineClass() {
-        return CalciteQueryEngine.class;
-    }
-
-    @Override
-    public void validate(CalciteQueryEngineConfig config) throws QueryEngineException {
-        QueryEngineFactory.super.validate(config);
-    }
+    config.validate();
+  }
 }

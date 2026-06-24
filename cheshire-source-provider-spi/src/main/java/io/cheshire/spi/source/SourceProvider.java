@@ -113,8 +113,6 @@ public interface SourceProvider<Q extends SourceProviderQuery> extends AutoClose
    * </ul>
    *
    * @throws SourceProviderConnectionException if the connection cannot be established
-   * @throws io.cheshire.spi.source.exception.SourceProviderInitializationException if
-   *     initialization fails
    * @see #isOpen()
    * @see #close()
    */
