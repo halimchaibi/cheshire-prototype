@@ -194,6 +194,36 @@ class CalciteQueryEngineTest {
   }
 
   @Test
+  @Order(4)
+  @DisplayName("stage wraps supplier failures with the execution stage")
+  void stageWrapsSupplierFailuresWithExecutionStage() throws Exception {
+    CalciteQueryEngine engine =
+        new CalciteQueryEngine(
+            new CalciteQueryEngineConfig("calcite-stage-failure", Map.of(), Map.of()));
+
+    Method stageMethod =
+        CalciteQueryEngine.class.getDeclaredMethod(
+            "stage", ExecutionStage.class, LambdaUtils.CheckedSupplier.class);
+    stageMethod.setAccessible(true);
+
+    Exception thrown =
+        assertThrows(
+            Exception.class,
+            () ->
+                stageMethod.invoke(
+                    engine,
+                    ExecutionStage.PARSE,
+                    (LambdaUtils.CheckedSupplier<Object>)
+                        () -> {
+                          throw new IllegalStateException("boom");
+                        }));
+
+    Throwable cause = thrown.getCause();
+    assertNotNull(cause);
+    assertTrue(cause.getMessage().contains("PARSE"));
+  }
+
+  @Test
   @Order(5)
   @DisplayName(
       "Phase 3 - Stage 1: PARSE stage parses a simple SQL into a SqlNode using planner + stage()")

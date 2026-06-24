@@ -19,6 +19,7 @@ import io.cheshire.query.engine.calcite.optimizer.OptimizationContext;
 import io.cheshire.query.engine.calcite.optimizer.QueryRuntimeContext;
 import io.cheshire.query.engine.calcite.optimizer.RuleSetBuilder;
 import io.cheshire.query.engine.calcite.optimizer.RuleSetManager;
+import io.cheshire.query.engine.calcite.parser.QueryCharacteristicsVisitor;
 import io.cheshire.query.engine.calcite.query.QueryCharacteristics;
 import io.cheshire.query.engine.calcite.query.QueryPlanCache;
 import io.cheshire.query.engine.calcite.query.QueryType;
@@ -36,9 +37,7 @@ import java.sql.ResultSet;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.calcite.rel.RelNode;
-import org.apache.calcite.rel.type.RelDataTypeSystem;
 import org.apache.calcite.sql.SqlNode;
-import org.apache.calcite.sql.type.SqlTypeFactoryImpl;
 import org.apache.calcite.tools.FrameworkConfig;
 import org.apache.calcite.tools.Frameworks;
 import org.apache.calcite.tools.Planner;
@@ -55,7 +54,7 @@ public class CalciteQueryEngine implements QueryEngine<LogicalQuery> {
 
   // TODO: This should be enough to start with, advanced use cases might require a custom
   // RelDataTypeSystem
-  private SqlTypeFactoryImpl typeFactory = new SqlTypeFactoryImpl(RelDataTypeSystem.DEFAULT);
+  // private SqlTypeFactoryImpl typeFactory = new SqlTypeFactoryImpl(RelDataTypeSystem.DEFAULT);
 
   private boolean isOpen = false;
 
@@ -106,29 +105,30 @@ public class CalciteQueryEngine implements QueryEngine<LogicalQuery> {
   public QueryEngineResult execute(LogicalQuery logicalQuery, QueryEngineContext context)
       throws QueryEngineException {
     ensureOpen();
+
+    QueryRuntimeContext runtimeContext =
+        QueryRuntimeContext.fromQuery(logicalQuery, context).build();
+
+    String sql = ObjectUtils.requireObjectAs(logicalQuery.query(), String.class);
+    QueryCharacteristics characteristics = analyzeCharacteristics(sql);
+    RuleSetManager ruleSet = buildQueryRuleSet(logicalQuery, characteristics, context);
+
+    // Build query scoped config
+    FrameworkConfig queryConfig =
+        FrameworkInitializer.builder()
+            .withSchemaManager(schemaManager)
+            .buildQueryConfig(this.frameworkConfig, runtimeContext, ruleSet);
+    Planner planner = new CalcitePlanner(queryConfig);
+
     try {
 
-      QueryRuntimeContext runtimeContext =
-          QueryRuntimeContext.fromQuery(logicalQuery, context).build();
-
-      RuleSetManager ruleSet = buildQueryRuleSet(logicalQuery, context);
-
-      // Build query scoped config
-      FrameworkConfig queryConfig =
-          FrameworkInitializer.builder()
-              .withSchemaManager(schemaManager)
-              .buildQueryConfig(this.frameworkConfig, runtimeContext, ruleSet);
-
-      Planner planner = Frameworks.getPlanner(queryConfig);
-
-      String sql = ObjectUtils.requireObjectAs(logicalQuery.query(), String.class);
-      // TODO: SqlNode parsed = stage(ExecutionStage.PARSE, () -> parser.parse(logicalQuery));
       SqlNode parsed = stage(ExecutionStage.PARSE, () -> planner.parse(sql));
 
-      // TODO: SqlNode validated = stage(ExecutionStage.VALIDATE, () -> validator.validate(parsed));
       SqlNode validated = stage(ExecutionStage.VALIDATE, () -> planner.validate(parsed));
 
-      RelNode optimizedPlan = stage(ExecutionStage.OPTIMIZE, () -> planner.rel(validated).rel);
+      RelNode logicalPlan = stage(ExecutionStage.CONVERT, () -> planner.rel(validated).rel);
+
+      RelNode optimizedPlan = stage(ExecutionStage.OPTIMIZE, () -> logicalPlan);
 
       ResultSet resultSet = stage(ExecutionStage.EXECUTE, () -> executor.execute(optimizedPlan));
 
@@ -141,6 +141,20 @@ public class CalciteQueryEngine implements QueryEngine<LogicalQuery> {
     }
   }
 
+  private QueryCharacteristics analyzeCharacteristics(String sql) {
+    try {
+      SqlNode parsed =
+          org.apache.calcite.sql.parser.SqlParser.create(sql, frameworkConfig.getParserConfig())
+              .parseStmt();
+      QueryCharacteristicsVisitor visitor = new QueryCharacteristicsVisitor();
+      parsed.accept(visitor);
+      return visitor.buildCharacteristics();
+    } catch (Exception e) {
+      log.debug("Could not analyze SQL characteristics, using defaults", e);
+      return new QueryCharacteristics();
+    }
+  }
+
   /**
    * Builds a query-scoped rule set based on the sources involved in the query. Uses SchemaManager
    * which already has all source configurations registered.
@@ -148,19 +162,14 @@ public class CalciteQueryEngine implements QueryEngine<LogicalQuery> {
    * @param context the query execution context
    * @return a CustomRuleSet optimized for the query's sources
    */
-  private RuleSetManager buildQueryRuleSet(LogicalQuery logicalQuery, QueryEngineContext context) {
+  private RuleSetManager buildQueryRuleSet(
+      LogicalQuery logicalQuery, QueryCharacteristics characteristics, QueryEngineContext context) {
 
-    // TODO: Extract query characteristics from query
     OptimizationContext optimizationContext =
         OptimizationContext.builder()
             .withQueryType(QueryType.OLTP)
             .withSchemas(schemaManager.schemas())
-            .withCharacteristics(
-                QueryCharacteristics.builder()
-                    .withJoins(false)
-                    .withAggregations(false)
-                    .withTableCount(1)
-                    .build())
+            .withCharacteristics(characteristics)
             .build();
 
     List<String> sourceNames = extractSourceNames(context);
