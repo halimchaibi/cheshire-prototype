@@ -179,13 +179,13 @@ java -jar my-app.jar --rest
 curl http://localhost:8080/api/v1/users
 ```
 
-### MCP for LLM Agents
+### MCP Clients
 
 ```bash
 # Start with MCP stdio
 java -jar my-app.jar --mcp-stdio
 
-# LLM agents can now interact via stdin/stdout
+# MCP clients can now interact via stdin/stdout
 ```
 
 ### Multi-Protocol
@@ -261,4 +261,3 @@ chmod +x mvnw
 ---
 
 **Ready to build?** Run `./mvnw clean install` and you're good to go! 🚀
-

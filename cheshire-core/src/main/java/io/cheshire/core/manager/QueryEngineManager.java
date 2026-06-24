@@ -192,19 +192,19 @@ public final class QueryEngineManager implements Initializable {
   @Override
   public void initialize() {
 
-    var engines = resolveSources(config);
+    var resolvedEngines = resolveSources(config);
     var factories = ServiceUtils.loadAll(QueryEngineFactory.class);
 
-    engines.forEach(
-        (name, engineDef) -> {
+    resolvedEngines.forEach(
+        (name, resolvedEngineDef) -> {
           try {
             @SuppressWarnings("unchecked")
-            Map<String, Object> engineConfig =
-                ObjectUtils.someObjectAs(engineDef, Map.class)
+            Map<String, Object> resolvedEngineConfig =
+                ObjectUtils.someObjectAs(resolvedEngineDef, Map.class)
                     .orElseThrow(() -> new IllegalStateException("Engine config must be a map"));
 
             String factoryClass =
-                MapUtils.someValueFromMapAs(engineConfig, "factory", String.class)
+                MapUtils.someValueFromMapAs(resolvedEngineConfig, "factory", String.class)
                     .orElseThrow(
                         () ->
                             new IllegalStateException(
@@ -217,7 +217,7 @@ public final class QueryEngineManager implements Initializable {
                             new IllegalStateException(
                                 "No QueryEngineFactory found for: " + factoryClass));
 
-            QueryEngine<?> engine = createAndValidate(factory, engineConfig);
+            QueryEngine<?> engine = createAndValidate(factory, resolvedEngineConfig);
             register(engine.name(), engine);
 
           } catch (Exception e) {
