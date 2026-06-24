@@ -198,8 +198,13 @@ public final class QueryEngineManager implements Initializable {
     engines.forEach(
         (name, engineDef) -> {
           try {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> engineConfig =
+                ObjectUtils.someObjectAs(engineDef, Map.class)
+                    .orElseThrow(() -> new IllegalStateException("Engine config must be a map"));
+
             String factoryClass =
-                MapUtils.someValueFromMapAs(engines, "factory", String.class)
+                MapUtils.someValueFromMapAs(engineConfig, "factory", String.class)
                     .orElseThrow(
                         () ->
                             new IllegalStateException(
@@ -211,11 +216,6 @@ public final class QueryEngineManager implements Initializable {
                         () ->
                             new IllegalStateException(
                                 "No QueryEngineFactory found for: " + factoryClass));
-
-            @SuppressWarnings("unchecked")
-            Map<String, Object> engineConfig =
-                ObjectUtils.someObjectAs(engineDef, Map.class)
-                    .orElseThrow(() -> new IllegalStateException("Engine config must be a map"));
 
             QueryEngine<?> engine = createAndValidate(factory, engineConfig);
             register(engine.name(), engine);
@@ -256,7 +256,7 @@ public final class QueryEngineManager implements Initializable {
 
           engineMap.put("name", engine.getName());
           engineMap.put("factory", engine.getFactory());
-          engineMap.put("description", engine.getFactory());
+          engineMap.put("description", engine.getDescription());
 
           Map<String, Object> resolvedSources =
               engine.getSources().stream()
