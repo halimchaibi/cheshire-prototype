@@ -13,6 +13,8 @@ package io.cheshire.query.engine.calcite.query;
 import io.cheshire.query.engine.calcite.config.CacheConfig;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import org.apache.calcite.rel.RelNode;
 
 public class QueryPlanCache {
@@ -20,32 +22,28 @@ public class QueryPlanCache {
   private final CacheConfig config;
   private final Map<String, CachedPlan> cache;
 
-  public QueryPlanCache(CacheConfig config) {
-    this.config = config;
-    // LinkedHashMap with access-order for LRU behavior
+  public QueryPlanCache(final CacheConfig config) {
+    this.config = Objects.requireNonNull(config, "Cache config is required");
     this.cache =
         new LinkedHashMap<>(config.maxCacheSize(), 0.75f, true) {
           @Override
-          protected boolean removeEldestEntry(Map.Entry<String, CachedPlan> eldest) {
+          protected boolean removeEldestEntry(final Map.Entry<String, CachedPlan> eldest) {
             return super.size() > config.maxCacheSize();
           }
         };
   }
 
-  public synchronized RelNode get(String queryKey) {
-    CachedPlan cached = cache.get(queryKey);
-    if (cached != null && !cached.isExpired(config.cacheTtlSeconds())) {
-      return cached.plan();
-    }
-    if (cached != null && cached.isExpired(config.cacheTtlSeconds())) {
-      cache.remove(queryKey);
-    }
-    return null;
+  public synchronized Optional<RelNode> get(final String queryKey) {
+    return Optional.ofNullable(cache.get(Objects.requireNonNull(queryKey, "Query key is required")))
+        .flatMap(cached -> validPlan(queryKey, cached));
   }
 
-  public synchronized void put(String queryKey, RelNode plan) {
+  public synchronized void put(final String queryKey, final RelNode plan) {
     if (config.enableQueryPlanCache()) {
-      cache.put(queryKey, new CachedPlan(plan, System.currentTimeMillis()));
+      cache.put(
+          Objects.requireNonNull(queryKey, "Query key is required"),
+          new CachedPlan(
+              Objects.requireNonNull(plan, "Query plan is required"), System.currentTimeMillis()));
     }
   }
 
@@ -61,8 +59,16 @@ public class QueryPlanCache {
     cache.entrySet().removeIf(entry -> entry.getValue().isExpired(config.cacheTtlSeconds()));
   }
 
+  private Optional<RelNode> validPlan(final String queryKey, final CachedPlan cached) {
+    if (cached.isExpired(config.cacheTtlSeconds())) {
+      cache.remove(queryKey);
+      return Optional.empty();
+    }
+    return Optional.of(cached.plan());
+  }
+
   private record CachedPlan(RelNode plan, long timestamp) {
-    boolean isExpired(long ttlSeconds) {
+    boolean isExpired(final long ttlSeconds) {
       return System.currentTimeMillis() - timestamp > ttlSeconds * 1000;
     }
   }

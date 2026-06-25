@@ -11,8 +11,8 @@
 package io.cheshire.query.engine.calcite.query;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.cheshire.query.engine.calcite.config.CacheConfig;
 import java.lang.reflect.Proxy;
@@ -23,39 +23,39 @@ class QueryPlanCacheTest {
 
   @Test
   void putDoesNotStorePlansWhenCacheIsDisabled() {
-    QueryPlanCache cache = new QueryPlanCache(new CacheConfig(false, true, 10, 3600));
-    RelNode plan = plan();
+    final QueryPlanCache cache = new QueryPlanCache(new CacheConfig(false, true, 10, 3600));
+    final RelNode plan = plan();
 
     cache.put("select-1", plan);
 
-    assertNull(cache.get("select-1"));
+    assertTrue(cache.get("select-1").isEmpty());
     assertEquals(0, cache.size());
   }
 
   @Test
   void putEvictsLeastRecentlyUsedPlanWhenCacheExceedsMaxSize() {
-    QueryPlanCache cache = new QueryPlanCache(new CacheConfig(true, true, 2, 3600));
-    RelNode first = plan();
-    RelNode second = plan();
-    RelNode third = plan();
+    final QueryPlanCache cache = new QueryPlanCache(new CacheConfig(true, true, 2, 3600));
+    final RelNode first = plan();
+    final RelNode second = plan();
+    final RelNode third = plan();
 
     cache.put("first", first);
     cache.put("second", second);
-    assertSame(first, cache.get("first"));
+    assertSame(first, cache.get("first").orElseThrow());
     cache.put("third", third);
 
-    assertSame(first, cache.get("first"));
-    assertNull(cache.get("second"));
-    assertSame(third, cache.get("third"));
+    assertSame(first, cache.get("first").orElseThrow());
+    assertTrue(cache.get("second").isEmpty());
+    assertSame(third, cache.get("third").orElseThrow());
   }
 
   @Test
   void getRemovesExpiredPlans() {
-    QueryPlanCache cache = new QueryPlanCache(new CacheConfig(true, true, 10, -1));
+    final QueryPlanCache cache = new QueryPlanCache(new CacheConfig(true, true, 10, -1));
 
     cache.put("expired", plan());
 
-    assertNull(cache.get("expired"));
+    assertTrue(cache.get("expired").isEmpty());
     assertEquals(0, cache.size());
   }
 

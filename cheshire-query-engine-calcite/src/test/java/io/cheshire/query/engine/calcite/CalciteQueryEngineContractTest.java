@@ -36,7 +36,7 @@ class CalciteQueryEngineContractTest {
   @Test
   void explainReturnsRelationalPlanForValidSql() throws QueryEngineException {
     try (CalciteQueryEngine engine = openedEngine("calcite-contract-explain")) {
-      String plan = engine.explain(new SqlQuery("SELECT 1 AS x", Map.of()));
+      final String plan = engine.explain(new SqlQuery("SELECT 1 AS x", Map.of()));
 
       assertAll(
           () -> assertFalse(plan.isBlank()),
@@ -47,7 +47,7 @@ class CalciteQueryEngineContractTest {
 
   @Test
   void supportsStreamingMatchesCurrentMaterializedExecutionModel() {
-    CalciteQueryEngine engine =
+    final CalciteQueryEngine engine =
         new CalciteQueryEngine(
             new CalciteQueryEngineConfig("calcite-contract-streaming", Map.of(), Map.of()));
 
@@ -56,7 +56,7 @@ class CalciteQueryEngineContractTest {
 
   @Test
   void factoryValidationRejectsIncompleteConfiguration() {
-    CalciteQueryEngineFactory factory = new CalciteQueryEngineFactory();
+    final CalciteQueryEngineFactory factory = new CalciteQueryEngineFactory();
 
     assertAll(
         () ->
@@ -73,13 +73,13 @@ class CalciteQueryEngineContractTest {
   }
 
   private CalciteQueryEngine openedEngine(String name) throws QueryEngineException {
-    CalciteQueryEngine engine = new CalciteQueryEngine(engineConfig(name));
+    final CalciteQueryEngine engine = new CalciteQueryEngine(engineConfig(name));
     engine.open();
     return engine;
   }
 
   private CalciteQueryEngineConfig engineConfig(String name) {
-    Map<String, Object> connection =
+    final Map<String, Object> connection =
         Map.of(
             "url",
             "jdbc:h2:mem:" + name + ";MODE=PostgreSQL;DB_CLOSE_DELAY=-1",
@@ -90,7 +90,7 @@ class CalciteQueryEngineContractTest {
             "password",
             "");
 
-    Map<String, Object> source =
+    final Map<String, Object> source =
         Map.of(
             "name",
             "contract-db",
