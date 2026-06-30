@@ -73,6 +73,190 @@ final class SqlTemplateQueryBuilderTest {
       assertThat(request.sqlQuery()).containsIgnoringCase("WHERE").containsIgnoringCase("id");
       assertThat(request.parameters()).containsEntry("userId", 123L);
     }
+
+    @Test
+    @DisplayName("should build SELECT with dynamic sort field and direction")
+    void shouldBuildSelectWithDynamicSortFieldAndDirection() throws QueryEngineException {
+      final var template =
+          """
+                    {
+                        "operation": "SELECT",
+                        "source": { "table": "users" },
+                        "projection": [
+                            { "field": "id" },
+                            { "field": "name" }
+                        ],
+                        "sort": "{param:sort}"
+                    }
+                    """;
+
+      final var params = Map.<String, Object>of("sort", "name", "order", "desc");
+
+      final var request = SqlTemplateQueryBuilder.buildQuery(template, params);
+
+      assertThat(request.sqlQuery()).endsWith("ORDER BY name DESC");
+    }
+
+    @Test
+    @DisplayName("should build SELECT with dynamic multi-column sort")
+    void shouldBuildSelectWithDynamicMultiColumnSort() throws QueryEngineException {
+      final var template =
+          """
+                    {
+                        "operation": "SELECT",
+                        "source": { "table": "articles" },
+                        "projection": [
+                            { "field": "id" },
+                            { "field": "title" },
+                            { "field": "created_at" }
+                        ],
+                        "sort": "{param:sort}"
+                    }
+                    """;
+
+      final var request =
+          SqlTemplateQueryBuilder.buildQuery(
+              template, Map.<String, Object>of("sort", "-created_at,title:asc"));
+
+      assertThat(request.sqlQuery()).endsWith("ORDER BY created_at DESC, title ASC");
+    }
+
+    @Test
+    @DisplayName("should build SELECT with dynamic JSON sort object")
+    void shouldBuildSelectWithDynamicJsonSortObject() throws QueryEngineException {
+      final var template =
+          """
+                    {
+                        "operation": "SELECT",
+                        "source": { "table": "users" },
+                        "projection": [
+                            { "field": "id" },
+                            { "field": "name" }
+                        ],
+                        "sort": "{param:sort}"
+                    }
+                    """;
+
+      final var request =
+          SqlTemplateQueryBuilder.buildQuery(
+              template, Map.<String, Object>of("sort", "{\"name\":\"DESC\"}"));
+
+      assertThat(request.sqlQuery()).endsWith("ORDER BY name DESC");
+    }
+
+    @Test
+    @DisplayName("should build SELECT with static sort object")
+    void shouldBuildSelectWithStaticSortObject() throws QueryEngineException {
+      final var template =
+          """
+                    {
+                        "operation": "SELECT",
+                        "source": { "table": "users" },
+                        "projection": [
+                            { "field": "id" },
+                            { "field": "name" }
+                        ],
+                        "sort": { "name": "DESC" }
+                    }
+                    """;
+
+      final var request = SqlTemplateQueryBuilder.buildQuery(template, Map.of());
+
+      assertThat(request.sqlQuery()).endsWith("ORDER BY name DESC");
+    }
+
+    @Test
+    @DisplayName("should build SELECT with static sort array")
+    void shouldBuildSelectWithStaticSortArray() throws QueryEngineException {
+      final var template =
+          """
+                    {
+                        "operation": "SELECT",
+                        "source": { "table": "users" },
+                        "projection": [
+                            { "field": "id" },
+                            { "field": "name" }
+                        ],
+                        "sort": [
+                            { "field": "name", "direction": "DESC" }
+                        ]
+                    }
+                    """;
+
+      final var request = SqlTemplateQueryBuilder.buildQuery(template, Map.of());
+
+      assertThat(request.sqlQuery()).endsWith("ORDER BY name DESC");
+    }
+
+    @Test
+    @DisplayName("should build SELECT with default sort when dynamic sort is absent")
+    void shouldBuildSelectWithDefaultDynamicSort() throws QueryEngineException {
+      final var template =
+          """
+                    {
+                        "operation": "SELECT",
+                        "source": { "table": "articles" },
+                        "projection": [
+                            { "field": "id" },
+                            { "field": "created_at" }
+                        ],
+                        "sort": "{param:sort,default:{'created_at':'DESC'}}"
+                    }
+                    """;
+
+      final var request = SqlTemplateQueryBuilder.buildQuery(template, Map.of());
+
+      assertThat(request.sqlQuery()).endsWith("ORDER BY created_at DESC");
+    }
+
+    @Test
+    @DisplayName("should reject unsafe dynamic sort values")
+    void shouldRejectUnsafeDynamicSortValues() {
+      final var template =
+          """
+                    {
+                        "operation": "SELECT",
+                        "source": { "table": "users" },
+                        "projection": [
+                            { "field": "id" },
+                            { "field": "name" }
+                        ],
+                        "sort": "{param:sort}"
+                    }
+                    """;
+
+      assertThatThrownBy(
+              () ->
+                  SqlTemplateQueryBuilder.buildQuery(
+                      template, Map.<String, Object>of("sort", "name; DROP TABLE users")))
+          .isInstanceOf(IllegalArgumentException.class)
+          .hasMessageContaining("Invalid sort field");
+    }
+
+    @Test
+    @DisplayName("should reject unsafe dynamic JSON sort keys")
+    void shouldRejectUnsafeDynamicJsonSortKeys() {
+      final var template =
+          """
+                    {
+                        "operation": "SELECT",
+                        "source": { "table": "users" },
+                        "projection": [
+                            { "field": "id" },
+                            { "field": "name" }
+                        ],
+                        "sort": "{param:sort}"
+                    }
+                    """;
+
+      assertThatThrownBy(
+              () ->
+                  SqlTemplateQueryBuilder.buildQuery(
+                      template,
+                      Map.<String, Object>of("sort", "{\"name; DROP TABLE users\":\"ASC\"}")))
+          .isInstanceOf(IllegalArgumentException.class)
+          .hasMessageContaining("Invalid sort field");
+    }
   }
 
   @Nested

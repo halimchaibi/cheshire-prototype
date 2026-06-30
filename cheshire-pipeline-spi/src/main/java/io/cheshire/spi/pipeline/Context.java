@@ -10,12 +10,12 @@
 
 package io.cheshire.spi.pipeline;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentMap;
 
 /** Marker interface representing the execution context for a pipeline processing operation. */
 public interface Context {
-  ConcurrentMap<String, Object> attributes = new ConcurrentHashMap<>();
+  ConcurrentMap<String, Object> attributes();
 
   /**
    * Conditionally adds an attribute if the key is not already present.
@@ -29,9 +29,9 @@ public interface Context {
    * @throws IllegalArgumentException if key is null
    */
   default Object putIfAbsent(String key, Object value) {
-    if (key == null) {
-      throw new IllegalArgumentException("Attribute key cannot be null");
-    }
-    return attributes.putIfAbsent(key, value);
+    return attributes()
+        .putIfAbsent(
+            Objects.requireNonNull(key, "Attribute key cannot be null"),
+            Objects.requireNonNull(value, "Attribute value cannot be null"));
   }
 }

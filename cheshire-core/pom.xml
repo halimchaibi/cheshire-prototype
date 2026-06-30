@@ -44,19 +44,6 @@
       <artifactId>cheshire-source-provider-spi</artifactId>
     </dependency>
 
-    <!-- Jetty jetty core -->
-    <dependency>
-      <groupId>org.eclipse.jetty.ee10</groupId>
-      <artifactId>jetty-ee10-servlet</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty.ee10</groupId>
-      <artifactId>jetty-ee10-servlets</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.modelcontextprotocol.sdk</groupId>
-      <artifactId>mcp</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>

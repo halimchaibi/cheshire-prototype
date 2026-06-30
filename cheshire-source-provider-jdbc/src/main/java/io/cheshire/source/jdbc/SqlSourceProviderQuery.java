@@ -12,9 +12,15 @@ package io.cheshire.source.jdbc;
 
 import io.cheshire.spi.source.SourceProviderQuery;
 import java.util.Map;
+import java.util.Objects;
 
 public record SqlSourceProviderQuery(String sql, Map<String, Object> params)
     implements SourceProviderQuery {
+
+  public SqlSourceProviderQuery {
+    sql = Objects.requireNonNull(sql, "sql must not be null");
+    params = params == null ? Map.of() : Map.copyOf(params);
+  }
 
   public static SqlSourceProviderQuery of(String sql, Map<String, Object> params) {
     return new SqlSourceProviderQuery(sql, params);
@@ -26,7 +32,7 @@ public record SqlSourceProviderQuery(String sql, Map<String, Object> params)
 
   @Override
   public Map<String, Object> parameters() {
-    return parameters();
+    return params;
   }
 
   @Override

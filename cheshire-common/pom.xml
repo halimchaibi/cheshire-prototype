@@ -20,25 +20,7 @@
     <spotbugs.exclude>../.spotbugs-exclude.xml</spotbugs.exclude>
   </properties>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>io.cheshire</groupId>
-        <artifactId>cheshire-bom</artifactId>
-        <version>${project.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
-    <!-- Swagger/OpenAPI -->
-    <dependency>
-      <groupId>io.swagger.core.v3</groupId>
-      <artifactId>swagger-core</artifactId>
-    </dependency>
-
     <!-- Jackson for JSON -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
@@ -99,4 +81,3 @@
   </dependencies>
 
 </project>
-

@@ -12,6 +12,7 @@ package io.cheshire.jetty;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.cheshire.core.config.CheshireConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -43,5 +44,29 @@ final class ServerConfigTest {
 
     assertThat(sslEnabled).isFalse();
     assertThat(sslPort).isEqualTo(8443);
+  }
+
+  @Test
+  @DisplayName("should expose live state after Jetty container start and stop")
+  void shouldExposeLiveStateAfterJettyContainerStartAndStop() throws Exception {
+    final var transport = new CheshireConfig.Transport();
+    final var threadPool = new CheshireConfig.Transport.ThreadPool();
+    threadPool.setMinThreads(1);
+    threadPool.setMaxThreads(4);
+    transport.setThreadPool(threadPool);
+    transport.setPort(0);
+
+    final var container = new JettyServerContainer(transport);
+
+    container.attach();
+    try {
+      container.start();
+
+      assertThat(container.isRunning()).isTrue();
+    } finally {
+      container.stop();
+    }
+
+    assertThat(container.isRunning()).isFalse();
   }
 }

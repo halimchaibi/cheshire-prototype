@@ -11,7 +11,6 @@
 package io.cheshire.query.engine.jdbc;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cheshire.spi.query.exception.QueryEngineException;
@@ -22,15 +21,16 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -40,9 +40,44 @@ public final class SqlTemplateQueryBuilder {
 
   // TODO: this a prototype for demo purposes only. Needs redesign.
   private static final ObjectMapper MAPPER = new ObjectMapper();
+  private static final Pattern SAFE_SORT_EXPRESSION =
+      Pattern.compile(
+          "[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*|[A-Za-z_][A-Za-z0-9_]*\\(\\)");
 
   private SqlTemplateQueryBuilder() {
     throw new AssertionError("Utility class - do not instantiate");
+  }
+
+  private enum SortDirection {
+    ASC,
+    DESC;
+
+    private static SortDirection from(Object direction) {
+      final var rawDirection = Optional.ofNullable(direction).map(Object::toString).orElse("ASC");
+      final var normalized = rawDirection.trim().toUpperCase(Locale.ROOT);
+      return switch (normalized) {
+        case "", "ASC" -> ASC;
+        case "DESC" -> DESC;
+        default -> throw new IllegalArgumentException("Invalid sort direction: " + rawDirection);
+      };
+    }
+  }
+
+  private record SortCriterion(String field, SortDirection direction) {
+
+    private SortCriterion {
+      Objects.requireNonNull(field, "field");
+      Objects.requireNonNull(direction, "direction");
+      final var normalizedField = field.trim();
+      if (normalizedField.isBlank() || !SAFE_SORT_EXPRESSION.matcher(normalizedField).matches()) {
+        throw new IllegalArgumentException("Invalid sort field: " + field);
+      }
+      field = normalizedField;
+    }
+
+    private String toSql() {
+      return field + " " + direction.name();
+    }
   }
 
   public static SqlQueryEngineRequest buildQuery(
@@ -810,137 +845,145 @@ public final class SqlTemplateQueryBuilder {
 
   private static void buildOrderBy(
       StringBuilder sql, JsonNode template, Map<String, Object> requestParams) {
-    if (template.has("sort")) {
-      JsonNode sortNode = template.get("sort");
-
-      if (sortNode.isTextual() && sortNode.asText().startsWith("{param:")) {
-        String sortParamValue = extractParamWithDefault(sortNode.asText(), requestParams);
-        if (sortParamValue != null && !sortParamValue.isBlank()) {
-          String orderByClause = parseSortObject(sortParamValue);
-          if (!orderByClause.isBlank()) {
-            sql.append(" ORDER BY ").append(orderByClause);
-          }
-        }
-      } else if (sortNode.isObject()) {
-        String orderByClause = parseSortObject(sortNode.toString());
-        if (!orderByClause.isBlank()) {
-          sql.append(" ORDER BY ").append(orderByClause);
-        }
-      } else if (sortNode.isArray()) {
-        String orderByClause = parseSortArray(sortNode);
-        if (!orderByClause.isBlank()) {
-          sql.append(" ORDER BY ").append(orderByClause);
-        }
-      }
-    }
+    Optional.ofNullable(template.get("sort"))
+        .flatMap(sortNode -> parseSortNode(sortNode, requestParams))
+        .ifPresent(orderByClause -> sql.append(" ORDER BY ").append(orderByClause));
   }
 
-  private static String parseSortObject(String sortParam) {
-    if (sortParam == null || sortParam.isBlank()) {
-      return "";
+  private static Optional<String> parseSortNode(
+      JsonNode sortNode, Map<String, Object> requestParams) {
+    if (sortNode.isTextual() && sortNode.asText().startsWith("{param:")) {
+      return parseDynamicSort(sortNode.asText(), requestParams);
+    }
+    if (sortNode.isTextual()) {
+      return toOrderByClause(parseSortText(sortNode.asText(), Optional.empty()));
+    }
+    if (sortNode.isObject()) {
+      return toOrderByClause(parseSortObject(sortNode));
+    }
+    if (sortNode.isArray()) {
+      return toOrderByClause(parseSortArray(sortNode));
+    }
+    return Optional.empty();
+  }
+
+  private static Optional<String> parseDynamicSort(
+      String sortTemplate, Map<String, Object> requestParams) {
+    final var sortParamValue = extractParamWithDefault(sortTemplate, requestParams);
+    if (sortParamValue.isBlank()) {
+      return Optional.empty();
     }
 
-    String cleanParam = sortParam.trim();
-
-    if (cleanParam.startsWith("{") && !cleanParam.endsWith("}")) {
-      cleanParam = cleanParam + "}";
+    final var normalizedSort = sortParamValue.trim();
+    final var order =
+        Optional.ofNullable(requestParams.get("order"))
+            .filter(value -> !(value instanceof String s && s.isBlank()));
+    if (normalizedSort.startsWith("{") && normalizedSort.endsWith("}")) {
+      return toOrderByClause(parseSortObject(normalizedSort));
     }
+    if (normalizedSort.startsWith("[") && normalizedSort.endsWith("]")) {
+      return toOrderByClause(parseSortArray(normalizedSort));
+    }
+    return toOrderByClause(parseSortText(normalizedSort, order));
+  }
 
-    cleanParam = cleanParam.replace("'", "\"");
-
+  private static List<SortCriterion> parseSortObject(String sortParam) {
     try {
-      Map<String, String> sortMap =
-          MAPPER.readValue(cleanParam, new TypeReference<LinkedHashMap<String, String>>() {});
-
-      return sortMap.entrySet().stream()
-          .map(entry -> entry.getKey() + " " + normalizeDirection(entry.getValue()))
-          .collect(Collectors.joining(", "));
-
-    } catch (Exception e) {
-      System.err.println("Failed to parse sort object: " + e.getMessage());
-      System.err.println("Cleaned input was: " + cleanParam);
-      return "";
+      final var normalized = sortParam.replace("'", "\"");
+      return parseSortObject(MAPPER.readTree(normalized));
+    } catch (JsonProcessingException e) {
+      throw new IllegalArgumentException("Invalid sort object", e);
     }
   }
 
-  private static String normalizeDirection(String direction) {
-    if (direction == null) return "ASC";
-
-    String normalized = direction.trim().toUpperCase();
-    return "ASC".equals(normalized) || "DESC".equals(normalized) ? normalized : "ASC";
+  private static List<SortCriterion> parseSortObject(JsonNode sortObject) {
+    if (!sortObject.isObject()) {
+      return List.of();
+    }
+    return StreamSupport.stream(
+            Spliterators.spliteratorUnknownSize(sortObject.fields(), Spliterator.ORDERED), false)
+        .map(
+            entry ->
+                new SortCriterion(entry.getKey(), SortDirection.from(entry.getValue().asText())))
+        .toList();
   }
 
-  private static String parseSortObjectAlternative(String sortParam) {
+  private static List<SortCriterion> parseSortArray(String sortArray) {
     try {
-      JsonNode sortObj = MAPPER.readTree(sortParam);
-      if (sortObj.isObject()) {
-        List<String> sortItems = new ArrayList<>();
-
-        Iterator<Map.Entry<String, JsonNode>> fields = sortObj.fields();
-        while (fields.hasNext()) {
-          Map.Entry<String, JsonNode> entry = fields.next();
-          String field = entry.getKey();
-          String direction = entry.getValue().asText().toUpperCase();
-
-          if (!"ASC".equals(direction) && !"DESC".equals(direction)) {
-            direction = "ASC";
-          }
-
-          sortItems.add(field + " " + direction);
-        }
-
-        return String.join(", ", sortItems);
-      }
-    } catch (Exception e) {
-      System.err.println("Failed to parse sort object: " + e.getMessage());
+      return parseSortArray(MAPPER.readTree(sortArray.replace("'", "\"")));
+    } catch (JsonProcessingException e) {
+      throw new IllegalArgumentException("Invalid sort array", e);
     }
-    return "";
   }
 
-  private static String parseSortArray(JsonNode sortArray) {
-    if (sortArray.isArray()) {
-      List<String> sortItems = new ArrayList<>();
-
-      for (JsonNode item : sortArray) {
-        if (item.isObject()) {
-          String field = item.path("field").asText();
-          String direction = item.path("direction").asText("ASC").toUpperCase();
-
-          if (!"ASC".equals(direction) && !"DESC".equals(direction)) {
-            direction = "ASC";
-          }
-
-          sortItems.add(field + " " + direction);
-        }
-      }
-
-      return String.join(", ", sortItems);
+  private static List<SortCriterion> parseSortArray(JsonNode sortArray) {
+    if (!sortArray.isArray()) {
+      return List.of();
     }
-    return "";
+    return StreamSupport.stream(sortArray.spliterator(), false)
+        .filter(JsonNode::isObject)
+        .map(
+            item ->
+                new SortCriterion(
+                    item.path("field").asText(),
+                    SortDirection.from(item.path("direction").asText("ASC"))))
+        .toList();
+  }
+
+  private static List<SortCriterion> parseSortText(
+      String sortText, Optional<Object> defaultDirection) {
+    if (sortText.isBlank()) {
+      return List.of();
+    }
+    final var direction = defaultDirection.map(SortDirection::from).orElse(SortDirection.ASC);
+    return Arrays.stream(sortText.split(","))
+        .map(String::trim)
+        .filter(token -> !token.isBlank())
+        .map(token -> parseSortToken(token, direction))
+        .toList();
+  }
+
+  private static SortCriterion parseSortToken(String token, SortDirection defaultDirection) {
+    if (token.startsWith("-") && token.length() > 1) {
+      return new SortCriterion(token.substring(1), SortDirection.DESC);
+    }
+    if (token.startsWith("+") && token.length() > 1) {
+      return new SortCriterion(token.substring(1), SortDirection.ASC);
+    }
+
+    final var parts = token.split(":", 2);
+    final var direction = parts.length == 2 ? SortDirection.from(parts[1]) : defaultDirection;
+    return new SortCriterion(parts[0], direction);
+  }
+
+  private static Optional<String> toOrderByClause(List<SortCriterion> criteria) {
+    final var orderByClause =
+        criteria.stream().map(SortCriterion::toSql).collect(Collectors.joining(", "));
+    return orderByClause.isBlank() ? Optional.empty() : Optional.of(orderByClause);
   }
 
   private static String extractParamWithDefault(
       String template, Map<String, Object> requestParams) {
-    String content = template.substring(1, template.length() - 1);
+    final var content = template.substring(1, template.length() - 1);
 
-    String[] parts = content.split(",", 2);
-    String paramPart = parts[0].trim();
+    final var parts = content.split(",", 2);
+    final var paramPart = parts[0].trim();
 
     if (!paramPart.startsWith("param:")) {
       return template;
     }
 
-    String paramName = paramPart.substring(6).trim();
+    final var paramName = paramPart.substring(6).trim();
 
-    Object paramValue = requestParams.get(paramName);
+    final var paramValue = requestParams.get(paramName);
     if (paramValue != null) {
       return paramValue.toString();
     }
 
     if (parts.length > 1) {
-      String defaultPart = parts[1].trim();
+      final var defaultPart = parts[1].trim();
       if (defaultPart.startsWith("default:")) {
-        String defaultValue = defaultPart.substring(8).trim();
+        var defaultValue = defaultPart.substring(8).trim();
         if ((defaultValue.startsWith("'") && defaultValue.endsWith("'"))
             || (defaultValue.startsWith("\"") && defaultValue.endsWith("\""))) {
           defaultValue = defaultValue.substring(1, defaultValue.length() - 1);
@@ -963,45 +1006,6 @@ public final class SqlTemplateQueryBuilder {
                       .collect(Collectors.joining(", "));
               if (!fields.isBlank()) sql.append(" RETURNING ").append(fields);
             });
-  }
-
-  private static String resolveMcpDirection(
-      String directionTemplate, Map<String, Object> requestParams) {
-    if (directionTemplate == null || !directionTemplate.startsWith("{param:")) {
-      return directionTemplate != null ? directionTemplate : "ASC";
-    }
-
-    String param = "sort";
-    String defaultVal = "ASC";
-    Map<String, String> values = new HashMap<>();
-
-    String content = directionTemplate.substring(1, directionTemplate.length() - 1);
-    for (String part : content.split(",")) {
-      String[] kv = part.split(":", 2);
-      if (kv.length < 2) continue;
-      String key = kv[0].trim();
-      String val = kv[1].trim().replaceAll("'", "");
-
-      switch (key) {
-        case "param" -> param = val;
-        case "default" -> defaultVal = val;
-        case "values" -> {
-          String vals = val.substring(1, val.length() - 1);
-          for (String entry : vals.split(",")) {
-            String[] v = entry.split(":");
-            if (v.length == 2) {
-              values.put(v[0].trim().replaceAll("'", ""), v[1].trim().replaceAll("'", ""));
-            }
-          }
-        }
-      }
-    }
-
-    Object requestVal = requestParams.get(param);
-    if (requestVal != null && values.containsKey(requestVal.toString().toLowerCase())) {
-      return values.get(requestVal.toString().toLowerCase());
-    }
-    return defaultVal;
   }
 
   private static Set<String> parseFields(Object fieldsParam) {

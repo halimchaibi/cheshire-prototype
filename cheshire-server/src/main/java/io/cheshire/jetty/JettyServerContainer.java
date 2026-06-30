@@ -13,6 +13,7 @@ package io.cheshire.jetty;
 import io.cheshire.core.config.CheshireConfig;
 import io.cheshire.core.server.CheshireTransport;
 import io.modelcontextprotocol.server.McpAsyncServer;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -75,11 +76,11 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
 public final class JettyServerContainer implements CheshireTransport {
 
   private final Server server;
+  private final ExecutorService virtualThreadsExecutor;
   private final CheshireConfig.Transport transportConfig;
   private final ContextHandlerCollection contexts;
   private final AtomicInteger refCount = new AtomicInteger(0);
   private final AtomicBoolean isStarted = new AtomicBoolean(false);
-  private boolean running;
 
   public JettyServerContainer(CheshireConfig.Transport transportConfig) {
     this.transportConfig = transportConfig;
@@ -90,7 +91,8 @@ public final class JettyServerContainer implements CheshireTransport {
     QueuedThreadPool threadPool = new QueuedThreadPool(max > 0 ? max : 200, min > 0 ? min : 8);
     threadPool.setName("cheshire-jetty-pool");
 
-    threadPool.setVirtualThreadsExecutor(Executors.newVirtualThreadPerTaskExecutor());
+    this.virtualThreadsExecutor = Executors.newVirtualThreadPerTaskExecutor();
+    threadPool.setVirtualThreadsExecutor(virtualThreadsExecutor);
 
     this.server = new Server(threadPool);
     this.contexts = new ContextHandlerCollection();
@@ -156,8 +158,13 @@ public final class JettyServerContainer implements CheshireTransport {
   public void start() throws Exception {
     synchronized (this) {
       if (isStarted.compareAndSet(false, true)) {
-        server.start();
-        log.info("Cheshire Jetty Container live on port {}", transportConfig.getPort());
+        try {
+          server.start();
+          log.info("Cheshire Jetty Container live on port {}", transportConfig.getPort());
+        } catch (Exception e) {
+          isStarted.set(false);
+          throw e;
+        }
       }
     }
   }
@@ -166,14 +173,18 @@ public final class JettyServerContainer implements CheshireTransport {
   public void stop() throws Exception {
     if (refCount.decrementAndGet() <= 0 && isStarted.compareAndSet(true, false)) {
       log.info("Shutting down Jetty Container on port {}", transportConfig.getPort());
-      server.stop();
+      try {
+        server.stop();
+      } finally {
+        virtualThreadsExecutor.shutdownNow();
+      }
     }
   }
 
   /** Returns true if the hardware socket is open and listening. */
   @Override
   public boolean isRunning() {
-    return running;
+    return isStarted.get() && server.isRunning();
   }
 
   @Override

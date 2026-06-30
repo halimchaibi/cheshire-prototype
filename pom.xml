@@ -22,6 +22,7 @@
     <module>cheshire-query-engine-spi</module>
     <module>cheshire-source-provider-spi</module>
     <module>cheshire-source-provider-jdbc</module>
+    <module>cheshire-source-provider-elasticsearch</module>
     <module>cheshire-query-engine-jdbc</module>
     <module>cheshire-query-engine-calcite</module>
     <module>cheshire-runtime</module>
@@ -41,7 +42,6 @@
     <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
     <checkstyle.version>12.1.2</checkstyle.version>
     <maven-enforcer-plugin.version>3.6.2</maven-enforcer-plugin.version>
-    <formatter-maven-plugin.version>2.29.0</formatter-maven-plugin.version>
     <maven-clean-plugin.version>3.5.0</maven-clean-plugin.version>
     <maven-install-plugin.version>3.1.4</maven-install-plugin.version>
     <maven-deploy-plugin.version>3.1.4</maven-deploy-plugin.version>
@@ -53,17 +53,31 @@
     <spotless-maven-plugin.version>3.1.0</spotless-maven-plugin.version>
     <spotless.skip>false</spotless.skip>
     <java.google.format.version>1.33.0</java.google.format.version>
+    <lombok.version>1.18.42</lombok.version>
+    <slf4j.version>2.0.17</slf4j.version>
+    <h2.version>2.4.240</h2.version>
+    <calcite.version>1.41.0</calcite.version>
+    <hikari.version>7.0.2</hikari.version>
+    <swagger.version>2.2.22</swagger.version>
+    <jackson.version>2.18.2</jackson.version>
+    <snakeyaml.version>2.2</snakeyaml.version>
+    <jetty.version>12.1.5</jetty.version>
+    <jakarta.websocket-api.version>2.1.0</jakarta.websocket-api.version>
+    <okhttp.version>4.12.0</okhttp.version>
+    <mcp.version>0.17.1</mcp.version>
+    <reactive-streams.version>1.0.4</reactive-streams.version>
+    <jetbrains.annotations.version>24.0.1</jetbrains.annotations.version>
+    <spotbugs-annotations.version>4.7.3</spotbugs-annotations.version>
+    <junit.version>5.13.4</junit.version>
+    <assertj.version>3.27.6</assertj.version>
+    <archunit.version>1.4.1</archunit.version>
+    <mockito.version>5.14.2</mockito.version>
+    <json-smart.version>2.5.2</json-smart.version>
+    <commons-lang3.version>3.20.0</commons-lang3.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>io.cheshire</groupId>
-        <artifactId>cheshire-bom</artifactId>
-        <version>${project.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
       <dependency>
         <groupId>io.cheshire</groupId>
         <artifactId>cheshire-common</artifactId>
@@ -96,6 +110,11 @@
       </dependency>
       <dependency>
         <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-source-provider-elasticsearch</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.cheshire</groupId>
         <artifactId>cheshire-query-engine-jdbc</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -118,6 +137,167 @@
         <groupId>io.cheshire</groupId>
         <artifactId>cheshire-test-common</artifactId>
         <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.modelcontextprotocol.sdk</groupId>
+        <artifactId>mcp-bom</artifactId>
+        <version>${mcp.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-bom</artifactId>
+        <version>${jetty.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson</groupId>
+        <artifactId>jackson-bom</artifactId>
+        <version>${jackson.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>${junit.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-simple</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.calcite</groupId>
+        <artifactId>calcite-core</artifactId>
+        <version>${calcite.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.calcite</groupId>
+        <artifactId>calcite-linq4j</artifactId>
+        <version>${calcite.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.zaxxer</groupId>
+        <artifactId>HikariCP</artifactId>
+        <version>${hikari.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty.ee10</groupId>
+        <artifactId>jetty-ee10-servlet</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty.ee10</groupId>
+        <artifactId>jetty-ee10-servlets</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>jakarta.websocket</groupId>
+        <artifactId>jakarta.websocket-api</artifactId>
+        <version>${jakarta.websocket-api.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty.ee10.websocket</groupId>
+        <artifactId>jetty-ee10-websocket-jakarta-server</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty.ee10.websocket</groupId>
+        <artifactId>jetty-ee10-websocket-jetty-server</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty.ee10.websocket</groupId>
+        <artifactId>jetty-ee10-websocket-servlet</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.squareup.okhttp3</groupId>
+        <artifactId>okhttp</artifactId>
+        <version>${okhttp.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.reactivestreams</groupId>
+        <artifactId>reactive-streams</artifactId>
+        <version>${reactive-streams.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.yaml</groupId>
+        <artifactId>snakeyaml</artifactId>
+        <version>${snakeyaml.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jetbrains</groupId>
+        <artifactId>annotations</artifactId>
+        <version>${jetbrains.annotations.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>${lombok.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>io.swagger.core.v3</groupId>
+        <artifactId>swagger-core</artifactId>
+        <version>${swagger.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.spotbugs</groupId>
+        <artifactId>spotbugs-annotations</artifactId>
+        <version>${spotbugs-annotations.version}</version>
+        <optional>true</optional>
+      </dependency>
+      <dependency>
+        <groupId>net.minidev</groupId>
+        <artifactId>json-smart</artifactId>
+        <version>${json-smart.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>${commons-lang3.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.h2database</groupId>
+        <artifactId>h2</artifactId>
+        <version>${h2.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>${assertj.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>${mockito.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-junit-jupiter</artifactId>
+        <version>${mockito.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.tngtech.archunit</groupId>
+        <artifactId>archunit-junit5</artifactId>
+        <version>${archunit.version}</version>
+        <scope>test</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -240,23 +420,6 @@
           </dependencies>
         </plugin>
 
-        <!-- Formatter -->
-<!--        <plugin>-->
-<!--          <groupId>net.revelc.code.formatter</groupId>-->
-<!--          <artifactId>formatter-maven-plugin</artifactId>-->
-<!--          <version>${formatter-maven-plugin.version}</version>-->
-<!--          <configuration>-->
-<!--            <configFile>${maven.multiModuleProjectDirectory}/.formatter.xml</configFile>-->
-<!--            <encoding>UTF-8</encoding>-->
-<!--            <lineEnding>LF</lineEnding>-->
-<!--            <compilerCompliance>${java.version}</compilerCompliance>-->
-<!--            <compilerSource>${java.version}</compilerSource>-->
-<!--            <compilerTargetPlatform>${java.version}</compilerTargetPlatform>-->
-<!--            <includes>-->
-<!--              <include>**/*.java</include>-->
-<!--            </includes>-->
-<!--          </configuration>-->
-<!--        </plugin>-->
         <plugin>
           <groupId>com.diffplug.spotless</groupId>
           <artifactId>spotless-maven-plugin</artifactId>
@@ -321,6 +484,16 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
+        <configuration>
+          <rules>
+            <requireMavenVersion>
+              <version>[3.8.0,)</version>
+            </requireMavenVersion>
+            <requireJavaVersion>
+              <version>[25,)</version>
+            </requireJavaVersion>
+          </rules>
+        </configuration>
         <executions>
           <execution>
             <id>enforce-maven</id>
@@ -330,6 +503,24 @@
             <phase>validate</phase>
           </execution>
         </executions>
+      </plugin>
+
+      <!-- Spotless validates auto-fixable formatting before semantic style checks. -->
+      <plugin>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>spotless-check</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <skip>${spotless.skip}</skip>
+        </configuration>
       </plugin>
 
       <!-- Checkstyle validate -->
@@ -347,36 +538,6 @@
         </executions>
       </plugin>
 
-      <!-- Formatter validate -->
-<!--      <plugin>-->
-<!--        <groupId>net.revelc.code.formatter</groupId>-->
-<!--        <artifactId>formatter-maven-plugin</artifactId>-->
-<!--        <executions>-->
-<!--          <execution>-->
-<!--            <id>format</id>-->
-<!--            <goals>-->
-<!--              <goal>format</goal>-->
-<!--            </goals>-->
-<!--            <phase>validate</phase>-->
-<!--          </execution>-->
-<!--        </executions>-->
-<!--      </plugin>-->
-
-      <plugin>
-        <groupId>com.diffplug.spotless</groupId>
-        <artifactId>spotless-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>compile</phase>
-            <goals>
-              <goal>apply</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <skip>${spotless.skip}</skip>
-        </configuration>
-      </plugin>
       <!-- SpotBugs verify -->
       <plugin>
         <groupId>com.github.spotbugs</groupId>
@@ -469,7 +630,6 @@
         <spotbugs.skip>true</spotbugs.skip>
         <dependency-check.skip>true</dependency-check.skip>
         <license.skip>true</license.skip>
-        <formatter.skip>true</formatter.skip>
         <spotless.skip>false</spotless.skip>
       </properties>
     </profile>
@@ -485,7 +645,6 @@
         <spotbugs.skip>true</spotbugs.skip>
         <dependency-check.skip>true</dependency-check.skip>
         <license.skip>true</license.skip>
-        <formatter.skip>true</formatter.skip>
         <spotless.skip>false</spotless.skip>
       </properties>
     </profile>
@@ -495,7 +654,6 @@
         <maven.test.skip>false</maven.test.skip>
         <enforcer.skip>false</enforcer.skip>
         <checkstyle.skip>false</checkstyle.skip>
-        <formatter.skip>false</formatter.skip>
         <spotbugs.skip>false</spotbugs.skip>
         <dependency-check.skip>false</dependency-check.skip>
         <license.skip>false</license.skip>
