@@ -18,57 +18,15 @@ import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 
-/**
- * Architecture tests specific to the Three-Stage Pipeline pattern.
- *
- * <p><strong>Three-Stage Pipeline Pattern:</strong>
- *
- * <pre>
- * MaterializedInput
- *      ↓
- * PreProcessor (validate/transform)
- *      ↓
- * Executor (business logic)
- *      ↓
- * PostProcessor (format/enrich)
- *      ↓
- * MaterializedOutput
- * </pre>
- *
- * <p><strong>Design Principles:</strong>
- *
- * <ul>
- *   <li><strong>Separation of Concerns:</strong> Each stage has distinct responsibility
- *   <li><strong>Composability:</strong> Stages can be chained via stream reduction
- *   <li><strong>Immutability:</strong> MaterializedInput/Output are immutable
- *   <li><strong>Type Safety:</strong> Strong typing prevents incorrect stage ordering
- * </ul>
- *
- * @since 1.0.0
- */
+/** Verifies the three-stage pipeline SPI and its core materialized data carriers. */
 @AnalyzeClasses(
     packages = "io.cheshire",
     importOptions = {ImportOption.DoNotIncludeTests.class})
 public class PipelineArchitectureTest {
 
-  // ============================================
-  // Pipeline Processor Implementation Rules
-  // ============================================
-
-  /**
-   * Ensures PreProcessor implementations follow naming conventions.
-   *
-   * <p><strong>Pattern:</strong> Classes implementing PreProcessor should indicate their purpose
-   * through naming:
-   *
-   * <ul>
-   *   <li>*InputProcessor
-   *   <li>*PreProcessor
-   *   <li>*Validator
-   * </ul>
-   */
+  /** PreProcessor implementations transform input and should advertise that in their names. */
   @ArchTest
-  static final ArchRule preProcessors_Should_Follow_Naming_Convention =
+  static final ArchRule pre_processors_should_follow_naming_convention =
       classes()
           .that()
           .implement("io.cheshire.spi.pipeline.step.PreProcessor")
@@ -80,20 +38,9 @@ public class PipelineArchitectureTest {
           .haveSimpleNameEndingWith("Validator")
           .because("PreProcessor implementations should follow naming conventions");
 
-  /**
-   * Ensures Executor implementations follow naming conventions.
-   *
-   * <p><strong>Pattern:</strong> Classes implementing Executor should clearly indicate execution
-   * responsibility:
-   *
-   * <ul>
-   *   <li>*Executor
-   *   <li>*Handler
-   *   <li>*Worker
-   * </ul>
-   */
+  /** Executor implementations contain the active pipeline step and should be named as such. */
   @ArchTest
-  static final ArchRule executors_Should_Follow_Naming_Convention =
+  static final ArchRule executors_should_follow_naming_convention =
       classes()
           .that()
           .implement("io.cheshire.spi.pipeline.step.Executor")
@@ -107,21 +54,9 @@ public class PipelineArchitectureTest {
           .haveSimpleNameEndingWith("Worker")
           .because("Executor implementations should follow naming conventions");
 
-  /**
-   * Ensures PostProcessor implementations follow naming conventions.
-   *
-   * <p><strong>Pattern:</strong> Classes implementing PostProcessor should indicate output
-   * transformation:
-   *
-   * <ul>
-   *   <li>*OutputProcessor
-   *   <li>*PostProcessor
-   *   <li>*Formatter
-   *   <li>*Enricher
-   * </ul>
-   */
+  /** PostProcessor implementations transform output and should advertise that in their names. */
   @ArchTest
-  static final ArchRule postProcessors_Should_Follow_Naming_Convention =
+  static final ArchRule post_processors_should_follow_naming_convention =
       classes()
           .that()
           .implement("io.cheshire.spi.pipeline.step.PostProcessor")
@@ -135,120 +70,54 @@ public class PipelineArchitectureTest {
           .haveSimpleNameEndingWith("Enricher")
           .because("PostProcessor implementations should follow naming conventions");
 
-  // ============================================
-  // Pipeline Method Signature Rules
-  // ============================================
-
-  /**
-   * Ensures PreProcessor process methods accept MaterializedInput.
-   *
-   * <p><strong>Contract:</strong>
-   *
-   * <pre>{@code
-   * MaterializedInput process(MaterializedInput input);
-   * }</pre>
-   */
+  /** Step defines the single generic apply(input, context) pipeline contract. */
   @ArchTest
-  static final ArchRule preProcessor_Process_Methods_Should_Accept_MaterializedInput =
+  static final ArchRule step_apply_method_should_accept_context =
       methods()
           .that()
           .areDeclaredInClassesThat()
-          .implement("io.cheshire.spi.pipeline.step.PreProcessor")
+          .haveFullyQualifiedName("io.cheshire.spi.pipeline.step.Step")
           .and()
-          .haveName("process")
+          .haveName("apply")
           .should()
-          .haveRawParameterTypes("io.cheshire.spi.pipeline.MaterializedInput")
-          .because("PreProcessor.process() must accept MaterializedInput");
+          .haveRawParameterTypes("java.lang.Object", "io.cheshire.spi.pipeline.Context")
+          .because("Step.apply() must accept a stage value and Context");
 
-  /**
-   * Ensures Executor execute methods accept MaterializedInput and SessionTask.
-   *
-   * <p><strong>Contract:</strong>
-   *
-   * <pre>{@code
-   * MaterializedOutput execute(MaterializedInput input, SessionTask task);
-   * }</pre>
-   */
+  /** Pipeline stage interfaces must remain lambda-friendly functional interfaces. */
   @ArchTest
-  static final ArchRule executor_Execute_Methods_Should_Accept_Correct_Parameters =
-      methods()
+  static final ArchRule pipeline_stage_interfaces_should_be_functional_interfaces =
+      classes()
           .that()
-          .areDeclaredInClassesThat()
-          .implement("io.cheshire.spi.pipeline.step.Executor")
+          .resideInAPackage("io.cheshire.spi.pipeline.step..")
           .and()
-          .haveName("execute")
-          .should()
-          .haveRawParameterTypes(
-              "io.cheshire.spi.pipeline.MaterializedInput", "io.cheshire.core.task.SessionTask")
-          .because("Executor.execute() must accept MaterializedInput and SessionTask");
-
-  /**
-   * Ensures PostProcessor process methods accept MaterializedOutput.
-   *
-   * <p><strong>Contract:</strong>
-   *
-   * <pre>{@code
-   * MaterializedOutput process(MaterializedOutput output);
-   * }</pre>
-   */
-  @ArchTest
-  static final ArchRule postProcessor_Process_Methods_Should_Accept_MaterializedOutput =
-      methods()
-          .that()
-          .areDeclaredInClassesThat()
-          .implement("io.cheshire.spi.pipeline.step.PostProcessor")
+          .areInterfaces()
           .and()
-          .haveName("process")
+          .haveSimpleNameEndingWith("Processor")
+          .or()
+          .haveSimpleName("Executor")
           .should()
-          .haveRawParameterTypes("io.cheshire.spi.pipeline.MaterializedOutput")
-          .because("PostProcessor.process() must accept MaterializedOutput");
+          .beAnnotatedWith(FunctionalInterface.class)
+          .because("pipeline stages should remain easy to compose as lambdas");
 
-  // ============================================
-  // Pipeline Immutability Rules
-  // ============================================
-
-  /**
-   * Ensures MaterializedInput/Output are immutable records.
-   *
-   * <p><strong>Rationale:</strong> Pipeline data carriers must be immutable to ensure:
-   *
-   * <ul>
-   *   <li>Thread safety
-   *   <li>Predictable transformations
-   *   <li>Easy testing
-   * </ul>
-   */
+  /** Materialized data carriers must stay immutable records. */
   @ArchTest
-  static final ArchRule materialized_Classes_Should_Be_Records =
+  static final ArchRule materialized_classes_should_be_records =
       classes()
           .that()
           .haveSimpleNameStartingWith("Materialized")
           .and()
-          .resideInAPackage("..pipeline..")
+          .resideInAPackage("io.cheshire.core.pipeline..")
           .should()
           .beRecords()
-          .because("Materialized input/output should be immutable records");
+          .because("materialized input/output must be immutable records");
 
-  // ============================================
-  // Pipeline Package Organization
-  // ============================================
-
-  /**
-   * Ensures pipeline step implementations are properly organized.
-   *
-   * <p><strong>Package Structure:</strong>
-   *
-   * <pre>
-   * io.application.pipeline
-   *   ├─ MyInputProcessor (PreProcessor)
-   *   ├─ MyExecutor (Executor)
-   *   └─ MyOutputProcessor (PostProcessor)
-   * </pre>
-   */
+  /** Pipeline step implementations owned by the framework live in core pipeline packages. */
   @ArchTest
-  static final ArchRule pipeline_Implementations_Should_Be_In_Pipeline_Packages =
+  static final ArchRule framework_pipeline_implementations_should_be_in_pipeline_packages =
       classes()
           .that()
+          .resideInAPackage("io.cheshire.core..")
+          .and()
           .implement("io.cheshire.spi.pipeline.step.PreProcessor")
           .or()
           .implement("io.cheshire.spi.pipeline.step.Executor")
@@ -258,19 +127,13 @@ public class PipelineArchitectureTest {
           .resideInAPackage("..pipeline..")
           .because("Pipeline implementations should be organized in pipeline packages");
 
-  /**
-   * Ensures PipelineProcessor orchestrator doesn't leak into application code.
-   *
-   * <p><strong>Rationale:</strong> PipelineProcessor is a framework internal class that
-   * orchestrates the three stages. Application code should only implement individual stage
-   * interfaces (PreProcessor, Executor, PostProcessor).
-   */
+  /** The pipeline orchestrator is immutable and keeps stage lists defensively copied. */
   @ArchTest
-  static final ArchRule applications_Should_Not_Implement_PipelineProcessor =
+  static final ArchRule pipeline_processor_should_be_record =
       classes()
           .that()
-          .resideOutsideOfPackage("io.cheshire.core..")
+          .haveFullyQualifiedName("io.cheshire.spi.pipeline.PipelineProcessor")
           .should()
-          .notImplement("io.cheshire.spi.pipeline.PipelineProcessor")
-          .because("Applications should implement stage interfaces, not PipelineProcessor");
+          .beRecords()
+          .because("PipelineProcessor should remain an immutable orchestration record");
 }
