@@ -6,242 +6,202 @@ Common testing utilities and architecture tests for the Cheshire Framework.
 
 This module provides:
 
-- **ArchUnit Tests** - Architecture validation using ArchUnit
-- **Test Utilities** - Common test fixtures and helpers
-- **Test Base Classes** - Base classes for integration tests
+- **ArchUnit Tests** - Architecture validation using ArchUnit.
+- **Module Coverage Guard** - Verifies the architecture suite imports every governed module.
+- **Test Utilities** - Common test fixtures and helpers.
 
 ## Architecture Tests
+
+### ModuleCoverageTest
+
+Validates that the ArchUnit classpath includes every governed module package:
+
+- `io.cheshire.common`
+- `io.cheshire.core`
+- `io.cheshire.spi.pipeline`
+- `io.cheshire.spi.query`
+- `io.cheshire.spi.source`
+- `io.cheshire.query.engine.jdbc`
+- `io.cheshire.query.engine.calcite`
+- `io.cheshire.source.jdbc`
+- `io.cheshire.source.elasticsearch`
+- `io.cheshire.jetty`
+- `io.cheshire.stdio`
+- `io.cheshire.runtime`
+
+This test fails when a module is added to the reactor but not wired into the architecture-test
+module dependencies.
 
 ### CheshireArchitectureTest
 
 Validates core architectural constraints:
 
-- ✅ **Module Layering** - Ensures proper dependency hierarchy
-    - SPI modules are independent (base layer)
-    - Core depends only on SPI
-    - Server depends on Core and SPI
-    - Runtime is the top layer
-
-- ✅ **No Circular Dependencies** - Prevents cyclic module dependencies
-- ✅ **SPI Compliance** - Query engines and source providers implement correct SPIs
-- ✅ **Factory Pattern** - Factories implement appropriate SPI factory interfaces
-- ✅ **Exception Hierarchy** - All exceptions extend Exception
-- ✅ **Naming Conventions** - Consistent class naming across modules
-- ✅ **Immutability** - Config/request/response classes are records
+- **SPI isolation** - SPI packages must not depend on core, providers, transports, or runtime.
+- **Core neutrality** - Core must not depend on concrete provider, query-engine, transport, or runtime packages.
+- **Provider isolation** - Query engines and source providers must not depend on transports or runtime.
+- **Transport isolation** - Jetty and stdio packages must not depend on runtime.
+- **Runtime top layer** - Lower modules must not depend on `io.cheshire.runtime`.
+- **SPI compliance** - Query engines, source providers, and their factories implement the correct SPIs.
+- **Core package cycles** - Core package slices must remain acyclic.
+- **Naming conventions** - Core manager classes belong under manager packages.
 
 ### PipelineArchitectureTest
 
 Validates the three-stage pipeline pattern:
 
-- ✅ **PreProcessor** - Input validation and transformation
-- ✅ **Executor** - Business logic execution
-- ✅ **PostProcessor** - Output transformation and enrichment
-- ✅ **MaterializedInput/Output** - Immutable data carriers
-- ✅ **Method Signatures** - Correct parameter and return types
-- ✅ **Package Organization** - Pipeline implementations properly organized
+- **PreProcessor** - Input validation and transformation naming.
+- **Executor** - Business logic execution naming.
+- **PostProcessor** - Output transformation and enrichment naming.
+- **MaterializedInput/Output** - Immutable records.
+- **Method signatures** - Correct generic `Step.apply(value, Context)` contract.
+- **Functional interfaces** - Pipeline stage interfaces stay lambda-friendly.
+- **Package organization** - Framework pipeline implementations stay in pipeline packages.
+- **PipelineProcessor** - Immutable orchestration record.
 
 ### SecurityArchitectureTest
 
 Enforces security best practices:
 
-- ✅ **SQL Injection Prevention** - No string concatenation for SQL
-- ✅ **No Hardcoded Credentials** - Passwords/keys in config, not code
-- ✅ **Immutable Security Configs** - Security configs are records
-- ✅ **Final Auth Classes** - Authentication classes are final
-- ✅ **Immutable Collections** - Sensitive data uses immutable collections
+- **No process stream writes** - Production code must not write to `System.out` or `System.err`.
+- **Immutable source configs** - Source provider configs are records.
+- **Immutable query configs** - Query engine configs are records.
 
 ### CodingStandardsTest
 
-Validates Scala-influenced functional Java style:
+Validates focused functional-Java standards:
 
-- ✅ **Immutability** - Fields are final (or atomic for state)
-- ✅ **Records for DTOs** - Value objects use Java 21 records
-- ✅ **Optional Instead of Null** - Finder methods return Optional
-- ✅ **SLF4J Logging** - Consistent logging via SLF4J
-- ✅ **No System.out/err** - Use logging instead
-- ✅ **Utility Classes** - Final with private constructors
-- ✅ **Sealed Interfaces** - ADTs use sealed interfaces
-- ✅ **Constructor Injection** - Dependencies via constructor
+- **SPI immutability** - SPI fields are final.
+- **Records for query/result values** - Implementation query and result data carriers are records.
+- **Null-safety conventions** - Public APIs must not be annotated nullable.
+- **Specific error contracts** - SPI public APIs must not declare raw `Throwable`.
 
 ## Running Tests
 
 ### Run All Architecture Tests
 
 ```bash
-# From cheshire root
-mvn test -pl cheshire-test-common
+mvn -q -Ptest -pl cheshire-test-common -am test
+```
 
-# With coverage
-mvn test -pl cheshire-test-common jacoco:report
+### Run Full Reactor Verification
+
+```bash
+mvn -q -Ptest verify
 ```
 
 ### Run Specific Test Class
 
 ```bash
-mvn test -Dtest=CheshireArchitectureTest
-mvn test -Dtest=PipelineArchitectureTest
-mvn test -Dtest=SecurityArchitectureTest
-mvn test -Dtest=CodingStandardsTest
+mvn -q -Ptest -pl cheshire-test-common -am -Dtest=ModuleCoverageTest -Dsurefire.failIfNoSpecifiedTests=false test
+mvn -q -Ptest -pl cheshire-test-common -am -Dtest=CheshireArchitectureTest -Dsurefire.failIfNoSpecifiedTests=false test
+mvn -q -Ptest -pl cheshire-test-common -am -Dtest=PipelineArchitectureTest -Dsurefire.failIfNoSpecifiedTests=false test
+mvn -q -Ptest -pl cheshire-test-common -am -Dtest=SecurityArchitectureTest -Dsurefire.failIfNoSpecifiedTests=false test
+mvn -q -Ptest -pl cheshire-test-common -am -Dtest=CodingStandardsTest -Dsurefire.failIfNoSpecifiedTests=false test
 ```
-
-### Run from IDE
-
-All tests can be run directly from your IDE using JUnit 5 runners. Simply right-click on the test class and select "Run".
 
 ## Architecture Rules Summary
 
-### Module Dependencies (Enforced)
+### Module Dependencies
 
-```
-┌─────────────────────────────────────────┐
-│           cheshire-runtime              │ (Top layer)
-└─────────────────────────────────────────┘
-                  ↓ depends on
-┌─────────────────────────────────────────┐
-│           cheshire-server               │
-└─────────────────────────────────────────┘
-                  ↓ depends on
-┌─────────────────────────────────────────┐
-│           cheshire-core                 │
-└─────────────────────────────────────────┘
-                  ↓ depends on
-┌─────────────────────────────────────────┐
-│        SPI Modules (base layer)         │
-│  • cheshire-pipeline-spi                │
-│  • cheshire-query-engine-spi            │
-│  • cheshire-source-provider-spi         │
-└─────────────────────────────────────────┘
-```
+`runtime -> transports -> core -> spi/common`
 
-### Naming Conventions (Enforced)
+Concrete query engines and source providers hang off SPI contracts and must remain independent of
+transport and runtime packages.
 
-| Pattern        | Example                  | Location                     |
-|----------------|--------------------------|------------------------------|
-| `*Manager`     | `ConfigurationManager`   | `..manager..`                |
-| `*QueryEngine` | `JdbcQueryEngine`        | `..query.engine..`           |
-| `*Provider`    | `JdbcDataSourceProvider` | `..source..`                 |
-| `*Factory`     | `JdbcQueryEngineFactory` | SPI implementation           |
-| `*Config`      | `JdbcQueryEngineConfig`  | Any package (must be record) |
-| `*Request`     | `SqlQueryRequest`        | Any package (must be record) |
-| `*Response`    | `ResponseEntity`         | Any package (must be sealed) |
-| `*Processor`   | `BlogInputProcessor`     | `..pipeline..`               |
-| `*Executor`    | `BlogExecutor`           | `..pipeline..`               |
+### Naming And Contract Requirements
+
+| Pattern | Example | Requirement |
+| --- | --- | --- |
+| `*Manager` | `ConfigurationManager` | Resides in `..manager..` |
+| `*QueryEngine` | `JdbcQueryEngine` | Implements `QueryEngine` |
+| `*SourceProvider` | `JdbcSourceProvider` | Implements `SourceProvider` |
+| `*Factory` | `JdbcQueryEngineFactory` | Implements the matching factory SPI |
+| `*Config` in providers/engines | `JdbcQueryEngineConfig` | Record |
+| `*Query` in providers/engines | `SqlQuery` | Record |
+| `*Result` in providers/engines | `ElasticsearchQueryResult` | Record |
 
 ### SPI Implementation Requirements
 
 **Query Engines:**
 
 ```java
-public class JdbcQueryEngine implements QueryEngine<SqlQueryRequest, JdbcDataSourceProvider> {
-    // Must implement QueryEngine SPI
+public class JdbcQueryEngine implements QueryEngine<SqlQueryEngineRequest> {
+  // Must implement QueryEngine SPI.
 }
 
-public class JdbcQueryEngineFactory implements QueryEngineFactory<...> {
-    // Must implement QueryEngineFactory SPI
-    // Must be registered in META-INF/services
+public class JdbcQueryEngineFactory implements QueryEngineFactory<JdbcQueryEngineConfig> {
+  // Must implement QueryEngineFactory SPI.
 }
 ```
 
 **Source Providers:**
 
 ```java
-public class JdbcDataSourceProvider implements SourceProvider<SqlQuery, SqlQueryResult> {
-    // Must implement SourceProvider SPI
+public class JdbcSourceProvider implements SourceProvider<SqlSourceProviderQuery> {
+  // Must implement SourceProvider SPI.
 }
 
-public class JdbcDataSourceProviderFactory implements SourceProviderFactory<...> {
-    // Must implement SourceProviderFactory SPI
-    // Must be registered in META-INF/services
+public class JdbcSourceProviderFactory implements SourceProviderFactory<JdbcSourceProviderConfig> {
+  // Must implement SourceProviderFactory SPI.
 }
 ```
 
 **Pipeline Processors:**
 
 ```java
-public class MyPreProcessor implements PreProcessor {
-    @Override
-    public MaterializedInput process(MaterializedInput input) { ... }
+public class MyPreProcessor implements PreProcessor<MaterializedInput> {
+  @Override
+  public MaterializedInput apply(MaterializedInput input, Context ctx) {
+    return input;
+  }
 }
 
-public class MyExecutor implements Executor {
-    @Override
-    public MaterializedOutput execute(MaterializedInput input, SessionTask task) { ... }
+public class MyExecutor implements Executor<MaterializedInput, MaterializedOutput> {
+  @Override
+  public MaterializedOutput apply(MaterializedInput input, Context ctx) {
+    return MaterializedOutput.empty();
+  }
 }
 
-public class MyPostProcessor implements PostProcessor {
-    @Override
-    public MaterializedOutput process(MaterializedOutput output) { ... }
+public class MyPostProcessor implements PostProcessor<MaterializedOutput> {
+  @Override
+  public MaterializedOutput apply(MaterializedOutput output, Context ctx) {
+    return output;
+  }
 }
 ```
 
 ## Adding New Architecture Tests
 
-To add new architecture rules:
-
-1. **Choose the appropriate test class:**
-    - General layering → `CheshireArchitectureTest`
-    - Pipeline-specific → `PipelineArchitectureTest`
-    - Security-related → `SecurityArchitectureTest`
-    - Coding standards → `CodingStandardsTest`
-
-2. **Add the rule:**
-
-```java
-@ArchTest
-static final ArchRule my_New_Rule =
-        classes().that()...
-                .should()...
-                .because("Clear explanation of why this rule exists");
-```
-
-3. **Document the rule:**
-    - Add comprehensive Javadoc explaining the rule
-    - Include examples of violations and correct patterns
-    - Reference relevant framework documentation
-
-4. **Run and verify:**
-
-```bash
-mvn test -Dtest=YourTestClass
-```
+1. Choose the appropriate test class:
+   - General layering -> `CheshireArchitectureTest`
+   - Pipeline-specific -> `PipelineArchitectureTest`
+   - Security-related -> `SecurityArchitectureTest`
+   - Coding standards -> `CodingStandardsTest`
+   - Module classpath coverage -> `ModuleCoverageTest`
+2. Add a focused `@ArchTest` rule with a clear `.because(...)` reason.
+3. Document the rule in this README.
+4. Run the focused test class and then the full architecture suite.
 
 ## Dependencies
 
-- **ArchUnit** `1.2.1` - Architecture testing framework
-- **JUnit 5** `5.10.1` - Test framework
-- **All Cheshire modules** - For comprehensive testing
+- **ArchUnit** - Architecture testing framework.
+- **JUnit 5** - Test framework.
+- **All governed Cheshire modules** - Imported through test-scope module dependencies.
 
-## Integration with CI/CD
+## CI Integration
 
-Architecture tests should be part of your CI/CD pipeline:
+Architecture tests should be part of CI:
 
 ```yaml
-# Example GitHub Actions
 - name: Run Architecture Tests
-  run: mvn test -pl cheshire-test-common
-  
-- name: Fail on Architecture Violations
-  run: mvn verify -pl cheshire-test-common
+  run: mvn -q -Ptest -pl cheshire-test-common -am test
 ```
 
 ## Best Practices
 
-1. **Keep rules focused** - Each rule should test one architectural concern
-2. **Provide clear messages** - Use `.because()` to explain why the rule exists
-3. **Use examples** - Show both violations and correct patterns in Javadoc
-4. **Test incrementally** - Add rules as architectural patterns emerge
-5. **Document exceptions** - If a rule has legitimate exceptions, document them
-
-## References
-
-- [ArchUnit Documentation](https://www.archunit.org/)
-- [ArchUnit User Guide](https://www.archunit.org/userguide/html/000_Index.html)
-- [Cheshire Architecture](../docs/architecture/)
-- [Cheshire Coding Standards](../.cursorrules)
-
----
-
-**Module**: `cheshire-test-common`  
-**Purpose**: Testing utilities and architecture validation  
-**Maintainers**: Cheshire Framework Team
-
+1. Keep each rule focused on one architectural concern.
+2. Prefer package-boundary and SPI-contract rules over implementation-style guesses.
+3. Use `.because()` to explain why a violation matters.
+4. Update `ModuleCoverageTest` and this README when adding governed modules.
+5. Document intentional exceptions in the rule text instead of hiding them in broad exclusions.

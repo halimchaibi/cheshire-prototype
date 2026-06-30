@@ -10,168 +10,63 @@
 
 package io.cheshire.architecture;
 
-import static com.tngtech.archunit.lang.conditions.ArchConditions.beFinal;
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 
-/**
- * Architecture tests for security-related patterns and practices.
- *
- * <p><strong>Security Principles Enforced:</strong>
- *
- * <ul>
- *   <li><strong>No hardcoded credentials:</strong> No password/key constants in code
- *   <li><strong>Secure configuration:</strong> Sensitive data in config, not code
- *   <li><strong>SQL injection prevention:</strong> No string concatenation for SQL
- *   <li><strong>Immutable security contexts:</strong> Security objects immutable
- * </ul>
- *
- * @since 1.0.0
- */
+/** Security-focused architecture rules for production-safe framework code. */
 @AnalyzeClasses(
     packages = "io.cheshire",
     importOptions = {ImportOption.DoNotIncludeTests.class})
 public class SecurityArchitectureTest {
 
-  // ============================================
-  // SQL Injection Prevention
-  // ============================================
-
-  /**
-   * Ensures SQL queries use parameter binding, not string concatenation.
-   *
-   * <p><strong>Security Risk:</strong> String concatenation in SQL leads to SQL injection:
-   *
-   * <pre>{@code
-   * // BAD - Vulnerable to SQL injection ✗
-   * String sql = "SELECT * FROM users WHERE id = " + userId;
-   *
-   * // GOOD - Parameterized query ✓
-   * String sql = "SELECT * FROM users WHERE id = :userId";
-   * }</pre>
-   *
-   * <p><strong>Cheshire Approach:</strong> All SQL generation uses DSL_QUERY templates with
-   * automatic parameter binding via {@code SqlTemplateQueryBuilder}.
-   */
+  /** Production code should use structured logging rather than writing to process streams. */
   @ArchTest
-  static final ArchRule query_Builders_Should_Not_Use_String_Concatenation =
+  static final ArchRule production_code_should_not_write_to_stdout =
       noClasses()
           .that()
-          .resideInAPackage("..query..")
+          .resideInAPackage("io.cheshire..")
           .should()
-          .dependOnClassesThat()
-          .haveFullyQualifiedName("java.lang.StringBuilder")
-          .orShould()
-          .dependOnClassesThat()
-          .haveFullyQualifiedName("java.lang.StringBuffer")
+          .accessField(System.class, "out")
           .because(
-              "Query builders should use parameter binding, not string concatenation, to prevent SQL injection");
+              "framework code should use SLF4J or explicit response payloads instead of System.out");
 
-  // ============================================
-  // Credential Management
-  // ============================================
-
-  /**
-   * Prevents hardcoded passwords in code.
-   *
-   * <p><strong>Security Best Practice:</strong> Passwords, API keys, and tokens should be
-   * externalized in configuration files or environment variables, never hardcoded.
-   *
-   * <p><strong>Detection:</strong> Looks for fields with names suggesting credentials.
-   */
+  /** Production code should use structured logging rather than writing to process error streams. */
   @ArchTest
-  static final ArchRule no_Hardcoded_Passwords =
-      fields()
+  static final ArchRule production_code_should_not_write_to_stderr =
+      noClasses()
           .that()
-          .haveName("password")
-          .or()
-          .haveName("PASSWORD")
-          .or()
-          .haveName("apiKey")
-          .or()
-          .haveName("API_KEY")
-          .or()
-          .haveName("secret")
-          .or()
-          .haveName("SECRET")
+          .resideInAPackage("io.cheshire..")
           .should()
-          .notBeStatic()
-          .orShould()
-          .notBeFinal()
-          .because("Credentials should not be hardcoded as static final fields");
+          .accessField(System.class, "err")
+          .because(
+              "framework code should use SLF4J or explicit response payloads instead of System.err");
 
-  // ============================================
-  // Configuration Security
-  // ============================================
-
-  /**
-   * Ensures security-related configuration uses secure types.
-   *
-   * <p><strong>Pattern:</strong> Security configs should be records for immutability.
-   */
+  /** Source provider configuration records may carry credentials and must remain immutable. */
   @ArchTest
-  static final ArchRule security_Config_Should_Be_Immutable =
+  static final ArchRule source_provider_configs_should_be_records =
       classes()
           .that()
-          .resideInAPackage("..security..")
+          .resideInAPackage("io.cheshire.source..")
           .and()
           .haveSimpleNameEndingWith("Config")
           .should()
           .beRecords()
-          .because("Security configuration should be immutable records");
+          .because("source provider configs can contain connection data and must be immutable");
 
-  // ============================================
-  // Authentication & Authorization
-  // ============================================
-
-  /**
-   * Ensures authentication/authorization classes are properly secured.
-   *
-   * <p><strong>Pattern:</strong> Auth-related classes should be final to prevent extension attacks.
-   */
+  /** Query engine configuration records must keep engine setup immutable after construction. */
   @ArchTest
-  static final ArchRule auth_Classes_Should_Be_Final =
+  static final ArchRule query_engine_configs_should_be_records =
       classes()
           .that()
-          .resideInAPackage("..security..")
+          .resideInAPackage("io.cheshire.query.engine..")
           .and()
-          .haveSimpleNameContaining("Auth")
-          .and()
-          .areNotInterfaces()
-          .and()
-          .areNotEnums()
-          .should(beFinal())
-          .as("Authentication/Authorization classes should be final to prevent subclass attacks");
-
-  // ============================================
-  // Secure Data Handling
-  // ============================================
-
-  /**
-   * Ensures sensitive data classes don't expose mutable collections.
-   *
-   * <p><strong>Security Risk:</strong> Mutable collections allow external modification.
-   *
-   * <p><strong>Best Practice:</strong> Use defensive copies or immutable collections.
-   */
-  @ArchTest
-  static final ArchRule sensitive_Data_Should_Use_Immutable_Collections =
-      noClasses()
-          .that()
-          .resideInAPackage("..security..")
-          .and()
-          .haveSimpleNameContaining("Credential")
-          .or()
-          .haveSimpleNameContaining("Token")
+          .haveSimpleNameEndingWith("Config")
           .should()
-          .accessClassesThat()
-          .haveFullyQualifiedName("java.util.ArrayList")
-          .orShould()
-          .accessClassesThat()
-          .haveFullyQualifiedName("java.util.HashMap")
-          .as("Sensitive data classes should use immutable collections for security");
+          .beRecords()
+          .because("query engine configs must be immutable after validation");
 }

@@ -17,7 +17,6 @@
   <properties>
     <maven.compiler.release>25</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <spotbugs.exclude>../.spotbugs-exclude.xml</spotbugs.exclude>
   </properties>
 
@@ -52,11 +51,18 @@
     <dependency>
       <groupId>io.cheshire</groupId>
       <artifactId>cheshire-query-engine-spi</artifactId>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.cheshire</groupId>
       <artifactId>cheshire-query-engine-jdbc</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.cheshire</groupId>
+      <artifactId>cheshire-query-engine-calcite</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -69,6 +75,12 @@
     <dependency>
       <groupId>io.cheshire</groupId>
       <artifactId>cheshire-source-provider-jdbc</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.cheshire</groupId>
+      <artifactId>cheshire-source-provider-elasticsearch</artifactId>
       <scope>test</scope>
     </dependency>
 
