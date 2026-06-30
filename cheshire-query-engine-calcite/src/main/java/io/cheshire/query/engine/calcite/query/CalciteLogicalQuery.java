@@ -12,4 +12,4 @@ package io.cheshire.query.engine.calcite.query;
 
 import io.cheshire.spi.query.request.LogicalQuery;
 
-public sealed interface CalciteLogicalQuery extends LogicalQuery permits SqlQuery {}
+public sealed interface CalciteLogicalQuery extends LogicalQuery permits DslQuery, SqlQuery {}

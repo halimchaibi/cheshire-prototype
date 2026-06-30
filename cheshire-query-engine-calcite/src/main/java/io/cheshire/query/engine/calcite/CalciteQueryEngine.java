@@ -18,6 +18,7 @@ import io.cheshire.query.engine.calcite.executor.QueryExecutor;
 import io.cheshire.query.engine.calcite.optimizer.QueryRuntimeContext;
 import io.cheshire.query.engine.calcite.optimizer.RuleSetBuilder;
 import io.cheshire.query.engine.calcite.optimizer.RuleSetManager;
+import io.cheshire.query.engine.calcite.query.DslQuery;
 import io.cheshire.query.engine.calcite.query.QueryPlanCache;
 import io.cheshire.query.engine.calcite.schema.SchemaManager;
 import io.cheshire.query.engine.calcite.transformer.ResultTransformer;
@@ -155,7 +156,7 @@ public class CalciteQueryEngine implements QueryEngine<LogicalQuery> {
   public boolean validate(final LogicalQuery query) throws QueryEngineException {
     ensureOpen();
     try {
-      final String sql = ObjectUtils.requireObjectAs(query.query(), String.class);
+      final String sql = sqlFor(query);
       final Planner planner = new CalcitePlanner(frameworkConfig);
       try {
         final SqlNode parsed = planner.parse(sql);
@@ -259,7 +260,7 @@ public class CalciteQueryEngine implements QueryEngine<LogicalQuery> {
       final QueryRuntimeContext runtimeContext,
       final QueryEngineContext context)
       throws Exception {
-    final String sql = ObjectUtils.requireObjectAs(logicalQuery.query(), String.class);
+    final String sql = sqlFor(logicalQuery);
     final QueryEngineContext executionContext =
         Optional.ofNullable(context).orElseGet(QueryEngineContext::empty);
     final RuleSetManager ruleSet = buildQueryRuleSet(executionContext);
@@ -279,6 +280,13 @@ public class CalciteQueryEngine implements QueryEngine<LogicalQuery> {
     } finally {
       planner.close();
     }
+  }
+
+  private String sqlFor(final LogicalQuery logicalQuery) {
+    return switch (logicalQuery) {
+      case DslQuery dslQuery -> dslQuery.toSql();
+      default -> ObjectUtils.requireObjectAs(logicalQuery.query(), String.class);
+    };
   }
 
   private record PlannedQuery(RelNode relNode) {}
