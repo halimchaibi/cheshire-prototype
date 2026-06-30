@@ -19,6 +19,10 @@ import java.util.stream.Stream;
 public record SqlSourceProviderQueryResult(List<Map<String, Object>> rows)
     implements SourceProviderQueryResult {
 
+  public SqlSourceProviderQueryResult {
+    rows = rows == null ? List.of() : List.copyOf(rows);
+  }
+
   public static SqlSourceProviderQueryResult of(List<Map<String, Object>> rows) {
     return new SqlSourceProviderQueryResult(rows);
   }
@@ -44,7 +48,5 @@ public record SqlSourceProviderQueryResult(List<Map<String, Object>> rows)
   }
 
   @Override
-  public void close() {
-    // TODO Auto-generated method stub
-  }
+  public void close() {}
 }

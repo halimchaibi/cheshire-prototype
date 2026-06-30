@@ -7,11 +7,11 @@ Get up and running with Cheshire in 5 minutes!
 ### 1. Prerequisites
 
 ```bash
-# Check Java version (must be 21+)
+# Check Java version (must be 25+)
 java --version
 ```
 
-**Required:** Java 21 or higher  
+**Required:** Java 25 or higher
 **Not Required:** Maven (project includes wrapper!)
 
 ### 2. Clone Repository
@@ -67,6 +67,13 @@ That's it! The Maven wrapper will download Maven automatically if needed.
     <dependency>
         <groupId>io.cheshire</groupId>
         <artifactId>cheshire-source-provider-jdbc</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </dependency>
+
+    <!-- Elasticsearch Support -->
+    <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-source-provider-elasticsearch</artifactId>
         <version>1.0-SNAPSHOT</version>
     </dependency>
     
@@ -202,6 +209,7 @@ Same application, multiple protocols:
 
 - [Full Documentation](../../../README.md)
 - [Architecture Guide](docs/architecture/)
+- [Federated SQL Reference](CHESHIRE_SQL_REFERENCE.md)
 - [DSL Query Reference](docs/guides/SQL_TEMPLATE_DSL_REFERENCE.md)
 - [Building Guide](../devloper/BUILDING.md)
 
@@ -234,7 +242,7 @@ Same application, multiple protocols:
 # Check version
 java --version
 
-# Must be Java 21+
+# Must be Java 25+
 ```
 
 ### Maven Wrapper

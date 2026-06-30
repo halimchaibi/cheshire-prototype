@@ -6,10 +6,10 @@ This guide covers building, testing, and packaging the Cheshire Framework.
 
 ### Required
 
-- **Java 21+** with preview features enabled
+- **Java 25+** with preview features enabled
   ```bash
   java --version
-  # Should show Java 21 or higher
+  # Should show Java 25 or higher
   ```
 
 ### Optional
@@ -203,14 +203,14 @@ mvn clean install
 
 ### Java Version Issues
 
-Ensure Java 21+ with preview features:
+Ensure Java 25+ with preview features:
 
 ```bash
 # Check Java version
 java --version
 
 # Set JAVA_HOME if needed
-export JAVA_HOME=/path/to/java-21
+export JAVA_HOME=/path/to/java-25
 export PATH=$JAVA_HOME/bin:$PATH
 ```
 
@@ -245,14 +245,14 @@ rm -rf ~/.m2/repository/io/cheshire
 1. Open the project root `pom.xml`
 2. IDEA will automatically detect Maven project
 3. Enable annotation processing for Lombok
-4. Set Java 21 with preview features enabled
+4. Set Java 25 with preview features enabled
 
 ### Eclipse
 
 1. Import as "Existing Maven Project"
 2. Right-click project → Maven → Update Project
 3. Install Lombok plugin
-4. Configure Java 21 with preview features
+4. Configure Java 25 with preview features
 
 ### VS Code
 
@@ -276,10 +276,10 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
-    - name: Set up JDK 21
+    - name: Set up JDK 25
       uses: actions/setup-java@v3
       with:
-        java-version: '21'
+        java-version: '25'
         distribution: 'temurin'
         
     - name: Build with Maven Wrapper
@@ -343,7 +343,7 @@ jobs:
 
 ```bash
 # Full verification (tests + integration tests + checks)
-./mvnw clean verify
+./mvnw -Pgithub clean verify
 ```
 
 ### Architecture Tests
@@ -356,12 +356,29 @@ jobs:
 ### Code Quality
 
 ```bash
-# Run Checkstyle
-./mvnw checkstyle:check
+# Apply auto-fixable Java formatting
+./mvnw com.diffplug.spotless:spotless-maven-plugin:3.1.0:apply
+
+# Verify Java formatting
+./mvnw com.diffplug.spotless:spotless-maven-plugin:3.1.0:check
+
+# Run semantic and structural style checks
+./mvnw -Pgithub checkstyle:check
 
 # Run SpotBugs
-./mvnw spotbugs:check
+./mvnw -Pgithub spotbugs:check
+
+# Run the full quality gate
+./mvnw -Pgithub verify
 ```
+
+Spotless is the single source of truth for auto-fixable formatting such as Google Java
+Format, import cleanup, trailing whitespace, and final newlines. Checkstyle intentionally
+keeps semantic and structural checks such as naming, design, complexity, illegal imports,
+and logging guardrails.
+
+Spotless is also bound to Maven `validate`, so `./mvnw -Ptest validate` verifies formatting
+without relying on local Maven plugin-prefix settings.
 
 ## Getting Help
 
@@ -390,4 +407,3 @@ jobs:
 ---
 
 **Need Help?** Open an issue on [GitHub](https://github.com/cheshire-framework/cheshire-framework/issues)
-

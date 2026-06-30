@@ -12,9 +12,11 @@ package io.cheshire.core.manager;
 
 import io.cheshire.common.exception.CheshireException;
 import io.cheshire.core.config.CheshireConfig;
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -70,8 +72,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class LifecycleManager {
-  private final List<ComponentEntry> registrar = new ArrayList<>();
-  private final ExecutorService executor = Executors.newCachedThreadPool();
+  private final List<ComponentEntry> registrar;
   private final CapabilityManager capabilityManager;
   private final SourceProviderManager sourceRegistry;
   private final QueryEngineManager queryRegistry;
@@ -89,6 +90,19 @@ public class LifecycleManager {
     this.capabilityManager = CapabilityManager.instance(config);
     this.sourceRegistry = SourceProviderManager.instance(config);
     this.queryRegistry = QueryEngineManager.instance(config);
+    this.registrar =
+        ordered(
+            List.of(
+                new ComponentEntry(sourceRegistry, InitializationPhase.SOURCE_PROVIDERS),
+                new ComponentEntry(queryRegistry, InitializationPhase.QUERY_ENGINES),
+                new ComponentEntry(capabilityManager, InitializationPhase.CAPABILITIES)));
+  }
+
+  LifecycleManager(List<ComponentEntry> registrar) {
+    this.capabilityManager = null;
+    this.sourceRegistry = null;
+    this.queryRegistry = null;
+    this.registrar = ordered(registrar);
   }
 
   /**
@@ -118,27 +132,21 @@ public class LifecycleManager {
       return;
     }
 
+    final var initialized = new CopyOnWriteArrayList<ComponentEntry>();
     try {
-      // Register components in order
-      registerComponent(sourceRegistry, InitializationPhase.SOURCE_PROVIDERS);
-      registerComponent(queryRegistry, InitializationPhase.QUERY_ENGINES);
-      registerComponent(capabilityManager, InitializationPhase.CAPABILITIES);
-
-      // Initialize all components in parallel
-      CompletableFuture<?>[] futures =
-          registrar.stream()
-              .map(entry -> CompletableFuture.runAsync(entry.component()::initialize, executor))
-              .toArray(CompletableFuture[]::new);
-
-      // Wait for all to complete
-      CompletableFuture.allOf(futures).join();
+      registrar.stream()
+          .map(ComponentEntry::phase)
+          .distinct()
+          .forEach(phase -> initializePhase(phase, initialized));
 
     } catch (CheshireException e) {
       running.set(false);
+      shutdownInitialized(initialized);
       log.error("LifecycleManager initialization failed due to framework error", e);
       throw e;
     } catch (Exception e) {
       running.set(false);
+      shutdownInitialized(initialized);
       log.error("LifecycleManager initialization failed - component initialization error", e);
       throw new CheshireException(
           "Failed to initialize LifecycleManager - one or more components failed to initialize", e);
@@ -173,23 +181,7 @@ public class LifecycleManager {
     }
 
     try {
-      // Shutdown registries first
-      for (int i = registrar.size() - 1; i >= 0; i--) {
-        registrar.get(i).component.shutdown();
-      }
-
-      // Cleanly terminate the thread pool
-      executor.shutdown();
-      if (!executor.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS)) {
-        executor.shutdownNow();
-      }
-    } catch (InterruptedException e) {
-      executor.shutdownNow();
-      Thread.currentThread().interrupt();
-      log.warn("LifecycleManager shutdown interrupted", e);
-    } catch (CheshireException e) {
-      log.error("LifecycleManager shutdown failed due to framework error", e);
-      throw e;
+      shutdownInitialized(registrar);
     } catch (Exception e) {
       log.error("LifecycleManager shutdown failed - unexpected error during component shutdown", e);
       throw new CheshireException(
@@ -209,16 +201,47 @@ public class LifecycleManager {
     return running.get();
   }
 
-  /**
-   * Registers a component for lifecycle management.
-   *
-   * <p>Components are registered with their initialization phase to ensure correct startup order.
-   *
-   * @param component the component implementing Initializable
-   * @param phase the initialization phase for ordering
-   */
-  private void registerComponent(Initializable component, InitializationPhase phase) {
-    registrar.add(new ComponentEntry(component, phase));
+  private void initializePhase(InitializationPhase phase, List<ComponentEntry> initialized) {
+    final var phaseEntries = registrar.stream().filter(entry -> entry.phase() == phase).toList();
+
+    try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+      final CompletableFuture<?>[] futures =
+          phaseEntries.stream()
+              .map(
+                  entry ->
+                      CompletableFuture.runAsync(
+                          () -> {
+                            entry.component().initialize();
+                            initialized.add(entry);
+                          },
+                          executor))
+              .toArray(CompletableFuture[]::new);
+
+      CompletableFuture.allOf(futures).join();
+    } catch (CompletionException e) {
+      throw e;
+    }
+  }
+
+  private void shutdownInitialized(List<ComponentEntry> entries) {
+    final var orderedEntries = ordered(entries);
+    java.util.stream.IntStream.iterate(
+            orderedEntries.size() - 1, index -> index >= 0, index -> index - 1)
+        .mapToObj(orderedEntries::get)
+        .forEach(
+            entry -> {
+              try {
+                entry.component().shutdown();
+              } catch (Exception e) {
+                log.error("Component shutdown failed for phase {}", entry.phase(), e);
+              }
+            });
+  }
+
+  private static List<ComponentEntry> ordered(List<ComponentEntry> entries) {
+    return entries.stream()
+        .sorted(Comparator.comparingInt(entry -> entry.phase().order()))
+        .toList();
   }
 
   /**
@@ -266,5 +289,5 @@ public class LifecycleManager {
    * @param component the initializable component
    * @param phase the initialization phase for ordering
    */
-  private record ComponentEntry(Initializable component, InitializationPhase phase) {}
+  record ComponentEntry(Initializable component, InitializationPhase phase) {}
 }

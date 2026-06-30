@@ -92,13 +92,7 @@ public final class RestAdapterServlet extends HttpServlet {
 
   private void sendError(HttpServletResponse resp, int status, String message) throws IOException {
     resp.setStatus(status);
-    resp.setContentType("application/json");
-    resp.getWriter()
-        .write(
-            """
-                { "error": "%s" }
-                """
-                .formatted(message));
+    writeJson(resp, new ErrorResponse(message));
   }
 
   private int mapStatusToHttp(ResponseEntity.Status status) {
@@ -118,4 +112,6 @@ public final class RestAdapterServlet extends HttpServlet {
     resp.setCharacterEncoding("UTF-8");
     mapper.writerWithDefaultPrettyPrinter().writeValue(resp.getWriter(), payload);
   }
+
+  private record ErrorResponse(String error) {}
 }

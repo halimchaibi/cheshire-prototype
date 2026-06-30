@@ -18,7 +18,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * Orchestrates three-stage pipeline execution for action processing.
@@ -84,6 +84,12 @@ public record PipelineProcessor<I extends CanonicalInput<?>, O extends Canonical
     List<PreProcessor<I>> preProcessors,
     Executor<I, O> executor,
     List<PostProcessor<O>> postProcessors) {
+
+  private static final ThreadFactory PIPELINE_THREAD_FACTORY =
+      Thread.ofVirtual().name("cheshire-pipeline-", 0).factory();
+
+  private static final java.util.concurrent.Executor ASYNC_EXECUTOR =
+      command -> PIPELINE_THREAD_FACTORY.newThread(command).start();
 
   /**
    * Compact constructor to prevent EI_EXPOSE_REP Mitigate CWE-374 - Defensively copied via
@@ -155,16 +161,14 @@ public record PipelineProcessor<I extends CanonicalInput<?>, O extends Canonical
    * @return a CompletableFuture representing the pending result of the pipeline
    */
   public CompletableFuture<O> executeAsync(I input, Context ctx) {
-    try (var vThreadExecutor = Executors.newVirtualThreadPerTaskExecutor()) {
-      return CompletableFuture.supplyAsync(
-          () -> {
-            try {
-              return execute(input, ctx);
-            } catch (PipelineException e) {
-              throw new CompletionException(e);
-            }
-          },
-          vThreadExecutor);
-    }
+    return CompletableFuture.supplyAsync(
+        () -> {
+          try {
+            return execute(input, ctx);
+          } catch (PipelineException e) {
+            throw new CompletionException(e);
+          }
+        },
+        ASYNC_EXECUTOR);
   }
 }

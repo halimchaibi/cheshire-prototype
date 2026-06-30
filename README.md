@@ -9,7 +9,7 @@
 <h1 align="center">Cheshire Framework</h1>
 
 <p align="center">
-  <strong>A modular Java 21+ framework for exposing resources as capabilities through multiple protocols</strong>
+  <strong>A modular Java 25+ framework for exposing resources as capabilities through multiple protocols</strong>
 </p>
 
 <p align="center">
@@ -33,7 +33,7 @@ Like its namesake, Cheshire appears wherever you need it, providing a consistent
 - 🔄 **Three-Stage Pipelines** - PreProcessor → Executor → PostProcessor
 - 🗄️ **DSL Query Templates** - JSON-based SQL generation with parameter binding
 - 🔧 **Modular Architecture** - SPI-based extensibility for custom implementations
-- 🛡️ **Type Safe** - Leverages Java 21's modern features (records, sealed interfaces, pattern matching)
+- 🛡️ **Type Safe** - Leverages Java 25's modern features (records, sealed interfaces, pattern matching)
 - ⚡ **High Performance** - Virtual Thread support, lock-free metrics, structured concurrency
 - 🧩 **Extensible** - Plugin architecture via ServiceLoader for query engines and source providers
 - 🧪 **Well Tested** - Comprehensive test coverage with reference implementations
@@ -43,7 +43,7 @@ Like its namesake, Cheshire appears wherever you need it, providing a consistent
 
 ### Prerequisites
 
-- **Java 21+** (with preview features enabled)
+- **Java 25+** (with preview features enabled)
 - **Maven 3.8+**
 
 ### Installation
@@ -90,6 +90,12 @@ Then add the modules you need:
     <dependency>
         <groupId>io.cheshire</groupId>
         <artifactId>cheshire-source-provider-jdbc</artifactId>
+    </dependency>
+
+    <!-- Elasticsearch Source Provider -->
+    <dependency>
+        <groupId>io.cheshire</groupId>
+        <artifactId>cheshire-source-provider-elasticsearch</artifactId>
     </dependency>
     
     <!-- Server implementations (Jetty + Stdio) -->
@@ -178,6 +184,8 @@ See the complete [blog-app example](https://github.com/halimchaibi/cheshire-blog
 
 - **[User Guide](docs/guides/user/)** - Getting started and common use cases
 - **[Pipeline Configuration Guide](docs/guides/user/PIPELINE_CONFIGURATION_GUIDE.md)** - Complete guide for configuring pipelines with DSL
+- **[Elasticsearch Source Provider](docs/guides/user/ELASTICSEARCH_SOURCE_PROVIDER.md)** - Configure search-backed sources
+- **[Cheshire Federated SQL Reference](docs/guides/user/CHESHIRE_SQL_REFERENCE.md)** - User guidelines for Calcite SQL across sources
 - **[Developer Guide](docs/guides/devloper/)** - Extending the framework
 - **[SQL Template DSL Reference](docs/guides/user/SQL_TEMPLATE_DSL_REFERENCE.md)** - Complete DSL_QUERY specification
 
@@ -607,21 +615,38 @@ Cheshire follows **Scala-influenced functional Java** style:
 
 See [.cursorrules](.cursorrules) for complete style guide.
 
+Formatting and static analysis are split deliberately:
+
+```bash
+# Apply auto-fixable Java formatting
+./mvnw com.diffplug.spotless:spotless-maven-plugin:3.1.0:apply
+
+# Check formatting without modifying files
+./mvnw com.diffplug.spotless:spotless-maven-plugin:3.1.0:check
+
+# Run semantic style checks and the full quality gate
+./mvnw -Pgithub checkstyle:check
+./mvnw -Pgithub verify
+```
+
+Spotless owns formatting. Checkstyle owns semantic and structural rules.
+Spotless also runs during Maven `validate`, so `./mvnw -Ptest validate` checks formatting
+without depending on local Maven plugin-prefix settings.
+
 ### Testing
 
 ```bash
 # Run all tests
-mvn test
+./mvnw -Ptest test
 
 # Run specific module tests
-cd cheshire-core
-mvn test
+./mvnw -Ptest -pl cheshire-core test
 
 # Run integration tests
-mvn verify
+./mvnw -Ptest verify
 
 # Run with coverage
-mvn clean test jacoco:report
+./mvnw -Ptest clean test jacoco:report
 ```
 
 ## 📋 Roadmap

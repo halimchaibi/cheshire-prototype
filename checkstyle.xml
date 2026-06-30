@@ -24,10 +24,6 @@
     <property name="fileExtensions" value="java"/>
   </module>
 
-  <module name="FileTabCharacter">
-    <property name="eachLine" value="true"/>
-  </module>
-
   <!-- TreeWalker -->
   <module name="TreeWalker">
 
@@ -41,24 +37,6 @@
     <module name="ParameterName"/>
     <module name="StaticVariableName"/>
     <module name="TypeName"/>
-
-    <!-- Braces / whitespace -->
-    <module name="LeftCurly"/>
-    <module name="RightCurly"/>
-    <module name="WhitespaceAround">
-      <property name="allowEmptyConstructors" value="true"/>
-      <property name="allowEmptyLambdas" value="true"/>
-      <property name="allowEmptyMethods" value="true"/>
-      <property name="allowEmptyTypes" value="true"/>
-      <property name="allowEmptyLoops" value="true"/>
-    </module>
-    <module name="WhitespaceAfter"/>
-    <module name="NoWhitespaceBefore"/>
-    <module name="NoWhitespaceAfter"/>
-
-    <module name="OperatorWrap"/>
-    <module name="ParenPad"/>
-    <module name="TypecastParenPad"/>
 
     <!-- Modifiers -->
     <module name="ModifierOrder"/>
@@ -77,7 +55,6 @@
 
     <!-- Blocks -->
     <module name="AvoidNestedBlocks"/>
-    <module name="NeedBraces"/>
     <module name="EmptyBlock">
       <property name="option" value="TEXT"/>
       <property name="tokens" value="LITERAL_TRY, LITERAL_FINALLY, LITERAL_IF, LITERAL_ELSE, LITERAL_SWITCH"/>
@@ -107,15 +84,6 @@
     <module name="AvoidStarImport"/>
     <module name="IllegalImport">
       <property name="illegalPkgs" value="java.util.logging, java.awt, javax.swing, sun"/>
-    </module>
-    <module name="RedundantImport"/>
-    <module name="UnusedImports"/>
-    <module name="ImportOrder">
-      <property name="groups" value="/^java\./,javax,org,com"/>
-      <property name="ordered" value="true"/>
-      <property name="separated" value="true"/>
-      <property name="option" value="bottom"/>
-      <property name="sortStaticImportsAlphabetically" value="true"/>
     </module>
 
     <!-- Javadoc -->
