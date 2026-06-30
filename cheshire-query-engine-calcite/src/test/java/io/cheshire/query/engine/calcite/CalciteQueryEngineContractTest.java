@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.cheshire.query.engine.calcite.config.CalciteQueryEngineConfig;
+import io.cheshire.query.engine.calcite.query.DslQuery;
 import io.cheshire.query.engine.calcite.query.SqlQuery;
 import io.cheshire.spi.query.exception.QueryEngineConfigurationException;
 import io.cheshire.spi.query.exception.QueryEngineException;
@@ -37,6 +38,25 @@ class CalciteQueryEngineContractTest {
   void explainReturnsRelationalPlanForValidSql() throws QueryEngineException {
     try (CalciteQueryEngine engine = openedEngine("calcite-contract-explain")) {
       final String plan = engine.explain(new SqlQuery("SELECT 1 AS x", Map.of()));
+
+      assertAll(
+          () -> assertFalse(plan.isBlank()),
+          () -> assertTrue(plan.contains("Logical"), plan),
+          () -> assertTrue(plan.contains("1"), plan));
+    }
+  }
+
+  @Test
+  void validateAcceptsDslQuery() throws QueryEngineException {
+    try (CalciteQueryEngine engine = openedEngine("calcite-contract-dsl-validation")) {
+      assertTrue(engine.validate(DslQuery.select("1 AS x")));
+    }
+  }
+
+  @Test
+  void explainReturnsRelationalPlanForDslQuery() throws QueryEngineException {
+    try (CalciteQueryEngine engine = openedEngine("calcite-contract-dsl-explain")) {
+      final String plan = engine.explain(DslQuery.select("1 AS x"));
 
       assertAll(
           () -> assertFalse(plan.isBlank()),
