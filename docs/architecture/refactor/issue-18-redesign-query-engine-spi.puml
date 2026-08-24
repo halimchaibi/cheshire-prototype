@@ -1,0 +1,255 @@
+@startuml
+
+' --- Neutral Architectural Palette ---
+!define INTERFACE_COLOR #FFFFFF
+!define CLASS_COLOR     #A8A499
+!define EXCEPTION_COLOR #F5F5F5
+!define EXTERNAL_COLOR  #D4D4D4
+
+' --- Skinparam Configurations ---
+skinparam {
+    BackgroundColor #FFFFFF
+    DefaultFontColor #262626
+    ArrowColor #525252
+    BorderColor #404040
+}
+
+skinparam interface {
+    BackgroundColor INTERFACE_COLOR
+    BorderColor #404040
+    FontStyle bold
+}
+
+skinparam class {
+    BackgroundColor #FFFFFF
+    BorderColor #404040
+    HeaderBackgroundColor #FAFAFA
+}
+
+skinparam class<<implementation>> {
+    BackgroundColor CLASS_COLOR
+}
+
+skinparam class<<exception>> {
+    BackgroundColor EXCEPTION_COLOR
+    BorderColor #A3A3A3
+}
+
+skinparam interface<<external dependency>> {
+    BackgroundColor EXTERNAL_COLOR
+    BorderColor #737373
+}
+
+' External Dependencies
+interface SourceProvider<Q, R> << external dependency >> EXTERNAL_COLOR  {
+  + execute(Q): R
+  + config(): SourceConfig
+  + close(): void
+  + open(): void
+   open: boolean
+}
+
+
+' Configuration
+interface QueryEngineConfig {
+  + asMap(): Map<String, Object>
+  + name(): String
+  + validate(): boolean
+}
+
+interface ConfigAdapter<A> {
+  + adapt(String, A): QueryEngineConfig
+}
+
+' Query Abstraction
+interface LogicalQuery {
+  + dialect(): String
+  + parameters(): Map<String, Object>
+  + query(): Object
+  + {default} hasParameters(): boolean
+}
+
+' Query Engine SPI
+interface QueryEngine {
+  + name(): String
+  + open(): void
+  + validate(LogicalQuery): boolean
+  + execute(LogicalQuery, QueryContext): QueryResult
+  + explain(LogicalQuery): String
+  + close(): void
+  + supportsStreaming(): boolean
+  + {abstract} isOpen(): boolean
+}
+
+' Factory
+interface QueryEngineFactory {
+  + create(QueryEngineConfig): QueryEngine
+  + queryEngineClass(): Class<QueryEngine>
+  + configClass(): Class<QueryEngineConfig>
+  + adapter(): ConfigAdapter<A>
+  + validate(QueryEngineConfig): void
+}
+
+' Result Types
+class QueryResult {
+  + columns(): List<Column>
+  + row(int): Map<String, Object>
+  + rows(): List<Map<String, Object>>
+  + rowCount(): int
+  + iterator(): Iterator<Map<String, Object>>
+  + stream(): Stream<Map<String, Object>>
+  + isEmpty(): boolean
+  + close(): void
+}
+
+entity Column <<record>> {
+  + name: String
+  + type: String
+  + nullable: boolean
+}
+
+class ValidationError {
+  + field(): String
+  + message(): String
+  + code(): String
+}
+
+' Context
+class QueryContext {
+  - traceId: String
+  - userId: String
+  - sessionId: String
+  - securityContext: Map<String, Object> {readOnly}
+  - sources: List<SourceProvider>
+  - attributes: ConcurrentMap<String, Object>
+  - arrivalTime: Instant
+  - deadline: Instant
+  --
+  + traceId(): String
+  + userId(): String
+  + sessionId(): String
+  + securityContext(): Map<String, Object>
+  + sources(): List<SourceProvider>
+  + attributes(): ConcurrentMap<String, Object>  {appendOnly}
+  + arrivalTime(): Instant
+  + deadline(): Instant
+  + putIfAbsent(String, Object): Object
+  + {static} empty(): QueryContext
+}
+
+' Exception Hierarchy
+abstract class QueryEngineException <<exception>> EXCEPTION_COLOR {
+  + QueryEngineException(String)
+  + QueryEngineException(String, Throwable)
+  + getErrorCode(): String
+  + isRetryable(): boolean
+}
+
+class QueryExecutionException <<exception>> EXCEPTION_COLOR {
+  + QueryExecutionException(String)
+  + QueryExecutionException(String, Throwable)
+  + getFailedQuery(): LogicalQuery
+  + getPartialResult(): Optional<QueryResult>
+}
+
+class QueryValidationException <<exception>> EXCEPTION_COLOR {
+  + QueryValidationException(String)
+  + QueryValidationException(String, List<ValidationError>)
+  + getValidationErrors(): List<ValidationError>
+}
+
+class QueryEngineConfigurationException <<exception>> EXCEPTION_COLOR {
+  + QueryEngineConfigurationException(String)
+  + QueryEngineConfigurationException(String, Throwable)
+  + getInvalidConfig(): QueryEngineConfig
+}
+
+class QueryTimeoutException <<exception>> EXCEPTION_COLOR {
+  + QueryTimeoutException(String, Duration)
+  + getElapsedTime(): Duration
+  + getDeadline(): Instant
+}
+
+class SourceProviderException <<exception>> EXCEPTION_COLOR {
+  + SourceProviderException(String, String)
+  + getSourceName(): String
+}
+
+' Relationships
+QueryEngineFactory ..> ConfigAdapter : uses
+QueryEngineFactory ..> QueryEngine : creates
+QueryEngineFactory ..> QueryEngineConfig : consumes
+QueryEngineFactory ..> QueryEngineConfigurationException : throws
+
+QueryContext "1" *-- "sources *" SourceProvider
+QueryContext ..> ValidationError : may contain
+
+QueryEngine ..> LogicalQuery : accepts
+QueryEngine ..> QueryContext : uses
+QueryEngine ..> QueryResult : returns
+QueryEngine ..> QueryEngineException : throws
+QueryEngine ..> QueryExecutionException : throws
+QueryEngine ..> QueryValidationException : throws
+
+QueryResult "1" *-- "columns *" Column
+QueryResult ..|> Iterable
+QueryResult ..|> AutoCloseable
+
+ConfigAdapter ..> QueryEngineConfig : produces
+
+QueryEngineException <|-- QueryExecutionException
+QueryEngineException <|-- QueryValidationException
+QueryEngineException <|-- QueryEngineConfigurationException
+QueryExecutionException <|-- QueryTimeoutException
+QueryExecutionException <|-- SourceProviderException
+
+QueryValidationException "1" *-- "errors *" ValidationError
+
+' Notes
+'note right of SourceProvider
+'  **External Dependency**
+'  Package: io.cheshire.source-provider.spi
+'
+'  Abstraction over heterogeneous sources:
+'  • JDBC databases
+'  • Elasticsearch clusters
+'  • CSV/JSON files
+'  • REST APIs
+'end note
+'
+'note right of QueryContext::securityContext
+'  **Immutable Map**
+'  Returns unmodifiable view.
+'  Set via constructor with:
+'  Map.copyOf(userProvidedMap)
+'
+'  Modification attempts throw
+'  UnsupportedOperationException
+'end note
+'
+'note bottom of QueryEngineException
+'  **Exception Design Principles**
+'
+'  • isRetryable() - hints if retry makes sense
+'  • getErrorCode() - machine-readable error classification
+'  • Hierarchy supports specific catch blocks
+'  • Partial results preserved when possible
+'end note
+'
+'note right of QueryResult
+'  **Flexible Access Patterns**
+'  • rows() - materialized (small results)
+'  • iterator() - streaming (large results)
+'  • stream() - functional pipelines
+'end note
+'
+'note bottom of LogicalQuery
+'  **Polymorphic Query Support**
+'  Dialect examples:
+'  • "sql" - SQL string
+'  • "calcite-rel" - RelNode AST
+'  • "elasticsearch-dsl" - JSON query
+'  • "graphql" - GraphQL query
+'  Engine validates via validate()
+'end note
+@enduml

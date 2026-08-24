@@ -1,0 +1,71 @@
+info:
+  version: "1.0.0"
+  name: "Cheshire OS Observability"
+  domain: "observability"
+  organization: "Cheshire"
+  contact: "halim.chaibi@gmail.com"
+  environment: "${ENV:-local}"
+  description: "OS and JVM metadata exposed through the Calcite OS adapter and REST."
+
+capabilities:
+  os:
+    name: os
+    description: "Read-only OS observability capability"
+    domain: observability
+    exposure: rest-api
+    transport: jetty
+    sources:
+      - os
+    query-engine: calcite
+    actions-specification-file: os-actions.yaml
+    pipelines-definition-file: os-pipelines.yaml
+
+sources:
+  os:
+    name: os
+    type: os
+    description: "Apache Calcite OS metadata adapter"
+    config:
+      type: os
+
+query-engines:
+  calcite:
+    name: calcite
+    description: "Calcite query engine with OS adapter source"
+    factory: io.cheshire.query.engine.calcite.CalciteQueryEngineFactory
+    sources:
+      - os
+    config:
+      defaultLimit: 100
+      maxLimit: 1000
+      timeoutMs: 30000
+
+exposures:
+  rest-api:
+    type: rest-http
+    enabled: true
+    binding: http-json
+    execution: sync
+    config:
+      path: /api/v1
+      asyncTimeout: 30000
+      enableSwagger: false
+      corsEnabled: false
+      maxRequestSize: 1048576
+
+transports:
+  jetty:
+    port: 9010
+    host: 127.0.0.1
+    factory: io.cheshire.ServerFactory
+    threadPool:
+      minThreads: 2
+      maxThreads: 32
+      idleTimeout: 60000
+    http:
+      requestHeaderSize: 8192
+      responseHeaderSize: 8192
+      outputBufferSize: 32768
+      requestTimeout: 30000
+    ssl:
+      enabled: false

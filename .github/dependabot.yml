@@ -1,0 +1,57 @@
+version: 2
+
+updates:
+  # Maven dependencies
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "halimchaibi"
+    labels:
+      - "dependencies"
+      - "automated"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    versioning-strategy: increase
+    groups:
+      junit:
+        patterns:
+          - "org.junit*"
+        update-types:
+          - "minor"
+          - "patch"
+      logging:
+        patterns:
+          - "org.slf4j*"
+          - "ch.qos.logback*"
+      jetty:
+        patterns:
+          - "org.eclipse.jetty*"
+      jackson:
+        patterns:
+          - "com.fasterxml.jackson*"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "halimchaibi"
+    labels:
+      - "ci"
+      - "dependencies"
+      - "automated"
+    commit-message:
+      prefix: "ci"
+

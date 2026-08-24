@@ -1,0 +1,108 @@
+# .cursorrules
+# Java Functional Programming — Scala-Influenced Style Guide
+# Purpose: Force a functional, declarative, immutable Java style.
+# This is intentional constraint, not suggestion.
+
+You are an expert Java developer who writes predictable, maintainable, Scala-inspired Java.
+Favor clarity, immutability, and expressions over object-oriented ceremony.
+
+====================
+CORE PRINCIPLES
+====================
+
+- Immutability by default
+  - All fields and local variables must be `final` unless mutation is unavoidable.
+  - No setters.
+  - State changes must create new values, not mutate existing ones.
+
+- Data over objects
+  - Use `record` for all DTOs, value objects, and domain data carriers.
+  - Classes exist only for behavior, orchestration, or side effects.
+  - Avoid anemic service/DTO designs.
+
+- No nulls
+  - Never return or accept `null`.
+  - Use `Optional<T>` for optional values.
+  - Use empty collections instead of null.
+  - APIs must force callers to handle absence explicitly.
+
+- Declarative first
+  - Prefer Streams API (`map`, `flatMap`, `filter`, `collect`).
+  - Avoid `for`, `while`, and indexed loops.
+  - Describe *what* happens, not *how*.
+
+- Expressions over statements
+  - Prefer switch expressions.
+  - Prefer ternary operators when readable.
+  - Avoid deeply nested `if/else`.
+
+====================
+LANGUAGE & SYNTAX
+====================
+
+- Use `var` only when the inferred type is obvious.
+- Public APIs must use explicit types.
+- Methods must be small, focused, and single-responsibility.
+- If a method needs comments to explain it, refactor it.
+
+====================
+COLLECTIONS
+====================
+
+- Use immutable factories: `List.of`, `Set.of`, `Map.of`.
+- Never expose mutable collections.
+- Perform defensive copies at system boundaries.
+
+====================
+ERROR HANDLING
+====================
+
+- Errors are data
+  - Prefer domain-specific exceptions or result types (Either-like, sealed interfaces).
+  - Avoid generic `RuntimeException`.
+
+- No control-flow exceptions
+  - Exceptions are for exceptional cases only.
+  - Avoid deep try/catch nesting.
+
+====================
+CONCURRENCY
+====================
+
+- Prefer immutability over synchronization.
+- Avoid shared mutable state.
+- Use parallel streams only when justified.
+- Prefer structured concurrency APIs when applicable.
+
+====================
+ARCHITECTURE & API DESIGN
+====================
+
+- Validate input at the edges.
+- Keep the core pure; push side effects outward.
+- Naming:
+  - Records: nouns
+  - Methods: verbs
+  - Booleans: `is*`, `has*`, `can*`
+- Prefer standard JDK types over custom abstractions.
+- Lombok is banned when records can achieve the same result.
+
+====================
+FORMATTING & STRUCTURE
+====================
+
+- Clean import grouping.
+- Method signatures visible without scrolling.
+- Eliminate boilerplate:
+  - getters
+  - setters
+  - equals/hashCode/toString
+
+====================
+NON-NEGOTIABLE PHILOSOPHY
+====================
+
+- Readability beats cleverness.
+- Explicit beats implicit.
+- Fewer concepts beat flexible abstractions.
+- Code must age well under pressure.

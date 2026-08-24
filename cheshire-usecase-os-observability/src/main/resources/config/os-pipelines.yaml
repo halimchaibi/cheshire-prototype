@@ -1,0 +1,65 @@
+list_system_info:
+  uri: /os/list_system_info
+  description: "Fetch host-level system metadata from the Calcite OS adapter."
+  input: io.cheshire.core.pipeline.MaterializedInput
+  pipeline:
+    preprocess:
+      - name: identityInput
+        type: transformer
+        implementation: io.cheshire.core.pipeline.IdentityInputProcessor
+    process:
+      name: listSystemInfo
+      type: executor
+      implementation: io.cheshire.query.engine.calcite.pipeline.CalciteSqlExecutor
+      template: |
+        SELECT *
+        FROM os.system_info
+    postprocess:
+      - name: identityOutput
+        type: transformer
+        implementation: io.cheshire.core.pipeline.IdentityOutputProcessor
+  output: io.cheshire.core.pipeline.MaterializedOutput
+
+list_java_info:
+  uri: /os/list_java_info
+  description: "Fetch JVM metadata from the Calcite OS adapter."
+  input: io.cheshire.core.pipeline.MaterializedInput
+  pipeline:
+    preprocess:
+      - name: identityInput
+        type: transformer
+        implementation: io.cheshire.core.pipeline.IdentityInputProcessor
+    process:
+      name: listJavaInfo
+      type: executor
+      implementation: io.cheshire.query.engine.calcite.pipeline.CalciteSqlExecutor
+      template: |
+        SELECT *
+        FROM os.java_info
+    postprocess:
+      - name: identityOutput
+        type: transformer
+        implementation: io.cheshire.core.pipeline.IdentityOutputProcessor
+  output: io.cheshire.core.pipeline.MaterializedOutput
+
+list_processes:
+  uri: /os/list_processes
+  description: "Fetch process metadata from the Calcite OS adapter."
+  input: io.cheshire.core.pipeline.MaterializedInput
+  pipeline:
+    preprocess:
+      - name: identityInput
+        type: transformer
+        implementation: io.cheshire.core.pipeline.IdentityInputProcessor
+    process:
+      name: listProcesses
+      type: executor
+      implementation: io.cheshire.query.engine.calcite.pipeline.CalciteSqlExecutor
+      template: |
+        SELECT *
+        FROM os.ps
+    postprocess:
+      - name: identityOutput
+        type: transformer
+        implementation: io.cheshire.core.pipeline.IdentityOutputProcessor
+  output: io.cheshire.core.pipeline.MaterializedOutput

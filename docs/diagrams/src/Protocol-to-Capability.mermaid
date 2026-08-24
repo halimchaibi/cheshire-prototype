@@ -1,0 +1,181 @@
+%%{
+  init: {
+    'theme': 'base',
+    'themeVariables': {
+      'primaryColor': '#e8f4f8',
+      'primaryTextColor': '#2c3e50',
+      'primaryBorderColor': '#3498db',
+      'lineColor': '#34495e',
+      'secondaryColor': '#ecf0f1',
+      'tertiaryColor': '#fff',
+      'fontSize': '14px',
+      'actorFontSize': '14px',
+      'messageFontSize': '12px',
+      'noteFontSize': '12px'
+    },
+    'sequence': {
+      'actorMargin': 50,
+      'messageMargin': 35,
+      'width': 150,
+      'mirrorActors': true,
+      'boxTextMargin': 5
+    }
+  }
+}%%
+sequenceDiagram
+    autonumber
+    participant Client as Client<br/>(LLM/Browser/CLI)
+    participant Server as Server<br/>(Jetty/stdio)
+    participant Adapter as Protocol Adapter<br/>(REST/MCP)
+    participant Dispatcher as Cheshire Dispatcher<br/>(Sealed Interface)
+    participant Capability as Capability<br/>(Business Domain)
+    participant Pipeline as Pipeline Processor<br/>(Three Stages)
+    participant Pre as PreProcessor<br/>(Validate/Transform)
+    participant Exec as Executor<br/>(Business Logic)
+    participant Builder as SqlTemplateQueryBuilder<br/>(DSL→SQL)
+    participant Engine as Query Engine<br/>(JDBC/Calcite)
+    participant Provider as Source Provider<br/>(Database/API)
+    participant Post as PostProcessor<br/>(Format/Enrich)
+%% ============================================
+%% LAYER 1: Protocol & Server
+%% ============================================
+    rect rgb(240, 248, 255)
+        Note over Client, Adapter: Layer 1: Protocol & Transport
+        Client ->>+ Server: HTTP Request / stdio message
+        Note right of Client: GET /api/v1/articles/{id}<br/>or MCP tool call
+        Server ->>+ Adapter: Raw request
+        Note over Adapter: Protocol-specific parsing
+        Adapter ->> Adapter: Parse headers/body
+        Adapter ->> Adapter: Extract parameters
+        Adapter -->>- Server: RequestEnvelope
+        Note over Server: RequestEnvelope contains:<br/>• RequestContext<br/>• RequestPayload<br/>• Metadata
+    end
+
+%% ============================================
+%% LAYER 2: Dispatch & Routing
+%% ============================================
+    rect rgb(245, 255, 245)
+        Note over Server, Capability: Layer 2: Dispatch & Routing
+        Server ->>+ Dispatcher: dispatch(RequestEnvelope)
+        Note over Dispatcher: Route to capability<br/>based on path/tool name
+        Dispatcher ->> Dispatcher: Resolve capability
+        Dispatcher ->> Dispatcher: Resolve action
+        Dispatcher ->> Dispatcher: Build SessionTask
+        Dispatcher ->>+ Capability: execute(SessionTask)
+        Note over Capability: Capability owns:<br/>• Actions (tools)<br/>• Pipelines<br/>• Exposure config
+        Capability ->> Capability: Lookup action
+        Capability ->> Capability: Get pipeline for action
+    end
+
+%% ============================================
+%% LAYER 3: Three-Stage Pipeline
+%% ============================================
+    rect rgb(255, 250, 240)
+        Note over Capability, Post: Layer 3: Three-Stage Pipeline Processing
+        Capability ->>+ Pipeline: execute(SessionTask)
+        Note over Pipeline: Stream-based reduction:<br/>input → pre → exec → post → output
+    %% Stage 1: PreProcessor
+        Pipeline ->>+ Pre: process(MaterializedInput)
+        Note over Pre: Stage 1: Input Validation
+        Pre ->> Pre: Validate parameters
+        Pre ->> Pre: Transform input
+        Pre ->> Pre: Apply business rules
+        Pre -->>- Pipeline: MaterializedInput (validated)
+    %% Stage 2: Executor
+        Pipeline ->>+ Exec: execute(MaterializedInput, SessionTask)
+        Note over Exec: Stage 2: Business Logic Execution
+
+        alt Action has DSL_QUERY template
+            Exec ->> Exec: Extract DSL template from action
+            Exec ->>+ Builder: buildQuery(template, params)
+            Note over Builder: DSL_QUERY → SQL Conversion
+            Builder ->> Builder: Parse JSON template
+            Builder ->> Builder: Handle operation (SELECT/INSERT/UPDATE/DELETE)
+            Builder ->> Builder: Build SQL with named params
+            Builder -->>- Exec: SqlQueryRequest
+            Exec ->> Exec: Resolve query engine
+            Exec ->> Exec: Resolve source provider
+            Exec ->>+ Engine: execute(SqlQueryRequest, sourceProvider)
+            Engine ->>+ Provider: execute(SqlQuery)
+            Note over Provider: Connection management<br/>Parameter binding<br/>SQL execution
+            Provider ->> Provider: getConnection()
+            Provider ->> Provider: prepareStatement()
+            Provider ->> Provider: bindParameters(:param → ?)
+            Provider ->> Provider: execute()
+            Provider ->> Provider: extractResults()
+            Provider -->>- Engine: SqlQueryResult (List<Map>)
+            Engine ->> Engine: Convert to MapQueryResult
+            Engine -->>- Exec: MapQueryResult
+        else Custom business logic
+            Exec ->> Exec: Execute custom logic
+            Note over Exec: Direct API calls,<br/>computations, etc.
+        end
+
+        Exec ->> Exec: Wrap in MaterializedOutput
+        Exec -->>- Pipeline: MaterializedOutput
+    %% Stage 3: PostProcessor
+        Pipeline ->>+ Post: process(MaterializedOutput)
+        Note over Post: Stage 3: Output Transformation
+        Post ->> Post: Format response
+        Post ->> Post: Add pagination
+        Post ->> Post: Enrich metadata
+        Post -->>- Pipeline: MaterializedOutput (formatted)
+        Pipeline -->>- Capability: TaskResult
+    end
+
+%% ============================================
+%% LAYER 4: Response Assembly
+%% ============================================
+    rect rgb(255, 245, 255)
+        Note over Capability, Client: Layer 4: Response Assembly & Delivery
+        Capability -->>- Dispatcher: TaskResult
+        Note over Dispatcher: TaskResult is sealed:<br/>• Success(output)<br/>• Failure(error)
+        Dispatcher ->> Dispatcher: Map to ResponseEntity
+        Dispatcher -->>- Server: ResponseEntity
+        Server ->>+ Adapter: fromResponseEntity(ResponseEntity)
+        Note over Adapter: Convert to protocol format
+        Adapter ->> Adapter: Format as JSON/MCP response
+        Adapter ->> Adapter: Add protocol headers
+        Adapter -->>- Server: Protocol Response
+        Server -->>- Client: HTTP 200 OK / MCP response
+        Note right of Client: JSON response with data
+    end
+
+%% ============================================
+%% Error Handling Flow
+%% ============================================
+    rect rgb(255, 240, 240)
+        Note over Client, Post: Error Handling (Any Stage)
+
+        alt Error in any stage
+            Post ->> Post: Exception thrown
+            Post -->> Pipeline: Failure
+            Pipeline -->> Capability: TaskResult.Failure
+            Capability -->> Dispatcher: TaskResult.Failure
+            Dispatcher ->> Dispatcher: Map to error ResponseEntity
+            Dispatcher -->> Server: ResponseEntity.failure()
+            Server ->> Adapter: fromResponseEntity(error)
+            Adapter -->> Server: Error response
+            Server -->> Client: HTTP 4xx/5xx or MCP error
+            Note right of Client: Error details in response
+        end
+    end
+
+%% ============================================
+%% Monitoring & Observability
+%% ============================================
+    rect rgb(245, 245, 250)
+        Note over Server, Engine: Monitoring (Parallel)
+
+        par Metrics Collection
+            Server ->> Server: metrics.startTimer()
+            Exec ->> Exec: Record execution time
+            Engine ->> Engine: Track query performance
+            Server ->> Server: metrics.success() / failure()
+        and Health Checks
+            Server ->> Server: health.recordEvent()
+            Capability ->> Capability: Update component health
+        end
+
+        Note over Server, Engine: RuntimeMetrics & RuntimeHealth<br/>Lock-free, Virtual Thread optimized
+    end

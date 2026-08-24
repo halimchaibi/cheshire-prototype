@@ -1,0 +1,188 @@
+@startuml
+
+' --- Neutral Architectural Palette ---
+!define INTERFACE_COLOR #FFFFFF
+!define CLASS_COLOR     #A8A499
+!define EXCEPTION_COLOR #F5F5F5
+!define EXTERNAL_COLOR  #D4D4D4
+
+' --- Skinparam Configurations ---
+skinparam {
+    BackgroundColor #FFFFFF
+    DefaultFontColor #262626
+    ArrowColor #525252
+    BorderColor #404040
+}
+
+skinparam interface {
+    BackgroundColor INTERFACE_COLOR
+    BorderColor #404040
+    FontStyle bold
+}
+
+skinparam class {
+    BackgroundColor #FFFFFF
+    BorderColor #404040
+    HeaderBackgroundColor #FAFAFA
+}
+
+skinparam class<<implementation>> {
+    BackgroundColor CLASS_COLOR
+}
+
+skinparam class<<exception>> {
+    BackgroundColor EXCEPTION_COLOR
+    BorderColor #A3A3A3
+}
+
+skinparam interface<<external dependency>> {
+    BackgroundColor EXTERNAL_COLOR
+    BorderColor #737373
+}
+
+' --- Core Interfaces ---
+interface Query << interface >> {
+  + parameters(): Map<String, Object>
+  + query(): Object
+  + {default} hasParameters(): boolean
+}
+
+interface QueryResult << interface >> {
+  + columns(): List<Column>
+  + rowCount(): int
+  + isEmpty(): boolean
+  + iterator(): Iterator<Map<String, Object>>
+  + stream(): Stream<Map<String, Object>>
+  + close(): void
+}
+
+' --- Source Provider SPI ---
+interface SourceConfig << interface >> {
+  + name(): String
+  + type(): String
+  + description(): String
+  + require(String): String
+  + get(String): String
+  + asMap(): Map<String, Object>
+}
+
+interface ConfigAdapter<T> << interface >> {
+  + adapt(String, T): SourceConfig
+}
+
+interface SourceProvider << interface >> {
+  + name(): String
+  + config(): SourceConfig
+  + open(): void
+  + execute(Query): QueryResult
+  + close(): void
+  + {abstract} isOpen(): boolean
+}
+
+interface SourceProviderFactory << interface >> {
+  + create(SourceConfig): SourceProvider
+  + providerClass(): Class<SourceProvider>
+  + configClass(): Class<SourceConfig>
+  + adapter(): ConfigAdapter<?>
+  + validate(SourceConfig): void
+}
+
+' --- Exception Hierarchy ---
+abstract class SourceProviderException <<exception>> {
+  + SourceProviderException(String)
+  + SourceProviderException(String, Throwable)
+  + getSourceName(): String
+  + getErrorCode(): String
+  + isRetryable(): boolean
+}
+
+class SourceConfigException <<exception>> {
+  + SourceConfigException(String)
+  + SourceConfigException(String, Throwable)
+  + getMissingKey(): String
+  + getInvalidConfig(): SourceConfig
+}
+
+class SourceConnectionException <<exception>> {
+  + SourceConnectionException(String, String)
+  + SourceConnectionException(String, String, Throwable)
+  + getConnectionUrl(): String
+}
+
+class SourceExecutionException <<exception>> {
+  + SourceExecutionException(String, String)
+  + SourceExecutionException(String, String, Throwable)
+  + getFailedQuery(): Query
+  + getPartialResult(): Optional<QueryResult>
+}
+
+class SourceTimeoutException <<exception>> {
+  + SourceTimeoutException(String, String, Duration)
+  + getElapsedTime(): Duration
+  + getTimeout(): Duration
+}
+
+' --- Relationships ---
+SourceProvider -[#595959,dashed]-> Query : accepts
+SourceProvider -[#595959,dashed]-> QueryResult : returns
+SourceProvider -[#595959,dashed]-> SourceConfig : uses
+SourceProvider -[#595959,dashed]-> SourceProviderException : throws
+
+SourceProviderFactory -[#595959,dashed]-> SourceConfig : consumes
+SourceProviderFactory -[#595959,dashed]-> SourceProvider : creates
+SourceProviderFactory -[#595959,dashed]-> ConfigAdapter : uses
+SourceProviderFactory -[#595959,dashed]-> SourceConfigException : throws
+
+ConfigAdapter -[#595959,dashed]-> SourceConfig : produces
+
+' Exception Hierarchy
+SourceProviderException <|-- SourceConfigException
+SourceProviderException <|-- SourceConnectionException
+SourceProviderException <|-- SourceExecutionException
+SourceExecutionException <|-- SourceTimeoutException
+
+' --- Notes ---
+'note right of SourceProvider
+'  **Request-Scoped Dependency**
+'
+'  Injected via QueryContext at execution time
+'
+'  Lifecycle managed by core framework:
+'  • Connection pooling
+'  • Authentication/Authorization
+'  • Tenant isolation
+'
+'  Never referenced directly by QueryEngine
+'end note
+'
+'note bottom of SourceProviderException
+'  **Exception Design Principles**
+'
+'  • getSourceName() - identifies failing source
+'  • getErrorCode() - machine-readable classification
+'  • isRetryable() - hints retry semantics
+'  • Hierarchy enables specific catch blocks
+'  • Preserves partial results when possible
+'end note
+'
+'note right of SourceConfig
+'  **Configuration Contract**
+'
+'  • require(key) - throws if missing (fail-fast)
+'  • get(key) - returns null if missing (lenient)
+'  • type() - identifies provider type
+'    (jdbc, elasticsearch, spark, etc.)
+'end note
+'
+'note left of ConfigAdapter
+'  **Adapter Pattern**
+'
+'  Generic <T> represents external config format:
+'  • Map<String, Object> (JSON/YAML)
+'  • Properties (Java properties files)
+'  • Custom domain objects
+'
+'  Adapts to canonical SourceConfig
+'end note
+
+@enduml

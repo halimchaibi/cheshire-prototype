@@ -1,0 +1,75 @@
+mcp: "1.0"
+
+info:
+  name: "Cheshire OS Observability"
+  version: "1.0.0"
+  description: "Read-only tools for OS and JVM metadata through Apache Calcite."
+  authors:
+    - "Cheshire"
+
+tools:
+  - uri: /os/list_system_info
+    name: list_system_info
+    description: "Return host-level system metadata."
+    inputSchema:
+      type: object
+      additionalProperties: false
+      properties: {}
+    metadata:
+      method: GET
+      path: /api/v1/os/list_system_info
+
+  - uri: /os/list_java_info
+    name: list_java_info
+    description: "Return JVM metadata for the running process."
+    inputSchema:
+      type: object
+      additionalProperties: false
+      properties: {}
+    metadata:
+      method: GET
+      path: /api/v1/os/list_java_info
+
+  - uri: /os/list_processes
+    name: list_processes
+    description: "Return operating-system process metadata."
+    inputSchema:
+      type: object
+      additionalProperties: false
+      properties: {}
+    metadata:
+      method: GET
+      path: /api/v1/os/list_processes
+
+resources:
+  - uri: cheshire://os/tables
+    name: os_tables
+    description: "Calcite OS adapter table catalog exposed by this sample."
+    mimeType: application/json
+    metadata:
+      tables:
+        - system_info
+        - java_info
+        - os_version
+        - memory_info
+        - cpu_info
+        - ps
+
+configuration:
+  server:
+    baseUrl: /api/v1/os
+    timeout: 30000
+    maxRetries: 0
+  authentication:
+    type: none
+    description: "Local sample only."
+  rateLimiting:
+    requestsPerMinute: 120
+  caching:
+    enabled: false
+
+schemas:
+  emptyInput:
+    type: object
+    additionalProperties: false
+    properties: {}
