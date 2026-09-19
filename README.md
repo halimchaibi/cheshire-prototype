@@ -703,7 +703,7 @@ See [cheshire-blog-app/README.md](https://github.com/halimchaibi/cheshire-blog-a
 
 ## License
 
-This project is licensed under the [PolyForm Noncommercial License 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0/).
+This project is licensed under the [PolyForm Noncommercial License 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0).
 
 See the [LICENSE](LICENSE) file for the full license text.
 
